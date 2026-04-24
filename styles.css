@@ -1,11 +1,13 @@
 :root{
-  --bg:#111;
-  --card:#1a1a1a;
+  --bg:#0d0d0d;
+  --card:#141414;
   --muted:#888;
   --text:#fff;
-  --red:#c0392b;
+  --blue:#0066FF;
+  --blue-dark:#0044cc;
+  --blue-dim:#0a1a3a;
   --green:#27ae60;
-  --border:#2a2a2a;
+  --border:#222;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -22,8 +24,8 @@ body{
 .hdr{
   position:sticky;top:0;z-index:10;
   background:var(--card);
-  border-bottom:2px solid var(--red);
-  padding:14px 16px;
+  border-bottom:2px solid var(--blue);
+  padding:10px 16px;
 }
 
 .hdr-inner{
@@ -34,18 +36,12 @@ body{
   align-items:center;
 }
 
-/* LOGO (desktop/tablet) */
+/* LOGO */
 .logo{
-  width: 132px;
-  height: 132px;
-  border-radius: 50%;
-  background: #fff;
-  padding: 3px;
-  border: 3px solid var(--red);
-  box-shadow: 0 10px 22px rgba(0,0,0,.45);
-  object-fit: contain;
+  width:120px;
+  height:auto;
+  object-fit:contain;
   display:block;
-  margin-top: 6px;
 }
 
 /* PAGE */
@@ -65,9 +61,9 @@ body{
 
 .title{font-size:22px;font-weight:900;margin-bottom:14px}
 
-.title-lg {
-  font-size: 24px;
-  font-weight: 900;
+.title-lg{
+  font-size:24px;
+  font-weight:900;
 }
 
 .label{
@@ -81,17 +77,17 @@ body{
 
 .input{
   width:100%;
-  padding:14px 14px;
+  padding:14px;
   font-size:16px;
   border-radius:12px;
-  background:#222;
-  border:2px solid #333;
+  background:#1a1a1a;
+  border:2px solid var(--border);
   color:var(--text);
   outline:none;
   margin-bottom:12px;
 }
-.input:focus{border-color:var(--red)}
-.input::placeholder{color:rgba(255,255,255,0.7)}
+.input:focus{border-color:var(--blue)}
+.input::placeholder{color:rgba(255,255,255,0.4)}
 
 .btn{
   width:100%;
@@ -102,13 +98,14 @@ body{
   font-size:19px;
   cursor:pointer;
 }
-.btn.primary{background:var(--red);color:#fff}
-.btn.secondary{background:#222;color:#fff;border:1px solid #333;margin-top:12px}
+.btn.primary{background:var(--blue);color:#fff}
+.btn.primary:active{background:var(--blue-dark)}
+.btn.secondary{background:#1a1a1a;color:#fff;border:1px solid var(--border);margin-top:12px}
 .btn.ghost{background:transparent;border:1px solid var(--border);color:#fff;width:auto;padding:10px 12px}
 
 .msg{margin-top:10px;font-size:13px;min-height:18px}
 .msg.err{color:#ff6b6b}
-.msg.info{color:#fff}
+.msg.info{color:#aaa}
 
 .hidden{display:none !important}
 
@@ -123,12 +120,6 @@ body{
 
 .name{font-size:24px;font-weight:900;margin-bottom:6px}
 
-.name-row{
-  display:flex;
-  align-items:center;
-  gap:8px;
-}
-
 .badge{
   display:inline-block;
   padding:3px 12px;
@@ -140,14 +131,14 @@ body{
 
 .kv{
   display:grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns:1fr auto;
   gap:10px 12px;
   padding-top:8px;
 }
 
 .k{
-  color:#fff;
-  font-size:14px;
+  color:#aaa;
+  font-size:13px;
   text-transform:uppercase;
   letter-spacing:1px;
 }
@@ -159,7 +150,7 @@ body{
   border-radius:12px;
   border:1px solid var(--border);
   color:#fff;
-  background:#141414;
+  background:#0a0a0a;
 }
 
 /* BOTTOM NAV */
@@ -175,7 +166,7 @@ body{
   flex:1;
   background:transparent;
   border:none;
-  color:#fff;
+  color:#666;
   padding:12px 6px;
   font-size:12px;
   cursor:pointer;
@@ -183,48 +174,27 @@ body{
   align-items:center;
   justify-content:center;
 }
-.navbtn.on{color:var(--red)}
+.navbtn.on{color:var(--blue)}
 .navbtn svg{display:block}
 
-/* ✅ MOBILE: logo menor + margens menores (fica melhor no celular) */
-@media (max-width: 420px){
-  .logo{
-    width: 132px;
-    height: 132px;
-    padding: 3px;
-    margin-top: 4px;
-  }
-
-  .page{
-    padding:12px 12px calc(88px + env(safe-area-inset-bottom, 0px));
-    max-width:520px;
-    margin:0 auto;
-  }
-
-  .card{
-    border-radius:14px;
-    padding:14px;
-  }
-
-  .btn{
-    padding:15px 14px;
-    font-size:18px;
-  }
-
-  .input{
-    padding:13px 14px;
-    font-size:15px;
-  }
+/* MOBILE */
+@media (max-width:420px){
+  .logo{ width:100px; }
+  .page{ padding:12px 12px calc(88px + env(safe-area-inset-bottom, 0px)); }
+  .card{ border-radius:14px; padding:14px; }
+  .btn{ padding:15px 14px; font-size:18px; }
+  .input{ padding:13px 14px; font-size:15px; }
 }
 
-/* ── CALENDAR / WEEK DAYS ─────────────────────────────────────── */
+/* CALENDAR */
 .mes-header{
-  font-size:15px;
+  font-size:13px;
   font-weight:900;
-  color:#fff;
-  background:var(--red);
+  color:var(--blue);
+  background:var(--blue-dim);
+  border:1px solid var(--blue);
   border-radius:8px;
-  padding:6px 12px;
+  padding:5px 12px;
   margin-bottom:6px;
   display:inline-block;
   text-transform:uppercase;
@@ -247,28 +217,28 @@ body{
   align-items:center;
   gap:4px;
   padding:10px 14px;
-  background:#222;
-  border:2px solid #333;
+  background:#1a1a1a;
+  border:2px solid var(--border);
   border-radius:12px;
   color:var(--text);
   cursor:pointer;
   min-width:58px;
 }
 .dia-btn.active{
-  border-color:var(--red);
-  background:#2a1010;
+  border-color:var(--blue);
+  background:var(--blue-dim);
   color:#fff;
 }
 .dia-btn.disabled{
-  opacity:.35;
+  opacity:.3;
   cursor:default;
   pointer-events:none;
 }
 .dia-nome{font-size:15px;font-weight:900}
-.dia-data{font-size:13px;color:#fff}
-.dia-btn.active .dia-data{color:#e88}
+.dia-data{font-size:13px;color:#aaa}
+.dia-btn.active .dia-data{color:var(--blue)}
 
-/* ── SESSAO ALUNO – tela full-height com footer fixo ─────────── */
+/* SESSAO ALUNO */
 #cardSessao{
   position:fixed;
   inset:0;
@@ -305,7 +275,7 @@ body{
   background:var(--card);
 }
 
-/* ── SESSAO PROFESSOR – tela full-height com lista rolável ─────── */
+/* SESSAO PROFESSOR */
 #cardProfSessao{
   position:fixed;
   inset:0;
@@ -331,7 +301,7 @@ body{
   -webkit-overflow-scrolling:touch;
 }
 
-/* ── SESSION CARDS ─────────────────────────────────────────────── */
+/* SESSION CARDS */
 .sessoes-lista{
   display:flex;
   flex-direction:column;
@@ -344,16 +314,16 @@ body{
   align-items:center;
   gap:10px;
   padding:12px 14px;
-  background:#222;
-  border:2px solid #333;
+  background:#1a1a1a;
+  border:2px solid var(--border);
   border-radius:12px;
   cursor:pointer;
   justify-content:space-between;
   flex-wrap:nowrap;
 }
 .sessao-card.active{
-  border-color:var(--red);
-  background:#2a1010;
+  border-color:var(--blue);
+  background:var(--blue-dim);
 }
 .sessao-info{
   display:flex;
@@ -365,7 +335,7 @@ body{
 .sessao-hor{
   font-size:17px;
   font-weight:900;
-  color:var(--red);
+  color:var(--blue);
   min-width:44px;
   flex-shrink:0;
 }
@@ -379,7 +349,7 @@ body{
   word-break:break-word;
 }
 .btn-sessao-action{
-  background:var(--red);
+  background:var(--blue);
   color:#fff;
   border:none;
   border-radius:10px;
@@ -389,10 +359,10 @@ body{
   cursor:pointer;
   white-space:nowrap;
   flex-shrink:0;
-  text-align:center;
 }
+.btn-sessao-action:active{background:var(--blue-dark)}
 
-/* ── PRESENCE BOX ───────────────────────────────────────────────── */
+/* PRESENCE BOX */
 .presenca-header{
   display:flex;
   align-items:center;
@@ -418,14 +388,14 @@ body{
 
 .btn-cancel{
   background:transparent;
-  border:1px solid #fff;
-  color:#fff;
+  border:1px solid var(--border);
+  color:#aaa;
   margin-top:10px;
   font-size:17px;
   font-weight:800;
 }
 
-/* ── PRESENCE LIST ───────────────────────────────────────────────── */
+/* PRESENCE LIST */
 .presenca-item{
   padding:10px 0;
   border-bottom:1px solid var(--border);
@@ -450,31 +420,6 @@ body{
   word-break:break-word;
 }
 
-.grad-info {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 6px;
-  flex: 1;
-  min-width: 0;
-}
-
-.grad-nome {
-  font-size: 15px;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
-  width: 100%;
-}
-
-.grad-badges {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-wrap: wrap;
-}
 .presenca-status{
   font-size:15px;
   font-weight:900;
@@ -483,28 +428,14 @@ body{
   white-space:nowrap;
   flex-shrink:0;
 }
-.status-ok  {background:#1a3a26;color:#4cd88a}
-.status-pend{background:#2a2510;color:#e8c84a}
-.status-err {background:#3a1010;color:#e86464}
+.status-ok  {background:#0a2a18;color:#4cd88a}
+.status-pend{background:#1a1800;color:#e8c84a}
+.status-err {background:#2a0a0a;color:#e86464}
 
-.presenca-vazia{color:#fff;font-size:16px;padding:12px 0}
-.loading{color:#fff;font-size:13px;padding:8px 0}
+.presenca-vazia{color:#aaa;font-size:16px;padding:12px 0}
+.loading{color:#aaa;font-size:13px;padding:8px 0}
 
-.prof-grad-restantes{
-  margin-top:6px;
-}
-.prof-grad-restantes .presenca-status{
-  font-size:14px;
-  font-weight:900;
-  padding:5px 12px;
-}
-.grad-badges .presenca-status{
-  font-size:15px;
-  font-weight:900;
-  padding:5px 14px;
-}
-
-/* ── PROFESSOR ACTIONS ───────────────────────────────────────────── */
+/* PROFESSOR ACTIONS */
 .prof-actions{
   display:flex;
   gap:8px;
@@ -520,14 +451,15 @@ body{
   font-weight:900;
   cursor:pointer;
 }
-.btn-ap.aprovar{background:#1a3a26;color:#4cd88a}
-.btn-ap.reprovar{background:#3a1010;color:#e86464}
+.btn-ap.aprovar {background:#0a2a18;color:#4cd88a}
+.btn-ap.reprovar{background:#2a0a0a;color:#e86464}
+.btn-ap.confirmar{background:#0a2a18;color:#4cd88a}
 .btn-ap:active{opacity:.75}
 
-/* ── BADGE VARIANTS ──────────────────────────────────────────────── */
-.badge-prof{background:var(--red)}
+/* BADGE VARIANTS */
+.badge-prof{background:var(--blue)}
 
-/* ── UTILITIES ───────────────────────────────────────────────────── */
+/* UTILITIES */
 .mb8{margin-bottom:8px}
 
 .divider{
@@ -536,7 +468,7 @@ body{
   margin:16px 0;
 }
 
-/* ── BIOMETRIA ───────────────────────────────────────────────────── */
+/* BIOMETRIA */
 .bio-icon{
   font-size:56px;
   text-align:center;
@@ -547,89 +479,69 @@ body{
 .bio-center{text-align:center;font-size:26px;font-weight:900}
 
 .bio-subtitle{
-  color:#fff;
-  font-size:20px;
-  font-weight:700;
+  color:#aaa;
+  font-size:18px;
+  font-weight:600;
   text-align:center;
   margin-bottom:16px;
   line-height:1.5;
 }
 
-.bio-switch{
-  margin-top:12px;
-  font-size:13px;
-}
-
 .bio-desc{
-  color:#fff;
+  color:#aaa;
   font-size:14px;
   line-height:1.6;
   margin-bottom:8px;
 }
 
-.bio-muted{color:#fff;font-size:13px}
+.bio-muted{color:#666;font-size:13px}
 
 .bio-list{
   list-style:disc;
   padding-left:20px;
-  color:#fff;
+  color:#aaa;
   font-size:14px;
   line-height:1.9;
   margin-bottom:8px;
 }
 
-/* ── Stats row (student card) ─────────────────────────────── */
-.stats-row {
-  display: flex;
-  gap: 12px;
-  margin: 16px 0;
-}
-
-.stat-card {
-  flex: 1;
-  background: #2a2a2a;
-  border-radius: 12px;
-  padding: 16px 12px;
-  text-align: center;
-}
-
-.stat-card--red {
-  background: #c0392b;
-}
-
-.stat-num {
-  font-size: 2.4rem;
-  font-weight: 700;
-  color: #ffffff;
-  line-height: 1;
-  margin-bottom: 6px;
-}
-
-.stat-label {
-  font-size: 0.85rem;
-  color: #fff;
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-/* ── Bell button ─────────────────────────────────────────────── */
-.row-actions{
+/* STATS ROW */
+.stats-row{
   display:flex;
-  align-items:center;
-  gap:8px;
+  gap:12px;
+  margin:16px 0;
 }
 
-/* ── botão confirmar ─────────────────────────────────────────────── */
-.btn-ap.confirmar {
-  flex: 1;
-  background: #1a3a26;
-  color: #4cd88a;
+.stat-card{
+  flex:1;
+  background:#1a1a1a;
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:16px 12px;
+  text-align:center;
 }
 
-/* ── WhatsApp nav button ─────────────────────────────────────── */
-#navWhatsApp{color:#25D366}
-#navWhatsApp:active{opacity:.75}
+.stat-card--red{
+  background:var(--blue-dim);
+  border-color:var(--blue);
+}
 
+.stat-num{
+  font-size:2.4rem;
+  font-weight:700;
+  color:#fff;
+  line-height:1;
+  margin-bottom:6px;
+}
+
+.stat-label{
+  font-size:0.85rem;
+  color:#aaa;
+  line-height:1.3;
+  font-weight:600;
+}
+
+/* BELL */
 .btn-bell{
   position:relative;
   background:transparent;
@@ -654,12 +566,12 @@ body{
   right:4px;
   width:9px;
   height:9px;
-  background:var(--red);
+  background:var(--blue);
   border-radius:50%;
   border:2px solid var(--card);
 }
 
-/* ── Notifications screen ────────────────────────────────────── */
+/* NOTIFICATIONS */
 .notif-header{
   display:flex;
   align-items:center;
@@ -691,7 +603,7 @@ body{
 .notif-item:last-child{border-bottom:none}
 
 .notif-status{
-  font-size:20px;
+  font-size:18px;
   font-weight:900;
   margin-bottom:6px;
 }
@@ -699,36 +611,40 @@ body{
 .notif-status.err{color:#e86464}
 
 .notif-detalhe{
-  font-size:18px;
+  font-size:16px;
   font-weight:700;
   color:#fff;
   margin-bottom:4px;
 }
 
 .notif-data{
-  font-size:17px;
-  font-weight:700;
-  color:#fff;
+  font-size:15px;
+  font-weight:600;
+  color:#aaa;
 }
 
-/* ── SKELETON LOADING ─────────────────────────────────────────── */
-@keyframes shimmer {
-  0%   { background-position: -400px 0; }
-  100% { background-position: 400px 0; }
+/* WHATSAPP */
+#navWhatsApp{color:#25D366}
+#navWhatsApp:active{opacity:.75}
+
+/* SKELETON */
+@keyframes shimmer{
+  0%  {background-position:-400px 0}
+  100%{background-position:400px 0}
 }
 
-.skeleton {
-  background: linear-gradient(90deg, #2a2a2a 25%, #3a3a3a 50%, #2a2a2a 75%);
-  background-size: 800px 100%;
-  animation: shimmer 1.4s infinite linear;
-  border-radius: 8px;
-  display: inline-block;
+.skeleton{
+  background:linear-gradient(90deg,#1a1a1a 25%,#2a2a2a 50%,#1a1a1a 75%);
+  background-size:800px 100%;
+  animation:shimmer 1.4s infinite linear;
+  border-radius:8px;
+  display:inline-block;
 }
 
-.sk-line   { height: 16px; margin-bottom: 8px; width: 100%; }
-.sk-line-sm{ height: 13px; margin-bottom: 6px; width: 60%;  }
-.sk-title  { height: 26px; margin-bottom: 14px; width: 70%; }
-.sk-badge  { height: 20px; width: 60px; border-radius: 999px; }
-.sk-num    { height: 38px; width: 60px; margin: 0 auto 6px; border-radius: 8px; }
-.sk-block  { height: 48px; width: 100%; border-radius: 12px; margin-bottom: 8px; }
-.sk-card   { height: 80px; width: 100%; border-radius: 12px; margin-bottom: 8px; }
+.sk-line   {height:16px;margin-bottom:8px;width:100%}
+.sk-line-sm{height:13px;margin-bottom:6px;width:60%}
+.sk-title  {height:26px;margin-bottom:14px;width:70%}
+.sk-badge  {height:20px;width:60px;border-radius:999px}
+.sk-num    {height:38px;width:60px;margin:0 auto 6px;border-radius:8px}
+.sk-block  {height:48px;width:100%;border-radius:12px;margin-bottom:8px}
+.sk-card   {height:80px;width:100%;border-radius:12px;margin-bottom:8px}
