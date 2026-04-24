@@ -3,9 +3,9 @@
   --card:#141414;
   --muted:#888;
   --text:#fff;
-  --blue:#0066FF;
-  --blue-dark:#0044cc;
-  --blue-dim:#0a1a3a;
+  --blue:#4F6FF5;
+  --blue-dark:#3A57E8;
+  --blue-dim:#0d1133;
   --green:#27ae60;
   --border:#222;
 }
@@ -38,7 +38,7 @@ body{
 
 /* LOGO */
 .logo{
-  width:120px;
+  width:180px;
   height:auto;
   object-fit:contain;
   display:block;
@@ -179,7 +179,7 @@ body{
 
 /* MOBILE */
 @media (max-width:420px){
-  .logo{ width:100px; }
+  .logo{ width:140px; }
   .page{ padding:12px 12px calc(88px + env(safe-area-inset-bottom, 0px)); }
   .card{ border-radius:14px; padding:14px; }
   .btn{ padding:15px 14px; font-size:18px; }
