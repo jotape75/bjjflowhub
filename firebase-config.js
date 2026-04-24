@@ -15,5 +15,6 @@ const app = initializeApp(firebaseConfig);
 export const db   = getFirestore(app);
 export const auth = getAuth(app);
 
-// Multi-tenant: lê academiaId pelo subdomínio
-export const academiaId = window.location.hostname.split('.')[0];
+// TODO: quando o domínio bjjflowhub.com.br estiver ativo, trocar para:
+// export const academiaId = window.location.hostname.split('.')[0];
+export const academiaId = 'demo';
