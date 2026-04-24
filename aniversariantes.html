@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#c0392b" />
+  <title>Aniversariantes – Riva BJJ</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    /* ── Header desktop compacto ── */
+    .admin-hdr-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .admin-hdr-titulo { display: none; }
+    .admin-hdr-sair { display: none; }
+    .btn-logout {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: #fff;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-logout:active { opacity: .75; }
+
+    .dias-row {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 8px;
+      margin-bottom: 16px;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      cursor: grab;
+    }
+    .dias-row:active {
+      cursor: grabbing;
+    }
+    .dia-col {
+      flex: 0 0 120px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 10px;
+      min-height: 100px;
+    }
+    .dia-col.hoje {
+      border-color: var(--red);
+      background: rgba(192, 57, 43, 0.12);
+    }
+    .dia-nome {
+      font-size: 12px;
+      font-weight: 900;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .dia-col.hoje .dia-nome {
+      color: var(--red);
+    }
+    .dia-numero {
+      font-size: 26px;
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.1;
+      margin-bottom: 10px;
+    }
+    .dia-col.hoje .dia-numero {
+      color: var(--red);
+    }
+    .aniversariante-card {
+      background: #2a2a2a;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-top: 6px;
+    }
+    .aniv-nome {
+      font-size: 13px;
+      font-weight: 800;
+      color: #fff;
+      word-break: break-word;
+    }
+    .aniv-categoria {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 2px;
+    }
+    .page-title {
+      font-size: 24px;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 4px;
+    }
+    .page-subtitle {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+    @media (min-width: 769px) {
+      .admin-hdr-inner {
+        max-width: 1100px;
+        justify-content: space-between;
+        padding: 0 24px;
+      }
+      .admin-logo {
+        width: 48px !important;
+        height: 48px !important;
+        margin-top: 0 !important;
+      }
+      .admin-hdr-titulo {
+        display: inline;
+        font-size: 20px;
+        font-weight: 900;
+        color: #fff;
+        letter-spacing: 0.5px;
+      }
+      .admin-hdr-sair { display: inline-block; }
+      .admin-page { max-width: 1100px; padding: 32px 32px 64px; }
+      .dias-row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        overflow-x: visible;
+      }
+      .dia-col {
+        flex: none;
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 16px;
+        min-height: auto;
+        padding: 14px 20px;
+      }
+      .dia-info {
+        min-width: 80px;
+        display: flex;
+        flex-direction: column;
+      }
+      .dia-anivs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        flex: 1;
+      }
+      .aniversariante-card {
+        min-width: 180px;
+      }
+    }
+    @media (max-width: 768px) {
+      .admin-hdr-inner { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hdr admin-hdr">
+    <div class="hdr-inner admin-hdr-inner">
+      <div class="admin-hdr-left">
+        <img class="logo admin-logo" src="./logo.png" alt="Riva BJJ" />
+        <span class="admin-hdr-titulo">Portal Administrativo</span>
+      </div>
+      <button class="btn-logout admin-hdr-sair" id="btnHdrSair">Sair</button>
+    </div>
+  </header>
+
+  <main class="page admin-page">
+
+    <section class="card" id="sectionAniversariantes">
+      <div class="page-title">Aniversariantes 🎂</div>
+      <div class="page-subtitle" id="subtitleSemana">Carregando…</div>
+
+      <div class="dias-row" id="diasRow"></div>
+
+      <p class="msg info" id="pageInfo"></p>
+    </section>
+
+  </main>
+
+  <script type="module">
+    import { db, auth } from './firebase-config.js';
+    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+    const TOKEN_KEY = 'rv_prof_token';
+    const CACHE_KEY = 'rv_anivs_cache';
+    const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 horas
+
+    function esc(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function salvarCache(alunos) {
+      localStorage.setItem(CACHE_KEY, JSON.stringify({ ts: Date.now(), alunos }));
+    }
+
+    function lerCache() {
+      try {
+        const c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null');
+        if (c && Date.now() - c.ts < CACHE_TTL) return c.alunos;
+      } catch(e) {}
+      return null;
+    }
+
+    // ── Auth check ─────────────────────────────────────────────
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        carregarAniversariantes();
+      } else {
+        location.href = './administrativo.html';
+      }
+    });
+
+    // ── Semana atual (seg a dom) ────────────────────────────────
+    function getSemanaAtual() {
+      const hoje = new Date();
+      const diaSemana = hoje.getDay();
+      const diffSeg = (diaSemana === 0) ? -6 : 1 - diaSemana;
+      const seg = new Date(hoje);
+      seg.setDate(hoje.getDate() + diffSeg);
+      seg.setHours(0, 0, 0, 0);
+      const dias = [];
+      const nomes = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+      for (var i = 0; i < 7; i++) {
+        const d = new Date(seg);
+        d.setDate(seg.getDate() + i);
+        dias.push({ data: d, nomeDia: nomes[i], dia: d.getDate(), mes: d.getMonth() + 1, ehHoje: (d.toDateString() === hoje.toDateString()) });
+      }
+      return dias;
+    }
+
+    function formatarDataBr(d) {
+      return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0');
+    }
+
+    // ── Carregar aniversariantes ────────────────────────────────
+    async function carregarAniversariantes() {
+      const cached = lerCache();
+      if (cached) { renderSemana(cached); return; }
+      document.getElementById('pageInfo').textContent = 'Carregando…';
+      try {
+        const q = query(collection(db, 'alunos'), where('status', '==', 'ATIVO'));
+        const snap = await getDocs(q);
+        const alunos = snap.docs.map(d => d.data());
+        salvarCache(alunos);
+        renderSemana(alunos);
+        document.getElementById('pageInfo').textContent = '';
+      } catch (e) {
+        document.getElementById('pageInfo').textContent = 'Erro de conexão. Tente novamente.';
+      }
+    }
+
+    // ── Renderizar semana ──────────────────────────────────────
+    function renderSemana(alunos) {
+      const dias    = getSemanaAtual();
+      const container = document.getElementById('diasRow');
+
+      const primeiro = dias[0].data;
+      const ultimo   = dias[6].data;
+      document.getElementById('subtitleSemana').textContent =
+        'Semana: ' + formatarDataBr(primeiro) + ' a ' + formatarDataBr(ultimo);
+
+      container.innerHTML = '';
+      dias.forEach(dia => {
+        const aniversariantes = alunos.filter(a => {
+          const nasc = a.data_nasc || '';
+          if (!nasc) return false;
+          let mes = 0, diaNum = 0;
+          if (/^\d{4}-\d{2}-\d{2}/.test(nasc)) {
+            const parts = nasc.split('-');
+            mes = parseInt(parts[1]);
+            diaNum = parseInt(parts[2]);
+          } else if (/^\d{2}\/\d{2}\/\d{4}/.test(nasc)) {
+            const parts = nasc.split('/');
+            diaNum = parseInt(parts[0]);
+            mes = parseInt(parts[1]);
+          }
+          return mes === dia.mes && diaNum === dia.dia;
+        });
+
+        const col = document.createElement('div');
+        col.className = 'dia-col' + (dia.ehHoje ? ' hoje' : '');
+        col.innerHTML = `<div class="dia-nome">${dia.nomeDia}</div><div class="dia-numero">${dia.dia}</div>`;
+        const anivContainer = document.createElement('div');
+        anivContainer.className = 'dia-anivs';
+        if (aniversariantes.length) {
+          aniversariantes.forEach(a => {
+            const nome = a.nome_aluno || a.nome || '—';
+            const card = document.createElement('div');
+            card.className = 'aniversariante-card';
+            card.innerHTML = `
+              <div class="aniv-nome">🎂 ${nome}</div>
+              <div class="aniv-categoria">${a.categoria || ''} · ${a.faixa || ''}</div>
+            `;
+            anivContainer.appendChild(card);
+          });
+        } else {
+          const vazio = document.createElement('div');
+          vazio.className = 'sem-aniv';
+          vazio.textContent = '—';
+          anivContainer.appendChild(vazio);
+        }
+        col.appendChild(anivContainer);
+        container.appendChild(col);
+      });
+    }
+
+    document.getElementById('btnHdrSair').addEventListener('click', () => {
+      signOut(auth).catch(() => {});
+      sessionStorage.removeItem(TOKEN_KEY);
+      location.href = './administrativo.html';
+    });
+  </script>
+</body>
+</html>

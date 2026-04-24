@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#c0392b" />
+  <title>Alunos – Riva BJJ</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    /* ── EMBED MODE: esconde header e rodapé quando aberto no portal ── */
+    html.embed-mode header,
+    html.embed-mode .hdr,
+    html.embed-mode .rodape-fixo { display: none !important; }
+    html.embed-mode .lista-scroll { padding-bottom: 24px !important; }
+    html.embed-mode .busca-fixa { top: 8px !important; }
+
+    .resumo-alunos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
+    .resumo-aluno-item { background: #141414; border: 1px solid var(--border); border-radius: 12px; padding: 14px 10px; text-align: center; }
+    .resumo-aluno-num { font-size: 28px; font-weight: 900; color: #fff; line-height: 1.1; }
+    .resumo-aluno-num.verde { color: #2ecc71; }
+    .resumo-aluno-num.vermelho { color: #e74c3c; }
+    .resumo-aluno-label { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+    .admin-hdr-left { display: flex; align-items: center; gap: 14px; }
+    .admin-hdr-titulo { display: none; }
+    .admin-hdr-sair { display: none; }
+    .btn-logout { background: transparent; border: 1px solid var(--border); color: #fff; border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .btn-logout:active { opacity: .75; }
+    .admin-logo { width: 56px !important; height: 56px !important; margin-top: 0 !important; }
+    @media (min-width: 769px) {
+      .admin-hdr-inner { max-width: 1100px; justify-content: space-between; padding: 0 24px; }
+      .admin-logo { width: 64px !important; height: 64px !important; margin-top: 0 !important; }
+      .admin-hdr-titulo { display: inline; font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
+      .admin-hdr-sair { display: inline-block; }
+      .admin-page { max-width: 1100px; padding: 32px 32px 64px; }
+    }
+    @media (max-width: 768px) { .admin-hdr-inner { justify-content: center; } }
+
+    .aluno-card-compact {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .aluno-card-compact:hover { border-color: var(--red); }
+    .aluno-card-compact:active { opacity: .8; }
+    .compact-info { flex: 1; min-width: 0; }
+    .compact-nome { font-size: 15px; font-weight: 900; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .compact-sub { font-size: 12px; color: #aaa; margin-top: 2px; }
+    .compact-badge { font-size: 11px; font-weight: 900; padding: 2px 10px; border-radius: 999px; white-space: nowrap; flex-shrink: 0; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.8); z-index: 50; align-items: flex-end; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px)); width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto; }
+    @media (min-width: 769px) { .modal-overlay { align-items: center; } .modal-box { border-radius: 20px; max-width: 560px; max-height: 88vh; } }
+    .modal-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
+    .modal-avatar { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 2.5px solid var(--red); flex-shrink: 0; }
+    .modal-avatar-placeholder { width: 140px; height: 140px; border-radius: 50%; background: #2a2a2a; border: 2.5px solid var(--red); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 900; color: var(--red); flex-shrink: 0; }
+    .modal-nome-wrap { flex: 1; min-width: 0; }
+    .modal-nome { font-size: 18px; font-weight: 900; color: #fff; word-break: break-word; }
+    .modal-email { font-size: 13px; color: #aaa; margin-top: 2px; word-break: break-all; }
+
+    .modal-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+    .aluno-faixa { font-size: 13px; font-weight: 700; color: #fff; background: #2a2a2a; border-radius: 8px; padding: 3px 10px; }
+    .badge-ativo   { display: inline-block; padding: 3px 12px; border-radius: 999px; background: var(--green); color: #fff; font-size: 11px; font-weight: 900; }
+    .badge-inativo { display: inline-block; padding: 3px 12px; border-radius: 999px; background: var(--red);   color: #fff; font-size: 11px; font-weight: 900; }
+
+    .modal-btns-acao { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .btn-toggle { background: #e67e22; border: none; color: #fff; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 900; cursor: pointer; white-space: nowrap; }
+    .btn-toggle:active { opacity: .75; }
+    .btn-faixa  { background: #2980b9; border: none; color: #fff; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 900; cursor: pointer; white-space: nowrap; }
+    .btn-faixa:active { opacity: .75; }
+    .btn-editar  { background: #27ae60; border: none; color: #fff; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 900; cursor: pointer; white-space: nowrap; }
+    .btn-editar:active { opacity: .75; }
+    .btn-remover { background: #e74c3c; border: none; color: #fff; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 900; cursor: pointer; white-space: nowrap; }
+    .btn-remover:active { opacity: .75; }
+
+    .modal-detalhes { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; border-top: 1px solid var(--border); padding-top: 14px; }
+    .detalhe-row { display: flex; flex-direction: column; gap: 2px; }
+    .detalhe-row.full-width { grid-column: 1 / -1; }
+    .detalhe-label { font-size: 12px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; }
+    .detalhe-valor { font-size: 14px; color: #fff; font-weight: 700; word-break: break-word; }
+
+    .trocar-faixa-inline { display: none; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .trocar-faixa-inline select { background: #222; border: 1px solid #555; color: #fff; border-radius: 8px; padding: 7px 10px; font-size: 13px; flex: 1; min-width: 100px; }
+    .btn-confirmar-faixa { background: var(--red); border: none; color: #fff; border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+    .btn-cancelar-faixa  { background: #333; border: 1px solid #555; color: #aaa; border-radius: 10px; padding: 8px 12px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+
+    .editar-inline { display: none; flex-direction: column; gap: 10px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+    .editar-inline label { font-size: 12px; color: #aaa; margin-bottom: 2px; display: block; }
+    .editar-inline input, .editar-inline select { background: #222; border: 1px solid #555; color: #fff; border-radius: 8px; padding: 7px 10px; font-size: 13px; width: 100%; box-sizing: border-box; }
+    .editar-inline input[readonly] { background: #1a1a1a; color: #777; }
+    .editar-inline-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+    .editar-secao { font-size: 13px; font-weight: 900; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 0 2px; border-top: 1px solid #2a2a2a; margin-top: 4px; }
+    .editar-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .cep-wrap-edit { position: relative; }
+    .cep-wrap-edit input { padding-right: 36px; }
+    .cep-spinner-edit { display: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #aaa; pointer-events: none; }
+    .fin-msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
+
+    /* VIP notice inside edit form */
+    .vip-edit-notice { display: none; background: linear-gradient(135deg,rgba(255,215,0,.12),rgba(255,165,0,.08)); border: 1px solid rgba(255,215,0,.35); border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 700; color: #ffd700; }
+
+    .lista-vazia { color: #aaa; text-align: center; padding: 24px 0; font-size: 15px; }
+    .busca-fixa { position: sticky; top: 72px; z-index: 9; background: var(--bg); padding: 12px 0 4px; margin-bottom: 8px; }
+    @media (max-width: 768px) { .busca-fixa { top: 68px; } }
+    .busca-fixa .input { margin-bottom: 8px; }
+    .busca-btns { display: flex; gap: 8px; }
+    .busca-btns .btn { margin-top: 0; padding: 12px 14px; font-size: 15px; font-weight: 800; }
+    .busca-btns .btn:first-child { flex: 1; }
+    .busca-btns .btn-atualizar { flex-shrink: 0; width: auto; padding: 12px 18px; }
+    .rodape-fixo { position: fixed; left: 0; right: 0; bottom: 0; z-index: 20; background: var(--bg); border-top: 1px solid var(--border); padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); }
+    .rodape-fixo .btn { margin-top: 0; max-width: 520px; margin-left: auto; margin-right: auto; display: block; }
+    @media (min-width: 769px) { .rodape-fixo .btn { max-width: 1100px; } }
+    .lista-scroll { padding-bottom: 90px; }
+  </style>
+</head>
+<body>
+  <script>
+    if (new URLSearchParams(location.search).get('embed') === '1') {
+      document.documentElement.classList.add('embed-mode');
+    }
+  </script>
+
+  <header class="hdr admin-hdr">
+    <div class="hdr-inner admin-hdr-inner">
+      <div class="admin-hdr-left">
+        <img class="logo admin-logo" src="./logo.png" alt="Riva BJJ" />
+        <span class="admin-hdr-titulo">Portal Administrativo</span>
+      </div>
+      <button class="btn-logout admin-hdr-sair" id="btnHdrSair">Sair</button>
+    </div>
+  </header>
+
+  <main class="page admin-page">
+    <section class="hidden" id="sectionAlunos">
+      <div class="busca-fixa">
+        <h1 class="title" style="margin-bottom:10px;">Alunos</h1>
+        <div class="resumo-alunos" id="resumoAlunos" style="display:none;">
+          <div class="resumo-aluno-item"><div class="resumo-aluno-num" id="resumoTotal">—</div><div class="resumo-aluno-label">Total</div></div>
+          <div class="resumo-aluno-item"><div class="resumo-aluno-num verde" id="resumoAtivos">—</div><div class="resumo-aluno-label">Ativos</div></div>
+          <div class="resumo-aluno-item"><div class="resumo-aluno-num vermelho" id="resumoInativos">—</div><div class="resumo-aluno-label">Inativos</div></div>
+        </div>
+        <input id="searchBox" class="input" type="search" placeholder="Buscar por nome ou CPF…" />
+        <div class="busca-btns">
+          <button class="btn secondary" id="btnVerTodos">Ver todos</button>
+          <button class="btn secondary btn-atualizar" id="btnAtualizar">🔄 Atualizar</button>
+        </div>
+        <p class="msg info" id="listInfo"></p>
+      </div>
+      <div id="listaAlunos" class="lista-scroll"></div>
+      <div class="rodape-fixo">
+        <button class="btn secondary" onclick="location.href='./administrativo.html'">← Voltar ao Portal</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL ALUNO -->
+  <div class="modal-overlay" id="modalAluno">
+    <div class="modal-box" id="modalAlunoBox">
+    </div>
+  </div>
+
+  <script type="module">
+    import { db, auth } from './firebase-config.js';
+    import { collection, doc, query, orderBy, getDocs, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+    const TOKEN_KEY        = 'rv_prof_token';
+    const CACHE_KEY_ALUNOS = 'rv_alunos_cache';
+    const CACHE_TTL_ALUNOS = 60 * 60 * 1000;
+
+    function salvarCacheAlunos(alunos) {
+      try {
+        const semFoto = alunos.map(a => ({ ...a, foto_url: '' }));
+        localStorage.setItem(CACHE_KEY_ALUNOS, JSON.stringify({ ts: Date.now(), alunos: semFoto }));
+      } catch(e) {}
+    }
+    function lerCacheAlunos() {
+      try {
+        const c = JSON.parse(localStorage.getItem(CACHE_KEY_ALUNOS) || 'null');
+        if (c && Date.now() - c.ts < CACHE_TTL_ALUNOS) return c.alunos;
+      } catch(e) {}
+      return null;
+    }
+    function invalidarCacheAlunos() { localStorage.removeItem(CACHE_KEY_ALUNOS); }
+
+    let todosAlunos    = [];
+    let listaCarregada = false;
+    let alunoModalAtual = null;
+
+    function show(id) { document.getElementById(id).classList.remove('hidden'); }
+    function setInfo(id, msg) { document.getElementById(id).textContent = msg; }
+
+    function formatarCpf(val) {
+      return val.replace(/\D/g,'').slice(0,11)
+        .replace(/(\d{3})(\d)/,'$1.$2')
+        .replace(/(\d{3})(\d)/,'$1.$2')
+        .replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    }
+    function formatarCep(val) {
+      return val.replace(/\D/g,'').slice(0,8).replace(/(\d{5})(\d)/,'$1-$2');
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) show('sectionAlunos');
+      else location.href = './administrativo.html';
+    });
+
+    async function carregarAlunos(forcar = false) {
+      if (!forcar) {
+        const cached = lerCacheAlunos();
+        if (cached) {
+          todosAlunos = cached;
+          setInfo('listInfo','');
+          renderListaFiltrada();
+          atualizarResumoAlunos();
+          getDocs(query(collection(db,'alunos'), orderBy('nome_aluno'))).then(snap => {
+            snap.docs.forEach(d => {
+              const fotoUrl = d.data().foto_url || '';
+              if (fotoUrl) {
+                const aluno = todosAlunos.find(a => a.id === d.id);
+                if (aluno) aluno.foto_url = fotoUrl;
+              }
+            });
+            renderListaFiltrada();
+          }).catch(() => {});
+          return;
+        }
+      }
+      setInfo('listInfo','Carregando alunos…');
+      document.getElementById('listaAlunos').innerHTML = '';
+      try {
+        const snap = await getDocs(query(collection(db,'alunos'), orderBy('nome_aluno')));
+        todosAlunos = snap.docs.map(d => {
+          const a = d.data();
+          return {
+            id: d.id,
+            nome_aluno: a.nome_aluno || '',
+            email: a.email || '',
+            status: a.status || 'ATIVO',
+            faixa: a.faixa || '',
+            grau_atual: a.grau_atual ?? 0,
+            aulas_no_grau: a.aulas_no_grau ?? 0,
+            aulas_restantes: a.aulas_restantes ?? 0,
+            meta_grau: a.meta_grau ?? 0,
+            data_ultimo_grau: a.data_ultimo_grau || '',
+            statusExame: a.statusExame || '',
+            telefone: a.telefone || '',
+            cpf: a.cpf || '',
+            data_nasc: a.data_nasc || '',
+            data_inicio: a.data_inicio || '',
+            categoria: a.categoria || '',
+            plano: a.plano || '',
+            grupo_familiar: a.grupo_familiar || '',
+            data_contrato: a.data_contrato || '',
+            cep: a.cep || '',
+            numero: a.numero || '',
+            rua: a.rua || '',
+            bairro: a.bairro || '',
+            cidade: a.cidade || '',
+            estado: a.estado || '',
+            criadoEm: a.criadoEm || '',
+            resp_nome: a.resp_nome || '',
+            resp_email: a.resp_email || '',
+            resp_telefone: a.resp_telefone || '',
+            resp_cpf: a.resp_cpf || '',
+            foto_url: a.foto_url || '',
+            contrato_assinado:    a.contrato_assinado    || false,
+            contrato_assinado_em: a.contrato_assinado_em || '',
+            contrato_assinatura:  a.contrato_assinatura  || '',
+          };
+        });
+        salvarCacheAlunos(todosAlunos);
+        setInfo('listInfo','');
+        renderListaFiltrada();
+        atualizarResumoAlunos();
+      } catch(e) { setInfo('listInfo','Erro de conexão. Tente novamente.'); }
+    }
+
+    function atualizarResumoAlunos() {
+      if (!todosAlunos.length) return;
+      const ativos   = todosAlunos.filter(a => a.status === 'ATIVO').length;
+      const inativos = todosAlunos.filter(a => a.status !== 'ATIVO').length;
+      document.getElementById('resumoTotal').textContent    = todosAlunos.length;
+      document.getElementById('resumoAtivos').textContent   = ativos;
+      document.getElementById('resumoInativos').textContent = inativos;
+      document.getElementById('resumoAlunos').style.display = '';
+    }
+
+    function renderListaFiltrada() {
+      const q = document.getElementById('searchBox').value.trim().toLowerCase();
+      if (!q) renderLista(todosAlunos);
+      else renderLista(todosAlunos.filter(a =>
+        (a.nome_aluno||'').toLowerCase().includes(q) || (a.cpf||'').includes(q)
+      ));
+    }
+
+    function renderLista(alunos) {
+      const container = document.getElementById('listaAlunos');
+      if (!alunos.length) { container.innerHTML='<p class="lista-vazia">Nenhum aluno encontrado.</p>'; return; }
+      container.innerHTML = alunos.map(a => {
+        const id = esc(String(a.id));
+        const avatarHtml = a.foto_url
+          ? `<img src="${esc(a.foto_url)}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #444;" />`
+          : `<div style="width:48px;height:48px;border-radius:50%;background:#2a2a2a;border:2px solid #444;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#888;flex-shrink:0;">${esc((a.nome_aluno||'?')[0].toUpperCase())}</div>`;
+        const badgeCls = a.status === 'ATIVO' ? 'badge-ativo' : 'badge-inativo';
+        // Show VIP badge alongside faixa
+        const planoLabel = a.plano === 'VIP' ? ' · ⭐ VIP' : '';
+        return `<div class="aluno-card-compact" data-id="${id}">
+          ${avatarHtml}
+          <div class="compact-info">
+            <div class="compact-nome">${esc(a.nome_aluno)}</div>
+            <div class="compact-sub">${esc(a.faixa||'—')} G${esc(String(a.grau_atual??0))}${planoLabel} · ${esc(a.email||'—')}</div>
+          </div>
+          <span class="compact-badge ${badgeCls}">${esc(a.status)}</span>
+        </div>`;
+      }).join('');
+
+      container.querySelectorAll('.aluno-card-compact').forEach(card => {
+        card.addEventListener('click', () => {
+          const a = todosAlunos.find(x => String(x.id) === card.dataset.id);
+          if (a) abrirModalAluno(a);
+        });
+      });
+    }
+
+    async function enviarContratoWhatsApp(a) {
+      const token  = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+      const expira = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      const tel    = (a.resp_telefone || a.telefone || '').replace(/\D/g,'');
+      if (!tel) { alert('Telefone do responsável não cadastrado.'); return; }
+      try {
+        await updateDoc(doc(db,'alunos',a.id), {
+          contrato_token:        token,
+          contrato_token_expira: expira,
+        });
+        const link = `https://rivabjj.com.br/contrato.html?token=${token}`;
+        const msg  = `Olá! 😊 Segue o link para assinar o contrato de matrícula de *${a.nome_aluno}* na Riva BJJ:\n\n${link}\n\nO link é válido por 7 dias.`;
+        window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+      } catch(e) { alert('Erro ao gerar link: ' + e.message); }
+    }
+
+    async function abrirModalAluno(a) {
+      alunoModalAtual = a;
+      if (!a.foto_url) {
+        try {
+          const snap = await getDoc(doc(db, 'alunos', a.id));
+          if (snap.exists()) a.foto_url = snap.data().foto_url || '';
+        } catch(e) {}
+      }
+
+      const id = esc(String(a.id));
+      const box = document.getElementById('modalAlunoBox');
+
+      const avatarHtml = a.foto_url
+        ? `<img class="modal-avatar" src="${esc(a.foto_url)}" alt="" />`
+        : `<div class="modal-avatar-placeholder">${esc((a.nome_aluno||'?')[0].toUpperCase())}</div>`;
+
+      const badgeCls = a.status === 'ATIVO' ? 'badge-ativo' : 'badge-inativo';
+      const toggleLabel = a.status === 'ATIVO' ? 'Desativar' : 'Ativar';
+
+      // VIP badge in modal meta
+      const vipBadge = a.plano === 'VIP'
+        ? `<span style="background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(255,165,0,.15));border:1px solid rgba(255,215,0,.5);border-radius:999px;padding:3px 12px;font-size:11px;font-weight:900;color:#ffd700;">⭐ VIP</span>`
+        : '';
+
+      box.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <div style="display:flex;align-items:center;gap:12px;flex:1;min-width:0;">
+            ${avatarHtml}
+            <div class="modal-nome-wrap">
+              <div class="modal-nome">${esc(a.nome_aluno)}</div>
+              <div class="modal-email">${esc(a.email||'—')}</div>
+            </div>
+          </div>
+          <button onclick="document.getElementById('modalAluno').classList.remove('open')"
+            style="background:transparent;border:1px solid #444;color:#aaa;border-radius:8px;padding:6px 12px;font-size:20px;cursor:pointer;flex-shrink:0;margin-left:8px;">✕</button>
+        </div>
+
+        <div class="modal-meta">
+          <span class="aluno-faixa" id="modal-faixaLabel-${id}">${esc(a.faixa||'—')} G${esc(String(a.grau_atual??0))}</span>
+          <span class="${badgeCls}" id="modal-badge-${id}">${esc(a.status)}</span>
+          ${vipBadge}
+        </div>
+
+        <div class="modal-btns-acao">
+          <button class="btn-editar"  id="modal-btnEditar-${id}">✏️ Editar</button>
+          <button class="btn-remover" id="modal-btnRemover-${id}">🗑️ Remover</button>
+          <button class="btn-faixa"   id="modal-btnFaixa-${id}">Trocar Faixa</button>
+          <button class="btn-toggle"  id="modal-btnToggle-${id}" data-status="${esc(a.status)}">${toggleLabel}</button>
+          ${!a.contrato_assinado ? `
+            <button class="btn-editar" id="modal-btnContrato-${id}" style="background:#25D366;">📲 Enviar contrato</button>
+          ` : ''}
+        </div>
+
+        <div class="trocar-faixa-inline" id="modal-trocaFaixaArea-${id}">
+          <select id="modal-selectFaixa-${id}">
+            <optgroup label="── Adulto ──">
+              <option value="Branca">Branca</option><option value="Azul">Azul</option>
+              <option value="Roxa">Roxa</option><option value="Marrom">Marrom</option><option value="Preta">Preta</option>
+            </optgroup>
+            <optgroup label="── Kids / Infantil / Juvenil ──">
+              <option value="Cinza e Branca">Cinza e Branca</option><option value="Cinza">Cinza</option>
+              <option value="Cinza e Preta">Cinza e Preta</option><option value="Amarela e Branca">Amarela e Branca</option>
+              <option value="Amarela">Amarela</option><option value="Amarela e Preta">Amarela e Preta</option>
+              <option value="Laranja e Branca">Laranja e Branca</option><option value="Laranja">Laranja</option>
+              <option value="Laranja e Preta">Laranja e Preta</option><option value="Verde e Branca">Verde e Branca</option>
+              <option value="Verde">Verde</option><option value="Verde e Preta">Verde e Preta</option>
+            </optgroup>
+          </select>
+          <button class="btn-confirmar-faixa" id="modal-btnConfirmarFaixa-${id}">Confirmar</button>
+          <button class="btn-cancelar-faixa"  id="modal-btnCancelarFaixa-${id}">Cancelar</button>
+        </div>
+
+        <div class="modal-detalhes">
+          <div class="detalhe-row"><span class="detalhe-label">Status</span><span class="detalhe-valor">${esc(a.status)}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Categoria</span><span class="detalhe-valor">${esc(a.categoria||'—')}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Aulas no Grau</span><span class="detalhe-valor">${esc(String(a.aulas_no_grau??'—'))}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Aulas Restantes</span><span class="detalhe-valor">${esc(String(a.aulas_restantes??'—'))}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Último Grau em</span><span class="detalhe-valor">${esc(formatarData(a.data_ultimo_grau))}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Plano</span><span class="detalhe-valor">${a.plano === 'VIP' ? '⭐ VIP – Isento' : esc(a.plano||'—')}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Telefone</span><span class="detalhe-valor">${esc(a.telefone||'—')}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">CPF</span><span class="detalhe-valor">${esc(a.cpf||'—')}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Data Nasc.</span><span class="detalhe-valor">${esc(formatarData(a.data_nasc))}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Data Início</span><span class="detalhe-valor">${esc(formatarData(a.data_inicio))}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Contrato</span><span class="detalhe-valor">${esc(formatarData(a.data_contrato))}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Grupo Familiar</span><span class="detalhe-valor">${esc(a.grupo_familiar||'—')}</span></div>
+          <div class="detalhe-row full-width"><span class="detalhe-label">Endereço</span><span class="detalhe-valor">${esc(a.rua)}, ${esc(a.numero)} - ${esc(a.bairro)}, ${esc(a.cidade)}/${esc(a.estado)}</span></div>
+          ${a.resp_nome ? `
+          <div class="detalhe-row full-width" style="border-top:1px solid #f39c12;margin-top:8px;padding-top:8px;">
+            <span class="detalhe-label" style="color:#f39c12;">👨‍👧 Responsável</span>
+          </div>
+          <div class="detalhe-row"><span class="detalhe-label">Nome</span><span class="detalhe-valor">${esc(a.resp_nome)}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">CPF</span><span class="detalhe-valor">${esc(a.resp_cpf||'—')}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Email</span><span class="detalhe-valor">${esc(a.resp_email||'—')}</span></div>
+          <div class="detalhe-row"><span class="detalhe-label">Telefone</span><span class="detalhe-valor">${esc(a.resp_telefone||'—')}</span></div>
+          ` : ''}
+          <div class="detalhe-row full-width" style="border-top:1px solid #2a2a2a;margin-top:8px;padding-top:8px;">
+            <span class="detalhe-label">Contrato</span>
+            <span class="detalhe-valor" id="modal-contrato-${id}">
+              ${a.contrato_assinado
+                ? `✅ Assinado em ${a.contrato_assinado_em ? new Date(a.contrato_assinado_em).toLocaleDateString('pt-BR') : '—'}`
+                : '⚠️ Não assinado'}
+            </span>
+          </div>
+          ${a.contrato_assinado ? `
+          <div class="detalhe-row full-width" style="margin-top:8px;">
+            <button class="btn-faixa" style="background:#27ae60;font-size:12px;padding:6px 14px;"
+              onclick="window.baixarContrato('${id}')">📄 Baixar Contrato PDF</button>
+          </div>` : ''}
+        </div>
+
+        <div class="editar-inline" id="modal-editarArea-${id}">
+          <div class="editar-secao" style="border-top:none;margin-top:0;">👤 Dados Pessoais</div>
+          <div><label>Nome</label><input type="text" id="modal-editNome-${id}" value="${esc(a.nome_aluno||'')}" /></div>
+          <div><label>Email</label><input type="email" id="modal-editEmail-${id}" value="${esc(a.email||'')}" /></div>
+          <div><label>Telefone</label><input type="tel" id="modal-editTelefone-${id}" value="${esc(a.telefone||'')}" /></div>
+          <div><label>CPF</label><input type="tel" inputmode="numeric" maxlength="14" id="modal-editCpf-${id}" value="${esc(a.cpf||'')}" placeholder="000.000.000-00" oninput="this.value=window._fmtCpf(this.value)" /></div>
+          <div><label>Data de Nascimento</label><input type="date" id="modal-editDataNasc-${id}" value="${esc(a.data_nasc||'')}" /></div>
+          <div><label>Data de Início</label><input type="date" id="modal-editDataInicio-${id}" value="${esc(a.data_inicio||'')}" /></div>
+          <div><label>Categoria</label>
+            <select id="modal-editCategoria-${id}">
+              <option value="Adulto"   ${a.categoria==='Adulto'  ?'selected':''}>Adulto</option>
+              <option value="Kids"     ${a.categoria==='Kids'    ?'selected':''}>Kids</option>
+              <option value="Infantil" ${a.categoria==='Infantil'?'selected':''}>Infantil</option>
+              <option value="Juvenil"  ${a.categoria==='Juvenil' ?'selected':''}>Juvenil</option>
+            </select>
+          </div>
+          ${['Kids','Infantil','Juvenil'].includes(a.categoria) ? `
+          <div class="editar-secao">👨‍👧 Responsável</div>
+          <div><label>Nome do Responsável</label><input type="text" id="modal-editRespNome-${id}" value="${esc(a.resp_nome||'')}" /></div>
+          <div><label>CPF do Responsável</label><input type="tel" inputmode="numeric" maxlength="14" id="modal-editRespCpf-${id}" value="${esc(a.resp_cpf||'')}" placeholder="000.000.000-00" oninput="this.value=window._fmtCpf(this.value)" /></div>
+          <div><label>Email do Responsável</label><input type="email" id="modal-editRespEmail-${id}" value="${esc(a.resp_email||'')}" /></div>
+          <div><label>Telefone do Responsável</label><input type="tel" id="modal-editRespTelefone-${id}" value="${esc(a.resp_telefone||'')}" /></div>
+          ` : ''}
+          <div class="editar-secao">🥋 Graduação</div>
+          <div><label>Grau Atual</label>
+            <select id="modal-editGrauAtual-${id}">
+              ${[0,1,2,3,4].map(g => `<option value="${g}" ${(a.grau_atual??0)==g?'selected':''}>${g}</option>`).join('')}
+            </select>
+          </div>
+          <div><label>Aulas no Grau Atual</label><input type="number" min="0" id="modal-editAulasNoGrau-${id}" value="${esc(String(a.aulas_no_grau??0))}" /></div>
+          <div class="editar-secao">📍 Endereço</div>
+          <div><label>CEP</label>
+            <div class="cep-wrap-edit">
+              <input type="tel" inputmode="numeric" maxlength="9" id="modal-editCep-${id}"
+                value="${esc(a.cep?a.cep.replace(/(\d{5})(\d{3})/,'$1-$2'):'')}" placeholder="00000-000"
+                oninput="window._editCepInput('modal-${id}',this)" />
+              <span class="cep-spinner-edit" id="modal-editCepSpinner-${id}">⏳</span>
+            </div>
+          </div>
+          <div><label>Rua</label><input type="text" id="modal-editRua-${id}" value="${esc(a.rua||'')}" readonly /></div>
+          <div class="editar-grid-2">
+            <div><label>Bairro</label><input type="text" id="modal-editBairro-${id}" value="${esc(a.bairro||'')}" readonly /></div>
+            <div><label>Cidade</label><input type="text" id="modal-editCidade-${id}" value="${esc(a.cidade||'')}" readonly /></div>
+          </div>
+          <div class="editar-grid-2">
+            <div><label>Estado</label><input type="text" id="modal-editEstado-${id}" value="${esc(a.estado||'')}" maxlength="2" readonly /></div>
+            <div><label>Número</label><input type="text" id="modal-editNumero-${id}" value="${esc(a.numero||'')}" placeholder="Ex: 277" /></div>
+          </div>
+          <div class="editar-secao">💰 Financeiro</div>
+          <div>
+            <label>Plano</label>
+            <select id="modal-editPlano-${id}" onchange="window._onEditPlanoChange('${id}',this.value)">
+              <option value=""           ${!a.plano             ?'selected':''}>Não definido</option>
+              <option value="Recorrente" ${a.plano==='Recorrente'?'selected':''}>Recorrente – R$ 200,00</option>
+              <option value="Semestral"  ${a.plano==='Semestral' ?'selected':''}>Semestral – R$ 220,00</option>
+              <option value="Mensal"     ${a.plano==='Mensal'    ?'selected':''}>Mensal – R$ 240,00</option>
+              <option value="Avista"     ${a.plano==='Avista'    ?'selected':''}>À Vista</option>
+              <option value="VIP"        ${a.plano==='VIP'       ?'selected':''}>⭐ VIP – Isento</option>
+            </select>
+            <div class="vip-edit-notice" id="modal-vipNotice-${id}" style="${a.plano==='VIP'?'display:block;margin-top:8px;':'display:none;margin-top:8px;'}">
+              ⭐ Aluno VIP — isento de mensalidade. Não aparece no financeiro.
+            </div>
+          </div>
+          <div id="modal-editFinWrap-${id}" style="${a.plano==='VIP'?'display:none':''}">
+            <div style="margin-top:10px;"><label>Grupo Familiar</label><input type="text" id="modal-editGrupoFamiliar-${id}" value="${esc(a.grupo_familiar||'')}" placeholder="Ex: Família Silva" /></div>
+            <div style="margin-top:10px;"><label>Data de Início do Contrato</label><input type="date" id="modal-editDataContrato-${id}" value="${esc(a.data_contrato||'')}" /></div>
+          </div>
+          <div class="editar-inline-btns" style="margin-top:10px;">
+            <button class="btn-confirmar-faixa" id="modal-btnSalvar-${id}">💾 Salvar</button>
+            <button class="btn-cancelar-faixa"  id="modal-btnCancelarEdit-${id}">Cancelar</button>
+          </div>
+          <p class="fin-msg" id="modal-editMsg-${id}"></p>
+        </div>
+      `;
+
+      document.getElementById(`modal-btnToggle-${id}`).addEventListener('click', () => toggleStatus(a.id));
+      document.getElementById(`modal-btnRemover-${id}`).addEventListener('click', () => removerAluno(a.id));
+      document.getElementById(`modal-btnFaixa-${id}`).addEventListener('click', () => {
+        const area = document.getElementById(`modal-trocaFaixaArea-${id}`);
+        area.style.display = area.style.display === 'flex' ? 'none' : 'flex';
+      });
+      document.getElementById(`modal-btnConfirmarFaixa-${id}`).addEventListener('click', () =>
+        trocarFaixa(a.id, document.getElementById(`modal-selectFaixa-${id}`).value));
+      document.getElementById(`modal-btnCancelarFaixa-${id}`).addEventListener('click', () => {
+        document.getElementById(`modal-trocaFaixaArea-${id}`).style.display = 'none';
+      });
+      document.getElementById(`modal-btnEditar-${id}`).addEventListener('click', () => {
+        const area = document.getElementById(`modal-editarArea-${id}`);
+        area.style.display = area.style.display === 'flex' ? 'none' : 'flex';
+        if (area.style.display === 'flex') area.scrollIntoView({ behavior: 'smooth' });
+      });
+      document.getElementById(`modal-btnSalvar-${id}`).addEventListener('click', () => salvarEdicao(a.id));
+      document.getElementById(`modal-btnCancelarEdit-${id}`).addEventListener('click', () => {
+        document.getElementById(`modal-editarArea-${id}`).style.display = 'none';
+      });
+      const btnContrato = document.getElementById(`modal-btnContrato-${id}`);
+      if (btnContrato) btnContrato.addEventListener('click', () => enviarContratoWhatsApp(a));
+      document.getElementById('modalAluno').classList.add('open');
+    }
+
+    // Toggle VIP notice + hide/show financial fields when plan changes in edit form
+    window._onEditPlanoChange = function(id, valor) {
+      const notice  = document.getElementById(`modal-vipNotice-${id}`);
+      const finWrap = document.getElementById(`modal-editFinWrap-${id}`);
+      if (notice)  notice.style.display  = valor === 'VIP' ? 'block' : 'none';
+      if (finWrap) finWrap.style.display = valor === 'VIP' ? 'none'  : '';
+    };
+
+    document.getElementById('modalAluno').addEventListener('click', function(e) {
+      if (e.target === this) this.classList.remove('open');
+    });
+
+    async function toggleStatus(id) {
+      const aluno = todosAlunos.find(a => String(a.id) === String(id));
+      if (!aluno) return;
+      const novoStatus = aluno.status === 'ATIVO' ? 'INATIVO' : 'ATIVO';
+      const eid = esc(String(id));
+      const badge  = document.getElementById(`modal-badge-${eid}`);
+      const btn    = document.getElementById(`modal-btnToggle-${eid}`);
+      aluno.status = novoStatus;
+      if (badge) { badge.textContent = novoStatus; badge.className = novoStatus === 'ATIVO' ? 'badge-ativo' : 'badge-inativo'; }
+      if (btn)   { btn.textContent = novoStatus === 'ATIVO' ? 'Desativar' : 'Ativar'; btn.dataset.status = novoStatus; }
+      try {
+        await updateDoc(doc(db,'alunos',id), { status: novoStatus });
+        salvarCacheAlunos(todosAlunos);
+        renderListaFiltrada();
+      } catch(e) {
+        aluno.status = novoStatus === 'ATIVO' ? 'INATIVO' : 'ATIVO';
+        alert('Erro ao alterar status.');
+      }
+    }
+
+    async function trocarFaixa(id, novaFaixa) {
+      const eid   = esc(String(id));
+      const label = document.getElementById(`modal-faixaLabel-${eid}`);
+      try {
+        const alunoTroca = todosAlunos.find(a => String(a.id) === String(id));
+        const metaGrau = (alunoTroca?.categoria === 'Juvenil') ? 30 : (novaFaixa === 'Branca' ? 36 : 56);
+        await updateDoc(doc(db,'alunos',id), {
+          faixa:            novaFaixa,
+          grau_atual:       0,
+          aulas_no_grau:    0,
+          aulas_restantes:  metaGrau,
+          meta_grau:        metaGrau,
+          statusExame:      '',
+          data_ultimo_grau: new Date().toISOString().slice(0,10)
+        });
+        if (alunoTroca) {
+          alunoTroca.faixa           = novaFaixa;
+          alunoTroca.grau_atual      = 0;
+          alunoTroca.meta_grau       = metaGrau;
+          alunoTroca.aulas_restantes = metaGrau;
+          alunoTroca.aulas_no_grau   = 0;
+        }
+        salvarCacheAlunos(todosAlunos);
+        if (label) label.textContent = novaFaixa + ' G0';
+        const area = document.getElementById(`modal-trocaFaixaArea-${eid}`);
+        if (area) area.style.display = 'none';
+        renderListaFiltrada();
+      } catch(e) { alert('Erro ao trocar faixa.'); }
+    }
+
+    async function salvarEdicao(id) {
+      const eid = esc(String(id));
+      const msg = document.getElementById(`modal-editMsg-${eid}`);
+      const btn = document.getElementById(`modal-btnSalvar-${eid}`);
+      if (btn) btn.disabled = true;
+      if (msg) msg.textContent = 'Salvando…';
+      try {
+        const grauAtual   = parseInt(document.getElementById(`modal-editGrauAtual-${eid}`).value) || 0;
+        const aulasNoGrau = parseInt(document.getElementById(`modal-editAulasNoGrau-${eid}`).value) || 0;
+        const aluno = todosAlunos.find(a => String(a.id) === String(id));
+        const categoriaEdit = document.getElementById(`modal-editCategoria-${eid}`)?.value || aluno?.categoria || '';
+        const faixaEdit = aluno?.faixa || '';
+        const metaGrau = (categoriaEdit === 'Juvenil') ? 30 : (faixaEdit === 'Branca' ? 36 : 56);
+        const cepRaw = (document.getElementById(`modal-editCep-${eid}`).value || '').replace(/\D/g,'');
+        const planoEdit = document.getElementById(`modal-editPlano-${eid}`).value;
+
+        const updates = {
+          nome_aluno:      document.getElementById(`modal-editNome-${eid}`).value.trim(),
+          email:           document.getElementById(`modal-editEmail-${eid}`).value.trim().toLowerCase(),
+          telefone:        document.getElementById(`modal-editTelefone-${eid}`).value.trim(),
+          cpf:             document.getElementById(`modal-editCpf-${eid}`).value.trim(),
+          data_nasc:       document.getElementById(`modal-editDataNasc-${eid}`).value,
+          data_inicio:     document.getElementById(`modal-editDataInicio-${eid}`).value,
+          categoria:       categoriaEdit,
+          plano:           planoEdit,
+          // Only save group/contract fields when not VIP
+          grupo_familiar:  planoEdit !== 'VIP' ? (document.getElementById(`modal-editGrupoFamiliar-${eid}`)?.value.trim() || '') : '',
+          data_contrato:   planoEdit !== 'VIP' ? (document.getElementById(`modal-editDataContrato-${eid}`)?.value || '')       : '',
+          cep:             cepRaw,
+          numero:          document.getElementById(`modal-editNumero-${eid}`).value.trim(),
+          rua:             document.getElementById(`modal-editRua-${eid}`).value.trim(),
+          bairro:          document.getElementById(`modal-editBairro-${eid}`).value.trim(),
+          cidade:          document.getElementById(`modal-editCidade-${eid}`).value.trim(),
+          estado:          document.getElementById(`modal-editEstado-${eid}`).value.trim(),
+          aulas_no_grau:   aulasNoGrau,
+          aulas_restantes: Math.max(0, metaGrau - aulasNoGrau),
+          grau_atual:      grauAtual,
+          resp_nome:     (document.getElementById(`modal-editRespNome-${eid}`)     ? document.getElementById(`modal-editRespNome-${eid}`).value.trim()                : ''),
+          resp_cpf:      (document.getElementById(`modal-editRespCpf-${eid}`)      ? document.getElementById(`modal-editRespCpf-${eid}`).value.trim()                 : ''),
+          resp_email:    (document.getElementById(`modal-editRespEmail-${eid}`)    ? document.getElementById(`modal-editRespEmail-${eid}`).value.trim().toLowerCase()  : ''),
+          resp_telefone: (document.getElementById(`modal-editRespTelefone-${eid}`) ? document.getElementById(`modal-editRespTelefone-${eid}`).value.trim()             : ''),
+        };
+        await updateDoc(doc(db,'alunos',id), updates);
+        if (aluno) Object.assign(aluno, updates);
+        salvarCacheAlunos(todosAlunos);
+        renderListaFiltrada();
+        if (msg) msg.textContent = '✅ Salvo!';
+        setTimeout(() => {
+          if (msg) msg.textContent = '';
+          const area = document.getElementById(`modal-editarArea-${eid}`);
+          if (area) area.style.display = 'none';
+          // Re-open modal to reflect updated VIP badge / plano label
+          const alunoAtualizado = todosAlunos.find(a => String(a.id) === String(id));
+          if (alunoAtualizado) abrirModalAluno(alunoAtualizado);
+        }, 1200);
+      } catch(e) {
+        if (msg) msg.textContent = 'Erro ao salvar: '+(e.message||'tente novamente.');
+      } finally { if (btn) btn.disabled = false; }
+    }
+
+    async function removerAluno(id) {
+      if (!confirm('Tem certeza que deseja remover este aluno? Esta ação não pode ser desfeita.')) return;
+      try {
+        await deleteDoc(doc(db,'alunos',id));
+        todosAlunos = todosAlunos.filter(a => String(a.id) !== String(id));
+        salvarCacheAlunos(todosAlunos);
+        renderListaFiltrada();
+        document.getElementById('modalAluno').classList.remove('open');
+        atualizarResumoAlunos();
+      } catch(e) { alert('Erro ao remover aluno: '+(e.message||'tente novamente.')); }
+    }
+
+    window._fmtCpf = formatarCpf;
+
+    window._editCepInput = function(prefixId, input) {
+      input.value = formatarCep(input.value);
+      const cepLimpo = input.value.replace(/\D/g,'');
+      const spinnerId = `${prefixId.includes('modal-') ? prefixId.split('modal-')[0] : ''}modal-editCepSpinner-${prefixId.replace('modal-','')}`;
+      const sp = document.getElementById(spinnerId);
+      if (cepLimpo.length !== 8) {
+        ['Rua','Bairro','Cidade','Estado'].forEach(f => {
+          const el = document.getElementById(`modal-edit${f}-${prefixId.replace('modal-','')}`);
+          if (el) el.value = '';
+        });
+        return;
+      }
+      if (sp) sp.style.display = '';
+      fetch('https://viacep.com.br/ws/'+cepLimpo+'/json/')
+        .then(r => r.json())
+        .then(data => {
+          if (sp) sp.style.display = 'none';
+          if (data.erro) return;
+          const pid = prefixId.replace('modal-','');
+          const set = (f, v) => { const el = document.getElementById(`modal-edit${f}-${pid}`); if (el) el.value = v; };
+          set('Rua',    data.logradouro || '');
+          set('Bairro', data.bairro     || '');
+          set('Cidade', data.localidade || '');
+          set('Estado', data.uf         || '');
+        })
+        .catch(() => { if (sp) sp.style.display = 'none'; });
+    };
+
+    function esc(str) {
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+    function formatarData(val) {
+      if (!val || String(val).trim() === '' || String(val).trim() === 'undefined') return '—';
+      const s = String(val).trim();
+      if (/^\d{4}-\d{2}-\d{2}/.test(s)) { const p=s.substring(0,10).split('-'); return p[2]+'/'+p[1]+'/'+p[0]; }
+      return s;
+    }
+
+    document.getElementById('searchBox').addEventListener('input', async (e) => {
+      const q = e.target.value.trim().toLowerCase();
+      if (!listaCarregada && q.length >= 2) { await carregarAlunos(); listaCarregada = true; }
+      if (listaCarregada) {
+        renderListaFiltrada();
+        if (q.length >= 2) {
+          const resultado = todosAlunos.filter(a =>
+            (a.nome_aluno||'').toLowerCase().includes(q) || (a.cpf||'').includes(q)
+          );
+          if (resultado.length === 1) abrirModalAluno(resultado[0]);
+        }
+      }
+    });
+
+    document.getElementById('btnVerTodos').addEventListener('click', async () => {
+      if (!listaCarregada) { await carregarAlunos(); listaCarregada = true; }
+      else renderListaFiltrada();
+    });
+
+    document.getElementById('btnAtualizar').addEventListener('click', async () => {
+      invalidarCacheAlunos(); listaCarregada = false; todosAlunos = [];
+      await carregarAlunos(true); listaCarregada = true;
+    });
+
+    document.getElementById('btnHdrSair').addEventListener('click', () => {
+      signOut(auth).catch(()=>{});
+      sessionStorage.removeItem(TOKEN_KEY);
+      location.href = './administrativo.html';
+    });
+
+    window.baixarContrato = function(id) {
+      const a = todosAlunos.find(a => a.id === id);
+      if (!a) return;
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+      const margin = 20, pageW = 210, maxW = pageW - margin * 2;
+      let y = 20;
+      pdf.setFont('helvetica', 'bold'); pdf.setFontSize(14);
+      pdf.text('CONTRATO DE PRESTAÇÃO DE SERVIÇOS', pageW / 2, y, { align: 'center' }); y += 6;
+      pdf.setFont('helvetica', 'normal'); pdf.setFontSize(10);
+      pdf.text('Riva BJJ Brazilian Jiu Jitsu Ltda — CNPJ 66.256.625/0001-27', pageW / 2, y, { align: 'center' }); y += 10;
+      pdf.setDrawColor(180); pdf.line(margin, y, pageW - margin, y); y += 8;
+      pdf.setFont('helvetica', 'bold'); pdf.setFontSize(10);
+      pdf.text('DADOS DO CONTRATANTE', margin, y); y += 6;
+      pdf.setFont('helvetica', 'normal');
+      const endereco = [a.rua, a.numero, a.bairro, a.cidade, a.estado].filter(Boolean).join(', ') || '—';
+      const isResp = ['Kids','Infantil','Juvenil'].includes(a.categoria);
+      const nomeContrato = isResp ? (a.resp_nome || a.nome_aluno || '—') : (a.nome_aluno || '—');
+      const cpfContrato  = isResp ? (a.resp_cpf  || '—') : (a.cpf || '—');
+      [`Nome: ${nomeContrato}`,`CPF: ${cpfContrato}`,`Endereço: ${endereco}`,`Plano: ${a.plano || '—'}`,`Início: ${a.data_contrato || a.data_inicio || '—'}`].forEach(linha => { pdf.text(linha, margin, y); y += 6; });
+      y += 4; pdf.setDrawColor(180); pdf.line(margin, y, pageW - margin, y); y += 8;
+      const clausulas = [
+        ['Cláusula Primeira – Dos Planos','As aulas terão frequência mínima de 02 aulas semanais, com planos mensais, recorrentes e anuais. Não haverá reposição e/ou troca de aula, exceto em caso de justificativa médica comprovada ou falta por parte da CONTRATADA.'],
+        ['Cláusula Segunda – Dos Valores','O valor correspondente a cada plano será pago a vencer, de forma mensal, mediante débito automático em cartão de crédito ou Pix, de acordo com a tabela de preço que segue em anexo.'],
+        ['Cláusula Terceira – Do Prazo','O presente contrato poderá ser renovado automaticamente. Quando da renovação, novos pagamentos deverão ser feitos de acordo com o plano escolhido.'],
+        ['Cláusula Quarta – Da Rescisão','O CONTRATANTE deverá comunicá-la com antecedência mínima de 30 (trinta) dias, sob pena de incidir o pagamento do mês vigente.'],
+        ['Cláusula Quinta – Do Termo de Responsabilidade','O CONTRATANTE declara ter consultado médico de sua confiança, e estar apto para a prática de atividades físicas e esportivas de qualquer natureza.'],
+        ['Cláusula Sexta – Dos Danos e Acidentes','O CONTRATANTE se obriga a observar estrita e exclusivamente as orientações dos profissionais da CONTRATADA para a prática das atividades físicas.'],
+        ['Cláusula Sétima – Da Imagem','A CONTRATADA, livre de quaisquer ônus junto ao CONTRATANTE, poderá utilizar-se da sua imagem para fins exclusivos de divulgação da Academia.'],
+        ['Cláusula Oitava – Dos Danos Causados','O CONTRATANTE se obriga a ressarcir a CONTRATADA por qualquer dano causado por ele, por dolo ou culpa, em até 48 horas após a constatação do evento.'],
+        ['Cláusula Nona – Dos Armários','A CONTRATADA disponibiliza aos seus usuários guarda-volumes e/ou armários, que deverão ser esvaziados diariamente. A CONTRATADA não se responsabiliza pelos objetos deixados.'],
+        ['Cláusula Décima – Do Estacionamento','O estacionamento é gratuito e de uso exclusivo dos CONTRATANTES. A CONTRATADA não se responsabiliza por roubos, furtos ou danos de veículos.'],
+        ['Cláusula Décima Primeira – Do Foro','As partes elegem o foro da cidade de Indaiatuba/SP para dirimir eventual entrave decorrente do presente contrato.'],
+      ];
+      clausulas.forEach(([titulo, texto]) => {
+        if (y > 260) { pdf.addPage(); y = 20; }
+        pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.text(titulo, margin, y); y += 5;
+        pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+        const linhas = pdf.splitTextToSize(texto, maxW);
+        pdf.text(linhas, margin, y); y += linhas.length * 5 + 4;
+      });
+      if (y > 220) { pdf.addPage(); y = 20; }
+      y += 4; pdf.setDrawColor(180); pdf.line(margin, y, pageW - margin, y); y += 8;
+      pdf.setFont('helvetica', 'bold'); pdf.setFontSize(10); pdf.text('ASSINATURA', margin, y); y += 6;
+      pdf.setFont('helvetica', 'normal'); pdf.setFontSize(9);
+      if (a.contrato_assinado_em) { pdf.text(`Assinado digitalmente em: ${new Date(a.contrato_assinado_em).toLocaleString('pt-BR')}`, margin, y); y += 6; }
+      if (a.contrato_assinatura) {
+        try {
+          const base64 = a.contrato_assinatura.replace('data:image/svg+xml;base64,','');
+          const svgDecoded = atob(base64);
+          const match = svgDecoded.match(/text-anchor="middle">([^<]+)<\/text>/);
+          const nomeAss = match ? match[1] : '';
+          if (nomeAss) {
+            pdf.setFont('times','bolditalic'); pdf.setFontSize(22);
+            const nomeLinhas = pdf.splitTextToSize(nomeAss, maxW);
+            y += 8; pdf.text(nomeLinhas, margin, y); y += nomeLinhas.length * 9;
+            pdf.setDrawColor(0); pdf.line(margin, y, margin + 120, y); y += 6;
+            pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+            pdf.text('Assinatura digital — ' + (a.nome_aluno || ''), margin, y); y += 6;
+          }
+        } catch(e) { pdf.text('[Assinatura digital registrada]', margin, y); y += 6; }
+      }
+      pdf.setFontSize(8); pdf.setTextColor(150);
+      pdf.text('Indaiatuba/SP — Riva BJJ Brazilian Jiu Jitsu Ltda', pageW / 2, 290, { align: 'center' });
+      pdf.save(`contrato_${(a.nome_aluno || 'aluno').replace(/\s+/g,'_')}.pdf`);
+    };
+  </script>
+</body>
+</html>

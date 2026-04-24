@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#c0392b" />
+  <title>Lembretes de Pagamento – Riva BJJ</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <style>
+    .admin-hdr-left { display: flex; align-items: center; gap: 14px; }
+    .admin-hdr-titulo { display: none; }
+    .admin-hdr-sair { display: none; }
+    .btn-logout { background: transparent; border: 1px solid var(--border); color: #fff; border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .btn-logout:active { opacity: .75; }
+    @media (min-width: 769px) {
+      .admin-hdr-inner { max-width: 1100px; justify-content: space-between; padding: 0 24px; }
+      .admin-logo { width: 48px !important; height: 48px !important; margin-top: 0 !important; }
+      .admin-hdr-titulo { display: inline; font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
+      .admin-hdr-sair { display: inline-block; }
+      .admin-page { max-width: 1100px; padding: 32px 32px 64px; }
+    }
+    @media (max-width: 768px) { .admin-hdr-inner { justify-content: center; } }
+
+    .page-title { font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+    .page-subtitle { font-size: 14px; color: #aaa; margin-bottom: 20px; }
+
+    /* ── Seção título ── */
+    .secao-titulo {
+      font-size: 12px;
+      font-weight: 800;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 24px 0 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .secao-titulo:first-child { margin-top: 0; }
+
+    /* ── Lembrete item ── */
+    .lembrete-item {
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .lembrete-item.avista { border-color: rgba(52,152,219,0.3); background: rgba(52,152,219,0.05); }
+    .lembrete-info { flex: 1; min-width: 0; }
+    .lembrete-nome { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lembrete-detalhe { font-size: 12px; color: #aaa; }
+    .lembrete-venc { font-size: 12px; color: #f39c12; font-weight: 700; margin-top: 2px; }
+    .lembrete-venc.azul { color: #3498db; }
+
+    .btn-wpp {
+      background: #25D366;
+      border: none;
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-wpp:active { opacity: .75; }
+
+    .resumo-box {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .resumo-num { font-size: 28px; font-weight: 900; color: #f39c12; }
+    .resumo-label { font-size: 13px; color: #aaa; margin-top: 2px; }
+
+    .lista-lembretes { padding-bottom: 24px; }
+    .presenca-vazia { color: #555; font-size: 13px; padding: 12px 0; }
+  </style>
+</head>
+<body>
+  <header class="hdr admin-hdr">
+    <div class="hdr-inner admin-hdr-inner">
+      <div class="admin-hdr-left">
+        <img class="logo admin-logo" src="./logo.png" alt="Riva BJJ" />
+        <span class="admin-hdr-titulo">Portal Administrativo</span>
+      </div>
+      <button class="btn-logout admin-hdr-sair" id="btnHdrSair">Sair</button>
+    </div>
+  </header>
+
+  <main class="page admin-page">
+    <section id="sectionLembretes">
+      <div class="page-title">📲 Lembretes de Pagamento</div>
+
+      <!-- ── Mensalidades vencendo (próximos 3 dias) ── -->
+      <div class="secao-titulo">📅 Mensalidades vencendo em breve</div>
+      <div class="page-subtitle" style="margin-bottom:12px;">Plano Mensal com vencimento nos próximos 3 dias</div>
+
+      <div class="resumo-box" id="resumoBox" style="display:none;">
+        <div>
+          <div class="resumo-num" id="resumoCount">0</div>
+          <div class="resumo-label">alunos para lembrar hoje</div>
+        </div>
+        <button class="btn primary" id="btnEnviarTodos" style="margin-top:0;">📲 Enviar todos</button>
+      </div>
+
+      <p class="msg info" id="pageInfo">Carregando…</p>
+      <div id="listaLembretes" class="lista-lembretes"></div>
+
+      <!-- ── Planos À Vista vencendo (próximos 30 dias) ── -->
+      <div class="secao-titulo">💳 Planos À Vista vencendo em breve</div>
+      <div class="page-subtitle" style="margin-bottom:12px;">Alunos com plano À Vista encerrando nos próximos 30 dias</div>
+
+      <p class="msg info" id="avistaInfo">Carregando…</p>
+      <div id="listaAvista" class="lista-lembretes"></div>
+
+    </section>
+  </main>
+
+  <script type="module">
+    import { db, auth } from './firebase-config.js';
+    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+
+    const TOKEN_KEY  = 'rv_prof_token';
+    const CHAVE_PIX  = '66.256.625/0001-27';
+    const DIAS_AVISO = 3;
+    const DIAS_AVISO_AVISTA = 30;
+
+    function esc(str) {
+      return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function formatarDataBR(dateStr) {
+      if (!dateStr) return '—';
+      if (/^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+        const [y,m,d] = dateStr.slice(0,10).split('-');
+        return `${d}/${m}/${y}`;
+      }
+      // YYYY-MM → MM/YYYY
+      if (/^\d{4}-\d{2}$/.test(dateStr)) {
+        const [y,m] = dateStr.split('-');
+        return `${m}/${y}`;
+      }
+      return dateStr;
+    }
+
+    function calcularProxVencimento(dataContrato) {
+      if (!dataContrato) return null;
+      const dc = new Date(dataContrato + 'T00:00:00');
+      if (isNaN(dc.getTime())) return null;
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      const venc = new Date(dc); venc.setHours(0,0,0,0);
+      while (venc <= hoje) venc.setDate(venc.getDate() + 30);
+      return venc;
+    }
+
+    function diasAteData(data) {
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      data.setHours(0,0,0,0);
+      return Math.round((data - hoje) / (1000 * 60 * 60 * 24));
+    }
+
+    function montarMensagem(aluno, vencimento) {
+      const nomeAluno = aluno.nome_aluno || '—';
+      const dataVenc  = formatarDataBR(vencimento.toISOString().slice(0,10));
+      return `Olá ${nomeAluno}! 😊 Sua mensalidade da Riva BJJ vence no dia ${dataVenc}. Você pode realizar o pagamento via PIX utilizando a chave: *${CHAVE_PIX}* ou passar na academia para pagar no débito. Qualquer dúvida estamos à disposição! 🥋`;
+    }
+
+    function montarMensagemAvista(aluno, mesAno) {
+      const nomeAluno = aluno.nome_aluno || '—';
+      return `Olá ${nomeAluno}! 😊 Seu plano À Vista na Riva BJJ está encerrando em ${mesAno}. Entre em contato para renovar e continuar treinando! 🥋`;
+    }
+
+    function abrirWhatsApp(telefone, mensagem) {
+      const tel = (telefone || '').replace(/\D/g,'');
+      if (!tel) { alert('Telefone não cadastrado.'); return; }
+      window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(mensagem)}`, '_blank');
+    }
+
+    let lembretes = [];
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) { carregarLembretes(); carregarAvistaVencendo(); }
+      else location.href = './administrativo.html';
+    });
+
+    /* ── Mensalidades Mensais vencendo em 3 dias ── */
+    async function carregarLembretes() {
+      const info  = document.getElementById('pageInfo');
+      const lista = document.getElementById('listaLembretes');
+
+      try {
+        const hoje     = new Date();
+        const mesAtual = hoje.getMonth() + 1;
+        const anoAtual = hoje.getFullYear();
+
+        const [snap, pagSnap] = await Promise.all([
+          getDocs(query(collection(db, 'alunos'), where('status', '==', 'ATIVO'), where('plano', '==', 'Mensal'))),
+          getDocs(query(collection(db, 'pagamentos'), where('mes', '==', mesAtual), where('ano', '==', anoAtual))),
+        ]);
+
+        const alunosPagos = new Set();
+        pagSnap.forEach(d => alunosPagos.add(d.data().alunoId));
+
+        lembretes = [];
+        snap.forEach(d => {
+          const a = d.data();
+          if (!a.data_contrato) return;
+          if (alunosPagos.has(d.id)) return;
+          const venc = calcularProxVencimento(a.data_contrato);
+          if (!venc) return;
+          const dias = diasAteData(new Date(venc));
+          if (dias >= 0 && dias <= DIAS_AVISO) {
+            lembretes.push({
+              id: d.id, nome_aluno: a.nome_aluno || '',
+              telefone: a.telefone || '', plano: a.plano || '',
+              vencimento: new Date(venc), dias,
+            });
+          }
+        });
+
+        lembretes.sort((a, b) => a.dias - b.dias);
+        info.textContent = '';
+
+        if (!lembretes.length) {
+          lista.innerHTML = '<p class="presenca-vazia">Nenhum aluno com vencimento nos próximos dias.</p>';
+          return;
+        }
+
+        document.getElementById('resumoCount').textContent = lembretes.length;
+        document.getElementById('resumoBox').style.display = '';
+        renderListaMensal();
+
+      } catch(e) {
+        info.textContent = '';
+        lista.innerHTML = `<p class="msg err">Erro ao carregar: ${esc(e.message)}</p>`;
+      }
+    }
+
+    function renderListaMensal() {
+      const lista = document.getElementById('listaLembretes');
+      lista.innerHTML = lembretes.map(a => {
+        const dataVencStr = formatarDataBR(a.vencimento.toISOString().slice(0,10));
+        const diasLabel   = a.dias === 0 ? 'Vence hoje!' : a.dias === 1 ? 'Vence amanhã!' : `Vence em ${a.dias} dias`;
+        const temTel      = !!(a.telefone || '').replace(/\D/g,'');
+        return `<div class="lembrete-item">
+          <div class="lembrete-info">
+            <div class="lembrete-nome" title="${esc(a.nome_aluno)}">${esc(a.nome_aluno)}</div>
+            <div class="lembrete-detalhe">${esc(a.plano)} · ${temTel ? esc(a.telefone) : '⚠️ Sem telefone'}</div>
+            <div class="lembrete-venc">📅 ${diasLabel} — ${dataVencStr}</div>
+          </div>
+          <button class="btn-wpp" onclick="enviarLembrete('${esc(a.id)}')">📲 Enviar</button>
+        </div>`;
+      }).join('');
+    }
+
+    window.enviarLembrete = function(id) {
+      const a = lembretes.find(x => x.id === id);
+      if (!a) return;
+      abrirWhatsApp(a.telefone, montarMensagem(a, a.vencimento));
+    };
+
+    document.getElementById('btnEnviarTodos').addEventListener('click', () => {
+      if (!lembretes.length) return;
+      if (!confirm(`Enviar lembretes para ${lembretes.length} aluno(s)?`)) return;
+      let i = 0;
+      function enviarProximo() {
+        if (i >= lembretes.length) return;
+        abrirWhatsApp(lembretes[i].telefone, montarMensagem(lembretes[i], lembretes[i].vencimento));
+        i++;
+        if (i < lembretes.length) setTimeout(enviarProximo, 1500);
+      }
+      enviarProximo();
+    });
+
+    /* ── Planos À Vista vencendo em 30 dias ── */
+    async function carregarAvistaVencendo() {
+      const info  = document.getElementById('avistaInfo');
+      const lista = document.getElementById('listaAvista');
+
+      try {
+        const snap = await getDocs(query(
+          collection(db, 'alunos'),
+          where('status', '==', 'ATIVO'),
+          where('plano', '==', 'Avista')
+        ));
+
+        const avistaVencendo = [];
+        const hoje = new Date(); hoje.setHours(0,0,0,0);
+
+        snap.forEach(d => {
+          const a = d.data();
+          if (!a.pago_ate) return; // "YYYY-MM"
+          // Último dia do mês pago
+          const [ano, mes] = a.pago_ate.split('-').map(Number);
+          const ultimoDia = new Date(ano, mes, 0); // dia 0 do mês seguinte = último dia do mês
+          ultimoDia.setHours(0,0,0,0);
+          const dias = diasAteData(new Date(ultimoDia));
+          if (dias >= 0 && dias <= DIAS_AVISO_AVISTA) {
+            avistaVencendo.push({
+              id:         d.id,
+              nome_aluno: a.nome_aluno || '',
+              telefone:   a.telefone   || '',
+              pago_ate:   a.pago_ate,
+              ultimoDia:  new Date(ultimoDia),
+              dias,
+            });
+          }
+        });
+
+        avistaVencendo.sort((a,b) => a.dias - b.dias);
+        info.textContent = '';
+
+        if (!avistaVencendo.length) {
+          lista.innerHTML = '<p class="presenca-vazia">Nenhum plano À Vista vencendo nos próximos 30 dias.</p>';
+          return;
+        }
+
+        lista.innerHTML = avistaVencendo.map(a => {
+          const mesAno    = formatarDataBR(a.pago_ate);
+          const diasLabel = a.dias === 0
+            ? '⚠️ Vence hoje!'
+            : a.dias <= 7
+            ? `⚠️ Vence em ${a.dias} dia${a.dias > 1 ? 's' : ''}`
+            : `Vence em ${a.dias} dias`;
+          const temTel = !!(a.telefone || '').replace(/\D/g,'');
+          return `<div class="lembrete-item avista">
+            <div class="lembrete-info">
+              <div class="lembrete-nome" title="${esc(a.nome_aluno)}">${esc(a.nome_aluno)}</div>
+              <div class="lembrete-detalhe">💳 À Vista · ${temTel ? esc(a.telefone) : '⚠️ Sem telefone'}</div>
+              <div class="lembrete-venc azul">📅 ${diasLabel} — Pago até ${mesAno}</div>
+            </div>
+            <button class="btn-wpp" style="background:#3498db;" onclick="enviarAvistaLembrete('${esc(a.id)}','${esc(a.pago_ate)}')">
+              📲 Avisar
+            </button>
+          </div>`;
+        }).join('');
+
+        // Guardar para uso no onclick
+        window._avistaVencendo = avistaVencendo;
+
+      } catch(e) {
+        info.textContent = '';
+        lista.innerHTML = `<p class="msg err">Erro ao carregar: ${esc(e.message)}</p>`;
+      }
+    }
+
+    window.enviarAvistaLembrete = function(id, pagoAte) {
+      const lista = window._avistaVencendo || [];
+      const a = lista.find(x => x.id === id);
+      if (!a) return;
+      const mesAno = formatarDataBR(pagoAte);
+      abrirWhatsApp(a.telefone, montarMensagemAvista(a, mesAno));
+    };
+
+    document.getElementById('btnHdrSair').addEventListener('click', () => {
+      signOut(auth).catch(() => {});
+      sessionStorage.removeItem(TOKEN_KEY);
+      location.href = './administrativo.html';
+    });
+  </script>
+</body>
+</html>
