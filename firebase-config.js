@@ -1,19 +1,19 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-analytics.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDj9SIhTF4-8oun-eACP179aUjSpMAR3So",
-  authDomain: "rivabjj-a477b.firebaseapp.com",
-  projectId: "rivabjj-a477b",
-  storageBucket: "rivabjj-a477b.firebasestorage.app",
-  messagingSenderId: "196632623313",
-  appId: "1:196632623313:web:9a7a3c1fee0795d7302df0",
-  measurementId: "G-7371GD4QK1"
+  apiKey: "AIzaSyD1j3WuBpRwS1LreI32DFJAFu07LODvs7s",
+  authDomain: "bjjflowhub-821fe.firebaseapp.com",
+  projectId: "bjjflowhub-821fe",
+  storageBucket: "bjjflowhub-821fe.firebasestorage.app",
+  messagingSenderId: "218946505499",
+  appId: "1:218946505499:web:7ea73d1c745a53cc42a1be"
 };
 
 const app = initializeApp(firebaseConfig);
-export const db      = getFirestore(app);
-export const auth    = getAuth(app);
-export const analytics = getAnalytics(app);
+export const db   = getFirestore(app);
+export const auth = getAuth(app);
+
+// Multi-tenant: lê academiaId pelo subdomínio
+export const academiaId = window.location.hostname.split('.')[0];
