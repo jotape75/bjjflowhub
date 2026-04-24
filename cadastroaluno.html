@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#c0392b" />
-  <title>Cadastrar Aluno – Riva BJJ</title>
+  <meta name="theme-color" content="#3D5A80" />
+  <title>Cadastrar Aluno – BJJFlowHub</title>
   <link rel="stylesheet" href="./styles.css" />
   <style>
     .admin-hdr-left { display: flex; align-items: center; gap: 14px; }
@@ -14,7 +14,7 @@
     .btn-logout:active { opacity: .75; }
     @media (min-width: 769px) {
       .admin-hdr-inner { max-width: 1100px; justify-content: space-between; padding: 0 24px; }
-      .admin-logo { width: 48px !important; height: 48px !important; margin-top: 0 !important; }
+      .admin-logo { width: 48px !important; height: auto !important; margin-top: 0 !important; }
       .admin-hdr-titulo { display: inline; font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
       .admin-hdr-sair { display: inline-block; }
       .admin-page { max-width: 1100px; padding: 32px 32px 64px; }
@@ -33,7 +33,7 @@
   <header class="hdr admin-hdr">
     <div class="hdr-inner admin-hdr-inner">
       <div class="admin-hdr-left">
-        <img class="logo admin-logo" src="./logo.png" alt="Riva BJJ" />
+        <img class="logo admin-logo" src="./logo.png" alt="BJJFlowHub" />
         <span class="admin-hdr-titulo">Portal Administrativo</span>
       </div>
       <button class="btn-logout admin-hdr-sair" id="btnHdrSair">Sair</button>
@@ -147,21 +147,19 @@
       <label class="label" for="fNumero">Número</label>
       <input id="fNumero" class="input" type="text" placeholder="Ex: 277" />
 
-      <!-- ── Financeiro ── -->
       <div style="border-top: 1px solid var(--border); margin: 16px 0 8px; padding-top: 12px;">
         <div style="font-size:15px;font-weight:900;color:#fff;margin-bottom:12px;">💰 Financeiro</div>
 
         <label class="label" for="fPlano">Plano</label>
         <select id="fPlano" class="input">
           <option value="">Não definido</option>
-          <option value="Recorrente">Recorrente – R$ 200,00</option>
-          <option value="Semestral">Semestral – R$ 220,00</option>
-          <option value="Mensal">Mensal – R$ 240,00</option>
+          <option value="Recorrente">Recorrente</option>
+          <option value="Semestral">Semestral</option>
+          <option value="Mensal">Mensal</option>
           <option value="Avista">À Vista</option>
           <option value="VIP">⭐ VIP – Isento</option>
         </select>
 
-        <!-- Aviso VIP, mostrado apenas quando VIP selecionado -->
         <div id="vipAviso" style="display:none;" class="vip-badge">
           ⭐ Aluno VIP — isento de mensalidade. Não aparecerá no financeiro.
         </div>
@@ -182,10 +180,11 @@
   </main>
 
   <script type="module">
-    import { db, auth } from './firebase-config.js';
-    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+    import { db, auth, academiaId } from './firebase-config.js';
+    import { collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 
+    const col = (nome) => collection(db, 'academias', academiaId, nome);
     const TOKEN_KEY = 'rv_prof_token';
 
     function setErr(id, msg)  { document.getElementById(id).textContent = msg; }
@@ -219,14 +218,12 @@
 
     document.getElementById('fCpf').addEventListener('input', function() { this.value = formatarCpf(this.value); });
 
-    // ── Plano VIP: mostrar/ocultar aviso e campos financeiros ──
     document.getElementById('fPlano').addEventListener('change', function () {
       const isVip = this.value === 'VIP';
-      document.getElementById('vipAviso').style.display       = isVip ? '' : 'none';
+      document.getElementById('vipAviso').style.display        = isVip ? '' : 'none';
       document.getElementById('secaoFinanceiro').style.display = isVip ? 'none' : '';
     });
 
-    // ── ViaCEP ──
     const cepInput   = document.getElementById('fCep');
     const cepSpinner = document.getElementById('cepSpinner');
     const cepErr     = document.getElementById('cepErr');
@@ -259,7 +256,6 @@
       }
     }
 
-    // ── Cadastrar aluno ──
     document.getElementById('btnCadastrar').addEventListener('click', async () => {
       const nome  = document.getElementById('fNome').value.trim();
       const email = document.getElementById('fEmail').value.trim().toLowerCase();
@@ -292,7 +288,7 @@
         const metaGrau    = (categoria === 'Juvenil' || categoria === 'Kids' || categoria === 'Infantil') ? 30 : (faixa === 'Branca' ? 36 : 56);
         const aulasNoGrau = parseInt(document.getElementById('fAulasNoGrau').value) || 0;
 
-        await addDoc(collection(db, 'alunos'), {
+        await addDoc(col('alunos'), {
           nome_aluno:       nome,
           email:            email,
           status:           'ATIVO',
