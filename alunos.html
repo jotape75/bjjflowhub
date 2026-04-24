@@ -4,14 +4,11 @@
   <meta charset="utf-8" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#c0392b" />
-  <title>Alunos – Riva BJJ</title>
+  <meta name="theme-color" content="#3D5A80" />
+  <title>Alunos – BJJFlowHub</title>
   <link rel="stylesheet" href="./styles.css" />
   <style>
-    /* ── EMBED MODE: esconde header e rodapé quando aberto no portal ── */
-    html.embed-mode header,
-    html.embed-mode .hdr,
-    html.embed-mode .rodape-fixo { display: none !important; }
+    html.embed-mode header, html.embed-mode .hdr, html.embed-mode .rodape-fixo { display: none !important; }
     html.embed-mode .lista-scroll { padding-bottom: 24px !important; }
     html.embed-mode .busca-fixa { top: 8px !important; }
 
@@ -26,29 +23,18 @@
     .admin-hdr-sair { display: none; }
     .btn-logout { background: transparent; border: 1px solid var(--border); color: #fff; border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
     .btn-logout:active { opacity: .75; }
-    .admin-logo { width: 56px !important; height: 56px !important; margin-top: 0 !important; }
+    .admin-logo { width: 56px !important; height: auto !important; margin-top: 0 !important; }
     @media (min-width: 769px) {
       .admin-hdr-inner { max-width: 1100px; justify-content: space-between; padding: 0 24px; }
-      .admin-logo { width: 64px !important; height: 64px !important; margin-top: 0 !important; }
+      .admin-logo { width: 64px !important; }
       .admin-hdr-titulo { display: inline; font-size: 20px; font-weight: 900; color: #fff; letter-spacing: 0.5px; }
       .admin-hdr-sair { display: inline-block; }
       .admin-page { max-width: 1100px; padding: 32px 32px 64px; }
     }
     @media (max-width: 768px) { .admin-hdr-inner { justify-content: center; } }
 
-    .aluno-card-compact {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 10px 14px;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      cursor: pointer;
-      transition: border-color 0.15s;
-    }
-    .aluno-card-compact:hover { border-color: var(--red); }
+    .aluno-card-compact { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: border-color 0.15s; }
+    .aluno-card-compact:hover { border-color: var(--blue); }
     .aluno-card-compact:active { opacity: .8; }
     .compact-info { flex: 1; min-width: 0; }
     .compact-nome { font-size: 15px; font-weight: 900; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -60,8 +46,8 @@
     .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px)); width: 100%; max-width: 520px; max-height: 92vh; overflow-y: auto; }
     @media (min-width: 769px) { .modal-overlay { align-items: center; } .modal-box { border-radius: 20px; max-width: 560px; max-height: 88vh; } }
     .modal-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; }
-    .modal-avatar { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 2.5px solid var(--red); flex-shrink: 0; }
-    .modal-avatar-placeholder { width: 140px; height: 140px; border-radius: 50%; background: #2a2a2a; border: 2.5px solid var(--red); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 900; color: var(--red); flex-shrink: 0; }
+    .modal-avatar { width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 2.5px solid var(--blue); flex-shrink: 0; }
+    .modal-avatar-placeholder { width: 140px; height: 140px; border-radius: 50%; background: #2a2a2a; border: 2.5px solid var(--blue); display: flex; align-items: center; justify-content: center; font-size: 48px; font-weight: 900; color: var(--blue); flex-shrink: 0; }
     .modal-nome-wrap { flex: 1; min-width: 0; }
     .modal-nome { font-size: 18px; font-weight: 900; color: #fff; word-break: break-word; }
     .modal-email { font-size: 13px; color: #aaa; margin-top: 2px; word-break: break-all; }
@@ -69,7 +55,7 @@
     .modal-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
     .aluno-faixa { font-size: 13px; font-weight: 700; color: #fff; background: #2a2a2a; border-radius: 8px; padding: 3px 10px; }
     .badge-ativo   { display: inline-block; padding: 3px 12px; border-radius: 999px; background: var(--green); color: #fff; font-size: 11px; font-weight: 900; }
-    .badge-inativo { display: inline-block; padding: 3px 12px; border-radius: 999px; background: var(--red);   color: #fff; font-size: 11px; font-weight: 900; }
+    .badge-inativo { display: inline-block; padding: 3px 12px; border-radius: 999px; background: #e74c3c; color: #fff; font-size: 11px; font-weight: 900; }
 
     .modal-btns-acao { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
     .btn-toggle { background: #e67e22; border: none; color: #fff; border-radius: 999px; padding: 8px 16px; font-size: 13px; font-weight: 900; cursor: pointer; white-space: nowrap; }
@@ -89,7 +75,7 @@
 
     .trocar-faixa-inline { display: none; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
     .trocar-faixa-inline select { background: #222; border: 1px solid #555; color: #fff; border-radius: 8px; padding: 7px 10px; font-size: 13px; flex: 1; min-width: 100px; }
-    .btn-confirmar-faixa { background: var(--red); border: none; color: #fff; border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; }
+    .btn-confirmar-faixa { background: var(--blue); border: none; color: #fff; border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; }
     .btn-cancelar-faixa  { background: #333; border: 1px solid #555; color: #aaa; border-radius: 10px; padding: 8px 12px; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
 
     .editar-inline { display: none; flex-direction: column; gap: 10px; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
@@ -103,8 +89,6 @@
     .cep-wrap-edit input { padding-right: 36px; }
     .cep-spinner-edit { display: none; position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #aaa; pointer-events: none; }
     .fin-msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
-
-    /* VIP notice inside edit form */
     .vip-edit-notice { display: none; background: linear-gradient(135deg,rgba(255,215,0,.12),rgba(255,165,0,.08)); border: 1px solid rgba(255,215,0,.35); border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 700; color: #ffd700; }
 
     .lista-vazia { color: #aaa; text-align: center; padding: 24px 0; font-size: 15px; }
@@ -131,7 +115,7 @@
   <header class="hdr admin-hdr">
     <div class="hdr-inner admin-hdr-inner">
       <div class="admin-hdr-left">
-        <img class="logo admin-logo" src="./logo.png" alt="Riva BJJ" />
+        <img class="logo admin-logo" src="./logo.png" alt="BJJFlowHub" />
         <span class="admin-hdr-titulo">Portal Administrativo</span>
       </div>
       <button class="btn-logout admin-hdr-sair" id="btnHdrSair">Sair</button>
@@ -161,16 +145,18 @@
     </section>
   </main>
 
-  <!-- MODAL ALUNO -->
   <div class="modal-overlay" id="modalAluno">
-    <div class="modal-box" id="modalAlunoBox">
-    </div>
+    <div class="modal-box" id="modalAlunoBox"></div>
   </div>
 
   <script type="module">
-    import { db, auth } from './firebase-config.js';
-    import { collection, doc, query, orderBy, getDocs, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+    import { db, auth, academiaId } from './firebase-config.js';
+    import { collection, doc, query, orderBy, getDocs, getDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+
+    // Multi-tenant helpers
+    const col  = (nome)     => collection(db, 'academias', academiaId, nome);
+    const doc_ = (nome, id) => doc(db, 'academias', academiaId, nome, id);
 
     const TOKEN_KEY        = 'rv_prof_token';
     const CACHE_KEY_ALUNOS = 'rv_alunos_cache';
@@ -221,7 +207,7 @@
           setInfo('listInfo','');
           renderListaFiltrada();
           atualizarResumoAlunos();
-          getDocs(query(collection(db,'alunos'), orderBy('nome_aluno'))).then(snap => {
+          getDocs(query(col('alunos'), orderBy('nome_aluno'))).then(snap => {
             snap.docs.forEach(d => {
               const fotoUrl = d.data().foto_url || '';
               if (fotoUrl) {
@@ -237,7 +223,7 @@
       setInfo('listInfo','Carregando alunos…');
       document.getElementById('listaAlunos').innerHTML = '';
       try {
-        const snap = await getDocs(query(collection(db,'alunos'), orderBy('nome_aluno')));
+        const snap = await getDocs(query(col('alunos'), orderBy('nome_aluno')));
         todosAlunos = snap.docs.map(d => {
           const a = d.data();
           return {
@@ -311,7 +297,6 @@
           ? `<img src="${esc(a.foto_url)}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid #444;" />`
           : `<div style="width:48px;height:48px;border-radius:50%;background:#2a2a2a;border:2px solid #444;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#888;flex-shrink:0;">${esc((a.nome_aluno||'?')[0].toUpperCase())}</div>`;
         const badgeCls = a.status === 'ATIVO' ? 'badge-ativo' : 'badge-inativo';
-        // Show VIP badge alongside faixa
         const planoLabel = a.plano === 'VIP' ? ' · ⭐ VIP' : '';
         return `<div class="aluno-card-compact" data-id="${id}">
           ${avatarHtml}
@@ -337,12 +322,9 @@
       const tel    = (a.resp_telefone || a.telefone || '').replace(/\D/g,'');
       if (!tel) { alert('Telefone do responsável não cadastrado.'); return; }
       try {
-        await updateDoc(doc(db,'alunos',a.id), {
-          contrato_token:        token,
-          contrato_token_expira: expira,
-        });
-        const link = `https://rivabjj.com.br/contrato.html?token=${token}`;
-        const msg  = `Olá! 😊 Segue o link para assinar o contrato de matrícula de *${a.nome_aluno}* na Riva BJJ:\n\n${link}\n\nO link é válido por 7 dias.`;
+        await updateDoc(doc_('alunos', a.id), { contrato_token: token, contrato_token_expira: expira });
+        const link = `${location.origin}${location.pathname.replace('alunos.html','contrato.html')}?token=${token}`;
+        const msg  = `Olá! 😊 Segue o link para assinar o contrato de matrícula de *${a.nome_aluno}* no BJJFlowHub:\n\n${link}\n\nO link é válido por 7 dias.`;
         window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`, '_blank');
       } catch(e) { alert('Erro ao gerar link: ' + e.message); }
     }
@@ -351,7 +333,7 @@
       alunoModalAtual = a;
       if (!a.foto_url) {
         try {
-          const snap = await getDoc(doc(db, 'alunos', a.id));
+          const snap = await getDoc(doc_('alunos', a.id));
           if (snap.exists()) a.foto_url = snap.data().foto_url || '';
         } catch(e) {}
       }
@@ -366,7 +348,6 @@
       const badgeCls = a.status === 'ATIVO' ? 'badge-ativo' : 'badge-inativo';
       const toggleLabel = a.status === 'ATIVO' ? 'Desativar' : 'Ativar';
 
-      // VIP badge in modal meta
       const vipBadge = a.plano === 'VIP'
         ? `<span style="background:linear-gradient(135deg,rgba(255,215,0,.2),rgba(255,165,0,.15));border:1px solid rgba(255,215,0,.5);border-radius:999px;padding:3px 12px;font-size:11px;font-weight:900;color:#ffd700;">⭐ VIP</span>`
         : '';
@@ -395,9 +376,7 @@
           <button class="btn-remover" id="modal-btnRemover-${id}">🗑️ Remover</button>
           <button class="btn-faixa"   id="modal-btnFaixa-${id}">Trocar Faixa</button>
           <button class="btn-toggle"  id="modal-btnToggle-${id}" data-status="${esc(a.status)}">${toggleLabel}</button>
-          ${!a.contrato_assinado ? `
-            <button class="btn-editar" id="modal-btnContrato-${id}" style="background:#25D366;">📲 Enviar contrato</button>
-          ` : ''}
+          ${!a.contrato_assinado ? `<button class="btn-editar" id="modal-btnContrato-${id}" style="background:#25D366;">📲 Enviar contrato</button>` : ''}
         </div>
 
         <div class="trocar-faixa-inline" id="modal-trocaFaixaArea-${id}">
@@ -510,14 +489,14 @@
             <label>Plano</label>
             <select id="modal-editPlano-${id}" onchange="window._onEditPlanoChange('${id}',this.value)">
               <option value=""           ${!a.plano             ?'selected':''}>Não definido</option>
-              <option value="Recorrente" ${a.plano==='Recorrente'?'selected':''}>Recorrente – R$ 200,00</option>
-              <option value="Semestral"  ${a.plano==='Semestral' ?'selected':''}>Semestral – R$ 220,00</option>
-              <option value="Mensal"     ${a.plano==='Mensal'    ?'selected':''}>Mensal – R$ 240,00</option>
+              <option value="Recorrente" ${a.plano==='Recorrente'?'selected':''}>Recorrente</option>
+              <option value="Semestral"  ${a.plano==='Semestral' ?'selected':''}>Semestral</option>
+              <option value="Mensal"     ${a.plano==='Mensal'    ?'selected':''}>Mensal</option>
               <option value="Avista"     ${a.plano==='Avista'    ?'selected':''}>À Vista</option>
               <option value="VIP"        ${a.plano==='VIP'       ?'selected':''}>⭐ VIP – Isento</option>
             </select>
             <div class="vip-edit-notice" id="modal-vipNotice-${id}" style="${a.plano==='VIP'?'display:block;margin-top:8px;':'display:none;margin-top:8px;'}">
-              ⭐ Aluno VIP — isento de mensalidade. Não aparece no financeiro.
+              ⭐ Aluno VIP — isento de mensalidade.
             </div>
           </div>
           <div id="modal-editFinWrap-${id}" style="${a.plano==='VIP'?'display:none':''}">
@@ -557,7 +536,6 @@
       document.getElementById('modalAluno').classList.add('open');
     }
 
-    // Toggle VIP notice + hide/show financial fields when plan changes in edit form
     window._onEditPlanoChange = function(id, valor) {
       const notice  = document.getElementById(`modal-vipNotice-${id}`);
       const finWrap = document.getElementById(`modal-editFinWrap-${id}`);
@@ -580,7 +558,7 @@
       if (badge) { badge.textContent = novoStatus; badge.className = novoStatus === 'ATIVO' ? 'badge-ativo' : 'badge-inativo'; }
       if (btn)   { btn.textContent = novoStatus === 'ATIVO' ? 'Desativar' : 'Ativar'; btn.dataset.status = novoStatus; }
       try {
-        await updateDoc(doc(db,'alunos',id), { status: novoStatus });
+        await updateDoc(doc_('alunos', id), { status: novoStatus });
         salvarCacheAlunos(todosAlunos);
         renderListaFiltrada();
       } catch(e) {
@@ -595,21 +573,14 @@
       try {
         const alunoTroca = todosAlunos.find(a => String(a.id) === String(id));
         const metaGrau = (alunoTroca?.categoria === 'Juvenil') ? 30 : (novaFaixa === 'Branca' ? 36 : 56);
-        await updateDoc(doc(db,'alunos',id), {
-          faixa:            novaFaixa,
-          grau_atual:       0,
-          aulas_no_grau:    0,
-          aulas_restantes:  metaGrau,
-          meta_grau:        metaGrau,
-          statusExame:      '',
-          data_ultimo_grau: new Date().toISOString().slice(0,10)
+        await updateDoc(doc_('alunos', id), {
+          faixa: novaFaixa, grau_atual: 0, aulas_no_grau: 0,
+          aulas_restantes: metaGrau, meta_grau: metaGrau,
+          statusExame: '', data_ultimo_grau: new Date().toISOString().slice(0,10)
         });
         if (alunoTroca) {
-          alunoTroca.faixa           = novaFaixa;
-          alunoTroca.grau_atual      = 0;
-          alunoTroca.meta_grau       = metaGrau;
-          alunoTroca.aulas_restantes = metaGrau;
-          alunoTroca.aulas_no_grau   = 0;
+          alunoTroca.faixa = novaFaixa; alunoTroca.grau_atual = 0;
+          alunoTroca.meta_grau = metaGrau; alunoTroca.aulas_restantes = metaGrau; alunoTroca.aulas_no_grau = 0;
         }
         salvarCacheAlunos(todosAlunos);
         if (label) label.textContent = novaFaixa + ' G0';
@@ -644,7 +615,6 @@
           data_inicio:     document.getElementById(`modal-editDataInicio-${eid}`).value,
           categoria:       categoriaEdit,
           plano:           planoEdit,
-          // Only save group/contract fields when not VIP
           grupo_familiar:  planoEdit !== 'VIP' ? (document.getElementById(`modal-editGrupoFamiliar-${eid}`)?.value.trim() || '') : '',
           data_contrato:   planoEdit !== 'VIP' ? (document.getElementById(`modal-editDataContrato-${eid}`)?.value || '')       : '',
           cep:             cepRaw,
@@ -661,7 +631,7 @@
           resp_email:    (document.getElementById(`modal-editRespEmail-${eid}`)    ? document.getElementById(`modal-editRespEmail-${eid}`).value.trim().toLowerCase()  : ''),
           resp_telefone: (document.getElementById(`modal-editRespTelefone-${eid}`) ? document.getElementById(`modal-editRespTelefone-${eid}`).value.trim()             : ''),
         };
-        await updateDoc(doc(db,'alunos',id), updates);
+        await updateDoc(doc_('alunos', id), updates);
         if (aluno) Object.assign(aluno, updates);
         salvarCacheAlunos(todosAlunos);
         renderListaFiltrada();
@@ -670,7 +640,6 @@
           if (msg) msg.textContent = '';
           const area = document.getElementById(`modal-editarArea-${eid}`);
           if (area) area.style.display = 'none';
-          // Re-open modal to reflect updated VIP badge / plano label
           const alunoAtualizado = todosAlunos.find(a => String(a.id) === String(id));
           if (alunoAtualizado) abrirModalAluno(alunoAtualizado);
         }, 1200);
@@ -682,7 +651,7 @@
     async function removerAluno(id) {
       if (!confirm('Tem certeza que deseja remover este aluno? Esta ação não pode ser desfeita.')) return;
       try {
-        await deleteDoc(doc(db,'alunos',id));
+        await deleteDoc(doc_('alunos', id));
         todosAlunos = todosAlunos.filter(a => String(a.id) !== String(id));
         salvarCacheAlunos(todosAlunos);
         renderListaFiltrada();
@@ -696,11 +665,11 @@
     window._editCepInput = function(prefixId, input) {
       input.value = formatarCep(input.value);
       const cepLimpo = input.value.replace(/\D/g,'');
-      const spinnerId = `${prefixId.includes('modal-') ? prefixId.split('modal-')[0] : ''}modal-editCepSpinner-${prefixId.replace('modal-','')}`;
-      const sp = document.getElementById(spinnerId);
+      const pid = prefixId.replace('modal-','');
+      const sp = document.getElementById(`modal-editCepSpinner-${pid}`);
       if (cepLimpo.length !== 8) {
         ['Rua','Bairro','Cidade','Estado'].forEach(f => {
-          const el = document.getElementById(`modal-edit${f}-${prefixId.replace('modal-','')}`);
+          const el = document.getElementById(`modal-edit${f}-${pid}`);
           if (el) el.value = '';
         });
         return;
@@ -711,12 +680,8 @@
         .then(data => {
           if (sp) sp.style.display = 'none';
           if (data.erro) return;
-          const pid = prefixId.replace('modal-','');
           const set = (f, v) => { const el = document.getElementById(`modal-edit${f}-${pid}`); if (el) el.value = v; };
-          set('Rua',    data.logradouro || '');
-          set('Bairro', data.bairro     || '');
-          set('Cidade', data.localidade || '');
-          set('Estado', data.uf         || '');
+          set('Rua', data.logradouro||''); set('Bairro', data.bairro||''); set('Cidade', data.localidade||''); set('Estado', data.uf||'');
         })
         .catch(() => { if (sp) sp.style.display = 'none'; });
     };
@@ -771,7 +736,7 @@
       pdf.setFont('helvetica', 'bold'); pdf.setFontSize(14);
       pdf.text('CONTRATO DE PRESTAÇÃO DE SERVIÇOS', pageW / 2, y, { align: 'center' }); y += 6;
       pdf.setFont('helvetica', 'normal'); pdf.setFontSize(10);
-      pdf.text('Riva BJJ Brazilian Jiu Jitsu Ltda — CNPJ 66.256.625/0001-27', pageW / 2, y, { align: 'center' }); y += 10;
+      pdf.text('BJJFlowHub', pageW / 2, y, { align: 'center' }); y += 10;
       pdf.setDrawColor(180); pdf.line(margin, y, pageW - margin, y); y += 8;
       pdf.setFont('helvetica', 'bold'); pdf.setFontSize(10);
       pdf.text('DADOS DO CONTRATANTE', margin, y); y += 6;
@@ -781,28 +746,6 @@
       const nomeContrato = isResp ? (a.resp_nome || a.nome_aluno || '—') : (a.nome_aluno || '—');
       const cpfContrato  = isResp ? (a.resp_cpf  || '—') : (a.cpf || '—');
       [`Nome: ${nomeContrato}`,`CPF: ${cpfContrato}`,`Endereço: ${endereco}`,`Plano: ${a.plano || '—'}`,`Início: ${a.data_contrato || a.data_inicio || '—'}`].forEach(linha => { pdf.text(linha, margin, y); y += 6; });
-      y += 4; pdf.setDrawColor(180); pdf.line(margin, y, pageW - margin, y); y += 8;
-      const clausulas = [
-        ['Cláusula Primeira – Dos Planos','As aulas terão frequência mínima de 02 aulas semanais, com planos mensais, recorrentes e anuais. Não haverá reposição e/ou troca de aula, exceto em caso de justificativa médica comprovada ou falta por parte da CONTRATADA.'],
-        ['Cláusula Segunda – Dos Valores','O valor correspondente a cada plano será pago a vencer, de forma mensal, mediante débito automático em cartão de crédito ou Pix, de acordo com a tabela de preço que segue em anexo.'],
-        ['Cláusula Terceira – Do Prazo','O presente contrato poderá ser renovado automaticamente. Quando da renovação, novos pagamentos deverão ser feitos de acordo com o plano escolhido.'],
-        ['Cláusula Quarta – Da Rescisão','O CONTRATANTE deverá comunicá-la com antecedência mínima de 30 (trinta) dias, sob pena de incidir o pagamento do mês vigente.'],
-        ['Cláusula Quinta – Do Termo de Responsabilidade','O CONTRATANTE declara ter consultado médico de sua confiança, e estar apto para a prática de atividades físicas e esportivas de qualquer natureza.'],
-        ['Cláusula Sexta – Dos Danos e Acidentes','O CONTRATANTE se obriga a observar estrita e exclusivamente as orientações dos profissionais da CONTRATADA para a prática das atividades físicas.'],
-        ['Cláusula Sétima – Da Imagem','A CONTRATADA, livre de quaisquer ônus junto ao CONTRATANTE, poderá utilizar-se da sua imagem para fins exclusivos de divulgação da Academia.'],
-        ['Cláusula Oitava – Dos Danos Causados','O CONTRATANTE se obriga a ressarcir a CONTRATADA por qualquer dano causado por ele, por dolo ou culpa, em até 48 horas após a constatação do evento.'],
-        ['Cláusula Nona – Dos Armários','A CONTRATADA disponibiliza aos seus usuários guarda-volumes e/ou armários, que deverão ser esvaziados diariamente. A CONTRATADA não se responsabiliza pelos objetos deixados.'],
-        ['Cláusula Décima – Do Estacionamento','O estacionamento é gratuito e de uso exclusivo dos CONTRATANTES. A CONTRATADA não se responsabiliza por roubos, furtos ou danos de veículos.'],
-        ['Cláusula Décima Primeira – Do Foro','As partes elegem o foro da cidade de Indaiatuba/SP para dirimir eventual entrave decorrente do presente contrato.'],
-      ];
-      clausulas.forEach(([titulo, texto]) => {
-        if (y > 260) { pdf.addPage(); y = 20; }
-        pdf.setFont('helvetica','bold'); pdf.setFontSize(9); pdf.text(titulo, margin, y); y += 5;
-        pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
-        const linhas = pdf.splitTextToSize(texto, maxW);
-        pdf.text(linhas, margin, y); y += linhas.length * 5 + 4;
-      });
-      if (y > 220) { pdf.addPage(); y = 20; }
       y += 4; pdf.setDrawColor(180); pdf.line(margin, y, pageW - margin, y); y += 8;
       pdf.setFont('helvetica', 'bold'); pdf.setFontSize(10); pdf.text('ASSINATURA', margin, y); y += 6;
       pdf.setFont('helvetica', 'normal'); pdf.setFontSize(9);
@@ -824,7 +767,7 @@
         } catch(e) { pdf.text('[Assinatura digital registrada]', margin, y); y += 6; }
       }
       pdf.setFontSize(8); pdf.setTextColor(150);
-      pdf.text('Indaiatuba/SP — Riva BJJ Brazilian Jiu Jitsu Ltda', pageW / 2, 290, { align: 'center' });
+      pdf.text('BJJFlowHub', pageW / 2, 290, { align: 'center' });
       pdf.save(`contrato_${(a.nome_aluno || 'aluno').replace(/\s+/g,'_')}.pdf`);
     };
   </script>
