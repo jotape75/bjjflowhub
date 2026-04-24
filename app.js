@@ -1,18 +1,22 @@
-import { db, auth } from './firebase-config.js';
+import { db, auth, academiaId } from './firebase-config.js';
 import {
   collection, doc, query, where, orderBy, limit,
   getDocs, getDoc, addDoc, updateDoc, deleteDoc, serverTimestamp,
   Timestamp
-} from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-import { signInAnonymously } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { signInAnonymously } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 
 const anonAuthPromise = signInAnonymously(auth).catch(() => {});
+
+// ── Multi-tenant helpers ───────────────────────────────────────
+const col  = (nome)     => collection(db, 'academias', academiaId, nome);
+const doc_ = (nome, id) => doc(db, 'academias', academiaId, nome, id);
 
 const SEMANA_TTL          = 600000;   // 10 min
 const PRESENCA_TTL        = 600000;   // 10 min
 const NOTIF_TTL           = 900000;   // 15 min
 const BIO_GRACE_MS        = 1800000;  // 30 min
-const RP_NAME             = 'Riva BJJ';
+const RP_NAME             = 'BJJFlowHub';
 const MAX_GRAU_POR_FAIXA = 4;
 
 // Faixas juvenis (36 aulas por grau)
@@ -23,7 +27,6 @@ const FAIXAS_JUVENIS = new Set([
   'Verde/Branca','Verde','Verde/Preta',
 ]);
 
-// Ícones: emoji para monocores com emoji disponível, HTML para o resto
 const EMOJI_FAIXA = {
   'Branca':  '🔲',
   'Azul':    '🟦',
@@ -34,7 +37,6 @@ const EMOJI_FAIXA = {
   'Verde':   '🟩',
 };
 
-// Cores para quadradinhos HTML
 const COR_FAIXA = {
   'Cinza':   '#9E9E9E',
   'Preta':   '#111111',
@@ -43,6 +45,7 @@ const COR_FAIXA = {
   'Laranja': '#FF6D00',
   'Verde':   '#2E7D32',
 };
+
 function _quadrado(cor, borda = false) {
   const b = borda ? 'border:1.5px solid #fff;' : '';
   return `<span style="display:inline-block;width:16px;height:16px;border-radius:3px;background:${cor};${b}vertical-align:middle;"></span>`;
@@ -129,7 +132,7 @@ async function uploadFotoPerfil(file, alunoId) {
     img.src = url;
   });
 
-  await updateDoc(doc(db, 'alunos', alunoId), { foto_url: base64 });
+  await updateDoc(doc_('alunos', alunoId), { foto_url: base64 });
   return base64;
 }
 
@@ -165,29 +168,18 @@ function preencherTextoContrato(a) {
 
   return `
     <p style="font-weight:900;text-align:center;color:#fff;margin-bottom:14px;">CONTRATO DE PRESTAÇÃO DE SERVIÇOS</p>
-    <p>Pelo presente instrumento particular, de um lado, <strong>RIVA BJJ BRAZILIAN JIU JITSU LTDA</strong>, com sede na Rua Jose Ramos, nº 4181, Loja 07, Parque Barnabé, Indaiatuba/SP, inscrita no CNPJ/MF sob nº 66.256.625/0001-27, aqui denominada simplesmente <strong>CONTRATADA</strong>, e de outro lado, ${campo(nomeAluno)}, inscrito(a) no CPF/MF sob o nº ${campo(cpf)}, residente e domiciliado(a) na ${campo(endereco)}, aqui denominado(a) simplesmente <strong>CONTRATANTE</strong>, fica ajustada a prestação de serviços específicos na área de preparação física, onde serão ministradas aulas de acordo com as cláusulas abaixo especificadas:</p>
+    <p>Pelo presente instrumento particular, de um lado, <strong>BJJFlowHub</strong>, aqui denominada simplesmente <strong>CONTRATADA</strong>, e de outro lado, ${campo(nomeAluno)}, inscrito(a) no CPF/MF sob o nº ${campo(cpf)}, residente e domiciliado(a) na ${campo(endereco)}, aqui denominado(a) simplesmente <strong>CONTRATANTE</strong>, fica ajustada a prestação de serviços específicos na área de preparação física, onde serão ministradas aulas de acordo com as cláusulas abaixo especificadas:</p>
     <p><strong>Cláusula Primeira – Dos Planos:</strong> As aulas terão frequência mínima de 02 aulas semanais, com planos mensais, recorrentes e anuais. Plano: ${campo(plano)} &nbsp; Valor: ${campo(valor)} &nbsp; Início: ${campo(inicioFmt)}</p>
-    <p>Parágrafo único – Não haverá reposição e/ou troca de aula, exceto em caso de justificativa médica comprovada ou falta por parte da CONTRATADA. Nestes casos, o CONTRATANTE poderá repor a aula em horário que lhe seja conveniente, com prévia e expressa autorização da CONTRATADA.</p>
-    <p><strong>Cláusula Segunda – Dos Valores:</strong> O valor correspondente a cada plano será pago a vencer, de forma mensal, mediante débito automático em cartão de crédito ou Pix, de acordo com a tabela de preço que segue em anexo, que poderá sofrer variações e reajustes a critério da CONTRATADA, limitados às disposições legais.</p>
-    <p>Parágrafo único – Não será permitida qualquer espécie de cessão do presente contrato, transferência de créditos restantes ou do plano contratado, independente do grau de parentesco ou da relação existente com o CONTRATANTE.</p>
+    <p>Parágrafo único – Não haverá reposição e/ou troca de aula, exceto em caso de justificativa médica comprovada ou falta por parte da CONTRATADA.</p>
+    <p><strong>Cláusula Segunda – Dos Valores:</strong> O valor correspondente a cada plano será pago a vencer, de forma mensal, mediante débito automático em cartão de crédito ou Pix.</p>
     <p><strong>Cláusula Terceira – Do Prazo:</strong> O presente contrato poderá ser renovado automaticamente.</p>
-    <p>Parágrafo único – Quando da renovação, novos pagamentos deverão ser feitos de acordo com o plano escolhido.</p>
     <p><strong>Cláusula Quarta – Da Rescisão:</strong> O CONTRATANTE deverá comunicá-la com antecedência mínima de 30 (trinta) dias, sob pena de incidir o pagamento do mês vigente.</p>
-    <p>Parágrafo único – Não ocorrendo o aviso de rescisão, nem o comparecimento na aula seguinte ao vencimento do plano, o CONTRATANTE renuncia o horário de suas aulas, facultando ao CONTRATADO disponibilização daquele horário.</p>
-    <p><strong>Cláusula Quinta – Do Termo de Responsabilidade:</strong> O CONTRATANTE declara ter consultado médico de sua confiança, e estar apto para a prática de atividades físicas e esportivas de qualquer natureza, bem como, declara estar ciente de que deverá apresentar o respectivo atestado médico.</p>
-    <p>Parágrafo 1º – O CONTRATANTE se responsabiliza pela manutenção e cuidados de sua saúde, bem como, pelo uso de qualquer medicamento e/ou substância que faça uso ou passe a utilizar, sob prescrição médica ou não.</p>
-    <p>Parágrafo 2º – O CONTRATANTE deverá apresentar também, caso seja portador de alguma deficiência ou enfermidade que imponha limitações à atividade física, laudo médico informando tal estado.</p>
-    <p>Parágrafo 3º – A validade do atestado médico e/ou laudo médico é de 01 (um) ano, sendo necessária sua renovação.</p>
+    <p><strong>Cláusula Quinta – Do Termo de Responsabilidade:</strong> O CONTRATANTE declara ter consultado médico de sua confiança, e estar apto para a prática de atividades físicas e esportivas de qualquer natureza.</p>
     <p><strong>Cláusula Sexta – Dos Danos e Acidentes:</strong> O CONTRATANTE se obriga a observar estrita e exclusivamente as orientações dos profissionais da CONTRATADA para a prática das atividades físicas.</p>
-    <p>Parágrafo único – A CONTRATADA não se responsabiliza por danos físicos de qualquer natureza resultantes da inobservância do CONTRATANTE às suas orientações, pelo acatamento à orientação de terceiros estranhos, ou ainda pelo uso inadequado dos aparelhos e equipamentos.</p>
-    <p><strong>Cláusula Sétima – Da Imagem:</strong> A CONTRATADA, livre de quaisquer ônus junto ao CONTRATANTE, poderá utilizar-se da sua imagem para fins exclusivos de divulgação da Academia e suas atividades, podendo reproduzi-la ou divulgá-la junto à Internet, redes sociais, jornais e todos os demais meios de comunicação público ou privado.</p>
-    <p>Parágrafo único – Em nenhuma hipótese poderá a imagem do CONTRATANTE ser utilizada de maneira contrária à moral ou aos bons costumes ou à ordem pública.</p>
-    <p><strong>Cláusula Oitava – Dos Danos Causados:</strong> O CONTRATANTE se obriga a ressarcir a CONTRATADA por qualquer dano causado por ele, por dolo ou culpa, em até 48 horas após a constatação do evento e sua consequente comunicação formal ao CONTRATANTE.</p>
-    <p><strong>Cláusula Nona – Dos Armários, Objetos e Pertences:</strong> A CONTRATADA disponibiliza aos seus usuários guarda-volumes e/ou armários, que deverão ser esvaziados diariamente. A CONTRATADA não se responsabiliza pelos objetos deixados no interior dos armários ou guarda-volumes.</p>
-    <p><strong>Cláusula Décima – Do Estacionamento:</strong> O estacionamento é gratuito e de uso exclusivo dos CONTRATANTES. A CONTRATADA não se responsabiliza por roubos, furtos, danos de veículos ou motos, ou por objetos deixados no interior deles.</p>
-    <p><strong>Cláusula Décima Primeira – Do Foro:</strong> As partes elegem o foro da cidade de Indaiatuba/SP, desprezando qualquer outro, por mais privilegiado que seja, para dirimir eventual entrave decorrente do presente contrato.</p>
+    <p><strong>Cláusula Sétima – Da Imagem:</strong> A CONTRATADA poderá utilizar-se da imagem do CONTRATANTE para fins exclusivos de divulgação da Academia e suas atividades.</p>
+    <p><strong>Cláusula Oitava – Do Foro:</strong> As partes elegem o foro da comarca onde a academia está situada para dirimir eventual entrave decorrente do presente contrato.</p>
     <p>E por estarem justos e contratados, assinam o presente instrumento em 02 (duas) vias de igual teor.</p>
-    <p style="text-align:center;margin-top:14px;">Indaiatuba, ${data}</p>
+    <p style="text-align:center;margin-top:14px;">${data}</p>
   `;
 }
 
@@ -225,7 +217,6 @@ async function mostrarTelaContrato(a) {
   if (inputAss) {
     inputAss.placeholder = isResponsavel ? 'Digite o nome do responsável' : 'Digite seu nome completo';
   }
-
   show('cardContrato');
 }
 
@@ -238,7 +229,7 @@ async function salvarAssinaturaContrato(a) {
   </svg>`;
   const assinaturaBase64 = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgStr)));
   const agora = new Date().toISOString();
-  await updateDoc(doc(db, 'alunos', a.id), {
+  await updateDoc(doc_('alunos', a.id), {
     contrato_assinado:    true,
     contrato_assinado_em: agora,
     contrato_assinatura:  assinaturaBase64,
@@ -279,7 +270,7 @@ function formatTimestamp(ts) {
 
 async function fbLogin(email) {
   try {
-    const alunosQ = query(collection(db, 'alunos'), where('email', '==', email));
+    const alunosQ = query(col('alunos'), where('email', '==', email));
     const alunosSnap = await getDocs(alunosQ);
     if (!alunosSnap.empty) {
       const docData = alunosSnap.docs[0].data();
@@ -316,7 +307,7 @@ async function fbLogin(email) {
         }
       };
     }
-    const profsQ = query(collection(db, 'professores'), where('email', '==', email));
+    const profsQ = query(col('professores'), where('email', '==', email));
     const profsSnap = await getDocs(profsQ);
     if (!profsSnap.empty) {
       const docData = profsSnap.docs[0].data();
@@ -334,7 +325,7 @@ async function fbLogin(email) {
 
 async function fbProfLoginEmail(email) {
   try {
-    const q = query(collection(db, 'professores'), where('email', '==', email));
+    const q = query(col('professores'), where('email', '==', email));
     const snap = await getDocs(q);
     if (!snap.empty) {
       const d = snap.docs[0].data();
@@ -348,7 +339,7 @@ async function fbProfLoginEmail(email) {
 
 async function fbTreinosSemana() {
   try {
-    const snap = await getDocs(collection(db, 'sessoes'));
+    const snap = await getDocs(col('sessoes'));
     const byDow = {};
     snap.forEach(d => {
       const s = d.data();
@@ -371,35 +362,24 @@ async function fbTreinosSemana() {
 async function fbListaPresenca(dataTreino, horario) {
   try {
     const q = query(
-      collection(db, 'checkins'),
+      col('checkins'),
       where('data_treino', '==', dataTreino),
       where('horario', '==', horario)
     );
     const snap = await getDocs(q);
-
-    const emails = [...new Set(
-      snap.docs.map(d => d.data().email).filter(Boolean)
-    )];
-
+    const emails = [...new Set(snap.docs.map(d => d.data().email).filter(Boolean))];
     const fotoMap = {};
     await Promise.all(emails.map(async (email) => {
       try {
-        const aq = query(collection(db, 'alunos'), where('email', '==', email), limit(1));
+        const aq = query(col('alunos'), where('email', '==', email), limit(1));
         const as = await getDocs(aq);
         if (!as.empty) fotoMap[email] = as.docs[0].data().foto_url || '';
       } catch (_) {}
     }));
-
     const data = [];
     snap.forEach(d => {
       const item = d.data();
-      data.push({
-        linha:    d.id,
-        nome:     item.nome,
-        status:   item.status,
-        email:    item.email || '',
-        foto_url: fotoMap[item.email] || '',
-      });
+      data.push({ linha: d.id, nome: item.nome, status: item.status, email: item.email || '', foto_url: fotoMap[item.email] || '' });
     });
     return { ok: true, data };
   } catch (e) {
@@ -408,81 +388,23 @@ async function fbListaPresenca(dataTreino, horario) {
 }
 
 async function fbListaPresencaArquivo(dataTreino, horario) {
-  try {
-    const q = query(
-      collection(db, 'checkins'),
-      where('data_treino', '==', dataTreino),
-      where('horario', '==', horario)
-    );
-    const snap = await getDocs(q);
-
-    const emails = [...new Set(
-      snap.docs.map(d => d.data().email).filter(Boolean)
-    )];
-
-    const fotoMap = {};
-    await Promise.all(emails.map(async (email) => {
-      try {
-        const aq = query(collection(db, 'alunos'), where('email', '==', email), limit(1));
-        const as = await getDocs(aq);
-        if (!as.empty) fotoMap[email] = as.docs[0].data().foto_url || '';
-      } catch (_) {}
-    }));
-
-    const data = [];
-    snap.forEach(d => {
-      const item = d.data();
-      data.push({
-        linha:    d.id,
-        nome:     item.nome,
-        status:   item.status,
-        email:    item.email || '',
-        foto_url: fotoMap[item.email] || '',
-      });
-    });
-    return { ok: true, data };
-  } catch (e) {
-    return { ok: false, erro: e.message };
-  }
+  return fbListaPresenca(dataTreino, horario);
 }
 
 async function fbCheckin(email, nome, horario, dataTreino, alunoId) {
   try {
-    const qDia = query(
-      collection(db, 'checkins'),
-      where('email', '==', email),
-      where('data_treino', '==', dataTreino)
-    );
+    const qDia = query(col('checkins'), where('email', '==', email), where('data_treino', '==', dataTreino));
     const snapDia = await getDocs(qDia);
-
     const horariosAtivos = new Set();
     snapDia.forEach(d => {
       const item = d.data();
-      if (!item.status || !item.status.includes('REPROVADO')) {
-        horariosAtivos.add(item.horario);
-      }
+      if (!item.status || !item.status.includes('REPROVADO')) horariosAtivos.add(item.horario);
     });
-
-    if (horariosAtivos.has(horario)) {
-      return { ok: false, erro: 'Você já fez check-in para este treino! ❌' };
-    }
-
-    if (horariosAtivos.size >= 2) {
-      return { ok: false, erro: 'Limite diário: você só pode fazer 2 check-ins por dia. ❌' };
-    }
-
-    const checkinData = {
-      email,
-      nome,
-      horario,
-      data_treino: dataTreino,
-      status: 'PENDENTE ⏳',
-      data_aprovacao: null,
-      arquivado: false,
-      criadoEm: serverTimestamp()
-    };
+    if (horariosAtivos.has(horario)) return { ok: false, erro: 'Você já fez check-in para este treino! ❌' };
+    if (horariosAtivos.size >= 2)    return { ok: false, erro: 'Limite diário: você só pode fazer 2 check-ins por dia. ❌' };
+    const checkinData = { email, nome, horario, data_treino: dataTreino, status: 'PENDENTE ⏳', data_aprovacao: null, arquivado: false, criadoEm: serverTimestamp() };
     if (alunoId) checkinData.alunoId = alunoId;
-    await addDoc(collection(db, 'checkins'), checkinData);
+    await addDoc(col('checkins'), checkinData);
     return { ok: true };
   } catch (e) {
     return { ok: false, erro: e.message };
@@ -491,15 +413,9 @@ async function fbCheckin(email, nome, horario, dataTreino, alunoId) {
 
 async function fbDeletarCheckin(email, dataTreino, horario) {
   try {
-    const q = query(
-      collection(db, 'checkins'),
-      where('email', '==', email),
-      where('data_treino', '==', dataTreino),
-      where('horario', '==', horario)
-    );
+    const q = query(col('checkins'), where('email', '==', email), where('data_treino', '==', dataTreino), where('horario', '==', horario));
     const snap = await getDocs(q);
-    const deletions = snap.docs.map(d => deleteDoc(doc(db, 'checkins', d.id)));
-    await Promise.all(deletions);
+    await Promise.all(snap.docs.map(d => deleteDoc(doc_('checkins', d.id))));
     return { ok: true };
   } catch (e) {
     return { ok: false, erro: e.message };
@@ -509,70 +425,45 @@ async function fbDeletarCheckin(email, dataTreino, horario) {
 async function fbAprovar(linhaId) {
   try {
     await anonAuthPromise;
-
-    const checkinRef = doc(db, 'checkins', String(linhaId));
-    await updateDoc(checkinRef, {
-      status: 'VALIDADO ✓',
-      data_aprovacao: serverTimestamp()
-    });
-
+    const checkinRef = doc_('checkins', String(linhaId));
+    await updateDoc(checkinRef, { status: 'VALIDADO ✓', data_aprovacao: serverTimestamp() });
     const checkinSnap = await getDoc(checkinRef);
     if (checkinSnap.exists()) {
       const checkinData = checkinSnap.data();
       let alunoRef = null;
-
       if (checkinData.alunoId) {
-        alunoRef = doc(db, 'alunos', checkinData.alunoId);
+        alunoRef = doc_('alunos', checkinData.alunoId);
       } else if (checkinData.email) {
-        const q = query(collection(db, 'alunos'), where('email', '==', checkinData.email), limit(1));
+        const q = query(col('alunos'), where('email', '==', checkinData.email), limit(1));
         const snap = await getDocs(q);
         if (!snap.empty) alunoRef = snap.docs[0].ref;
       }
-
       if (alunoRef) {
         const alunoSnap = await getDoc(alunoRef);
         if (alunoSnap.exists()) {
-          const a         = alunoSnap.data();
+          const a = alunoSnap.data();
           const faixaNorm = (a.faixa || '').replace(' e ', '/').replace(' E ', '/');
           const metaGrau  = a.meta_grau ?? ((a.categoria === 'Juvenil') ? 30 : (faixaNorm === 'Branca' ? 36 : 56));
           const grauAtual = a.grau_atual ?? 0;
           const novoAulasNoGrau = (a.aulas_no_grau ?? 0) + 1;
-
           try {
             if (novoAulasNoGrau >= metaGrau && metaGrau > 0) {
               if (grauAtual < MAX_GRAU_POR_FAIXA) {
                 const novoGrau = grauAtual + 1;
-                await updateDoc(alunoRef, {
-                  grau_atual:       novoGrau,
-                  aulas_no_grau:    0,
-                  aulas_restantes:  metaGrau,
-                  meta_grau:        metaGrau,
-                  statusExame:      gerarStatus(faixaNorm, novoGrau),
-                  data_ultimo_grau: hojeDataBR(),
-                });
+                await updateDoc(alunoRef, { grau_atual: novoGrau, aulas_no_grau: 0, aulas_restantes: metaGrau, meta_grau: metaGrau, statusExame: gerarStatus(faixaNorm, novoGrau), data_ultimo_grau: hojeDataBR() });
               } else {
-                await updateDoc(alunoRef, {
-                  aulas_restantes: 0,
-                  statusExame:     gerarStatus(faixaNorm, MAX_GRAU_POR_FAIXA),
-                });
+                await updateDoc(alunoRef, { aulas_restantes: 0, statusExame: gerarStatus(faixaNorm, MAX_GRAU_POR_FAIXA) });
               }
             } else {
-              await updateDoc(alunoRef, {
-                aulas_no_grau:   novoAulasNoGrau,
-                aulas_restantes: Math.max(0, metaGrau - novoAulasNoGrau),
-                statusExame:     gerarStatus(faixaNorm, grauAtual),
-              });
+              await updateDoc(alunoRef, { aulas_no_grau: novoAulasNoGrau, aulas_restantes: Math.max(0, metaGrau - novoAulasNoGrau), statusExame: gerarStatus(faixaNorm, grauAtual) });
             }
           } catch (permErr) {
-            if (permErr.code === 'permission-denied') {
-              return { ok: false, erro: 'Erro de permissão: verifique se Anonymous Auth está habilitado no Firebase Console.' };
-            }
+            if (permErr.code === 'permission-denied') return { ok: false, erro: 'Erro de permissão: verifique se Anonymous Auth está habilitado no Firebase Console.' };
             throw permErr;
           }
         }
       }
     }
-
     return { ok: true };
   } catch (e) {
     return { ok: false, erro: e.message };
@@ -581,10 +472,7 @@ async function fbAprovar(linhaId) {
 
 async function fbReprovar(linhaId) {
   try {
-    await updateDoc(doc(db, 'checkins', String(linhaId)), {
-      status: 'REPROVADO ✗',
-      data_aprovacao: serverTimestamp()
-    });
+    await updateDoc(doc_('checkins', String(linhaId)), { status: 'REPROVADO ✗', data_aprovacao: serverTimestamp() });
     return { ok: true };
   } catch (e) {
     return { ok: false, erro: e.message };
@@ -593,13 +481,7 @@ async function fbReprovar(linhaId) {
 
 async function fbNotificacoes(email) {
   try {
-    const q = query(
-      collection(db, 'checkins'),
-      where('email', '==', email),
-      where('status', 'in', ['VALIDADO ✓', 'REPROVADO ✗']),
-      orderBy('data_aprovacao', 'desc'),
-      limit(50)
-    );
+    const q = query(col('checkins'), where('email', '==', email), where('status', 'in', ['VALIDADO ✓', 'REPROVADO ✗']), orderBy('data_aprovacao', 'desc'), limit(50));
     const snap = await getDocs(q);
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
     const data = [];
@@ -611,12 +493,7 @@ async function fbNotificacoes(email) {
         ts = dt.getTime();
       }
       if (ts >= thirtyDaysAgo) {
-        data.push({
-          status:        item.status,
-          horario:       item.horario || '',
-          dataTreino:    item.data_treino || '',
-          dataAprovacao: formatTimestamp(item.data_aprovacao)
-        });
+        data.push({ status: item.status, horario: item.horario || '', dataTreino: item.data_treino || '', dataAprovacao: formatTimestamp(item.data_aprovacao) });
       }
     });
     return { ok: true, data };
@@ -632,7 +509,7 @@ const hide = id => $(id).classList.add('hidden');
 
 function diasDiferenca(dataStr) {
   if (!dataStr || typeof dataStr !== 'string') return 0;
-  var p  = dataStr.split('/');
+  var p = dataStr.split('/');
   if (p.length !== 3) return 0;
   var dt = new Date(parseInt(p[2]), parseInt(p[1]) - 1, parseInt(p[0]));
   if (isNaN(dt.getTime())) return 0;
@@ -641,25 +518,12 @@ function diasDiferenca(dataStr) {
   return Math.round((hoje - dt) / (1000 * 60 * 60 * 24));
 }
 
-/* ── Drag-to-scroll ───────────────────────────────────────────── */
 function enableDragScroll(el) {
   let isDown = false, startX, scrollLeft, moved = false;
-  el.addEventListener('mousedown', e => {
-    isDown = true; moved = false;
-    startX = e.pageX - el.offsetLeft;
-    scrollLeft = el.scrollLeft;
-    el.style.cursor = 'grabbing';
-    el.style.userSelect = 'none';
-  });
+  el.addEventListener('mousedown', e => { isDown = true; moved = false; startX = e.pageX - el.offsetLeft; scrollLeft = el.scrollLeft; el.style.cursor = 'grabbing'; el.style.userSelect = 'none'; });
   el.addEventListener('mouseleave', () => { isDown = false; el.style.cursor = 'grab'; el.style.userSelect = ''; });
   el.addEventListener('mouseup',    () => { isDown = false; el.style.cursor = 'grab'; el.style.userSelect = ''; });
-  el.addEventListener('mousemove', e => {
-    if (!isDown) return;
-    e.preventDefault();
-    const walk = e.pageX - el.offsetLeft - startX;
-    if (Math.abs(walk) > 5) moved = true;
-    el.scrollLeft = scrollLeft - walk;
-  });
+  el.addEventListener('mousemove', e => { if (!isDown) return; e.preventDefault(); const walk = e.pageX - el.offsetLeft - startX; if (Math.abs(walk) > 5) moved = true; el.scrollLeft = scrollLeft - walk; });
   el.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
   el.style.cursor = 'grab';
 }
@@ -668,8 +532,7 @@ function enableDragScroll(el) {
 let bioAction = 'unlock';
 
 function b64urlEncode(buf) {
-  return btoa(String.fromCharCode(...new Uint8Array(buf)))
-    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
 function b64urlDecode(s) {
@@ -679,21 +542,14 @@ function b64urlDecode(s) {
 }
 
 function webAuthnAvailable() {
-  return !!(window.PublicKeyCredential &&
-            navigator.credentials &&
-            typeof navigator.credentials.create === 'function' &&
-            typeof navigator.credentials.get   === 'function');
+  return !!(window.PublicKeyCredential && navigator.credentials && typeof navigator.credentials.create === 'function' && typeof navigator.credentials.get === 'function');
 }
 
 function bioErrorMsg(e) {
-  if (e.name === 'NotAllowedError')
-    return 'Autenticação cancelada ou negada. Toque em "Desbloquear" para tentar novamente.';
-  if (e.name === 'NotSupportedError')
-    return 'Biometria não suportada neste dispositivo ou navegador.';
-  if (e.name === 'SecurityError')
-    return 'Erro de segurança. Verifique se o site está em HTTPS.';
-  if (e.name === 'InvalidStateError')
-    return 'Biometria já registrada neste dispositivo.';
+  if (e.name === 'NotAllowedError')  return 'Autenticação cancelada ou negada. Toque em "Desbloquear" para tentar novamente.';
+  if (e.name === 'NotSupportedError') return 'Biometria não suportada neste dispositivo ou navegador.';
+  if (e.name === 'SecurityError')    return 'Erro de segurança. Verifique se o site está em HTTPS.';
+  if (e.name === 'InvalidStateError') return 'Biometria já registrada neste dispositivo.';
   return `Erro ao autenticar: ${e.message || 'desconhecido'}.`;
 }
 
@@ -705,14 +561,8 @@ async function bioRegister(email) {
       rp: { name: RP_NAME, id: location.hostname },
       user: { id: userId, name: email, displayName: email },
       challenge,
-      pubKeyCredParams: [
-        { type: 'public-key', alg: -7   },
-        { type: 'public-key', alg: -257 },
-      ],
-      authenticatorSelection: {
-        userVerification: 'required',
-        residentKey: 'preferred',
-      },
+      pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+      authenticatorSelection: { userVerification: 'required', residentKey: 'preferred' },
       timeout: 60000,
       attestation: 'none',
     },
@@ -724,26 +574,17 @@ async function bioRegister(email) {
 async function bioAuthenticate() {
   const challenge  = crypto.getRandomValues(new Uint8Array(32));
   const credIdStr  = localStorage.getItem(LS_CREDENTIAL);
-  const allowCreds = credIdStr
-    ? [{ type: 'public-key', id: b64urlDecode(credIdStr) }]
-    : [];
-  await navigator.credentials.get({
-    publicKey: {
-      challenge,
-      allowCredentials: allowCreds,
-      userVerification: 'required',
-      timeout: 60000,
-    },
-  });
+  const allowCreds = credIdStr ? [{ type: 'public-key', id: b64urlDecode(credIdStr) }] : [];
+  await navigator.credentials.get({ publicKey: { challenge, allowCredentials: allowCreds, userVerification: 'required', timeout: 60000 } });
 }
 
 function showBioLock(mode) {
   bioAction = mode;
-  ['cardLogin', 'cardContrato', 'cardAluno', 'cardAgendar', 'cardProf', 'cardBioLock', 'cardNoSupport', 'cardNotificacoes', 'cardSessao', 'cardProfSessao', 'cardSobre'].forEach(hide);
+  ['cardLogin','cardContrato','cardAluno','cardAgendar','cardProf','cardBioLock','cardNoSupport','cardNotificacoes','cardSessao','cardProfSessao','cardSobre'].forEach(hide);
   hide('mainNav');
   if (mode === 'unlock') {
     $('bioIcon').textContent     = '🔒';
-    $('bioTitle').textContent    = 'Riva BJJ';
+    $('bioTitle').textContent    = 'BJJFlowHub';
     $('bioSubtitle').textContent = 'Use biometria para desbloquear o app.';
     $('btnBioAction').textContent = '🔓 Desbloquear';
   } else {
@@ -763,11 +604,8 @@ async function onBioAction() {
   $('bioInfo').textContent   = 'Aguardando biometria…';
   const email = localStorage.getItem(LS_EMAIL) || localStorage.getItem(LS_PROF_EMAIL) || '';
   try {
-    if (bioAction === 'register') {
-      await bioRegister(email);
-    } else {
-      await bioAuthenticate();
-    }
+    if (bioAction === 'register') await bioRegister(email);
+    else await bioAuthenticate();
     $('bioInfo').textContent = '';
     afterBioSuccess();
   } catch (e) {
@@ -791,12 +629,8 @@ function afterBioSuccess(updateTs = true) {
   if (pEmail && pNome) {
     profData = { nome: pNome, email: pEmail };
     showProfPage();
-    fbProfLoginEmail(pEmail)
-      .then(r => { if (r && r.ok) { profData = r.data; $('pNome').textContent = profData.nome || 'Professor'; } })
-      .catch(() => {});
-    if (savedPage === 'sessaoProf' && savedSessao) {
-      showSessaoProf(savedSessao);
-    }
+    fbProfLoginEmail(pEmail).then(r => { if (r && r.ok) { profData = r.data; $('pNome').textContent = profData.nome || 'Professor'; } }).catch(() => {});
+    if (savedPage === 'sessaoProf' && savedSessao) showSessaoProf(savedSessao);
     return;
   }
 
@@ -805,34 +639,18 @@ function afterBioSuccess(updateTs = true) {
     alunoData = { nome, foto_url: fotoUrl };
     preencherCard(alunoData);
     showAlunoSkeleton();
-    fbLogin(email)
-      .then(r => {
-        if (r && r.ok) {
-          alunoData = r.data;
-          preencherCard(alunoData);
-          if (!alunoData.contrato_assinado) {
-            mostrarTelaContrato(alunoData);
-          } else {
-            hide('cardContrato');
-            show('cardAluno');
-            show('mainNav');
-          }
-        }
-      })
-      .catch(() => {});
-    if (savedPage === 'sessaoAluno' && savedSessao) {
-      aSelSessao = savedSessao;
-      showTab('Agendar');
-      showSessaoAluno(savedSessao);
-    } else if (savedPage === 'Agendar') {
-      showTab('Agendar');
-    } else if (savedPage === 'notificacoes') {
-      showTab('Home');
-      loadNotificacoes();
-    } else {
-      sessionStorage.removeItem(SS_PAGE);
-      showTab('Home');
-    }
+    fbLogin(email).then(r => {
+      if (r && r.ok) {
+        alunoData = r.data;
+        preencherCard(alunoData);
+        if (!alunoData.contrato_assinado) { mostrarTelaContrato(alunoData); }
+        else { hide('cardContrato'); show('cardAluno'); show('mainNav'); }
+      }
+    }).catch(() => {});
+    if (savedPage === 'sessaoAluno' && savedSessao) { aSelSessao = savedSessao; showTab('Agendar'); showSessaoAluno(savedSessao); }
+    else if (savedPage === 'Agendar') showTab('Agendar');
+    else if (savedPage === 'notificacoes') { showTab('Home'); loadNotificacoes(); }
+    else { sessionStorage.removeItem(SS_PAGE); showTab('Home'); }
     checkBellBadge();
     return;
   }
@@ -843,11 +661,8 @@ function afterBioSuccess(updateTs = true) {
 function afterLoginSuccess() {
   const bioOk  = localStorage.getItem(LS_BIO_ATIVADA) === '1';
   const credId = localStorage.getItem(LS_CREDENTIAL);
-  if (bioOk && credId) {
-    afterBioSuccess();
-  } else {
-    showBioLock('register');
-  }
+  if (bioOk && credId) afterBioSuccess();
+  else showBioLock('register');
 }
 
 /* ── State ────────────────────────────────────────────────────── */
@@ -857,23 +672,17 @@ let semanaCache  = null;
 let presenceCache = {};
 let semanaInFlight   = false;
 let presencaInFlight = {};
-let aSelDia      = null;
-let aSelSessao   = null;
-let pSelDia      = null;
-let pSelSessao   = null;
-let notifCache   = null;
-let notifInFlight = false;
+let aSelDia = null, aSelSessao = null, pSelDia = null, pSelSessao = null;
+let notifCache = null, notifInFlight = false;
 
-/* ── Month / day helpers ──────────────────────────────────────── */
 const NOMES_DIA_PT = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
 const MESES_PT     = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
 function getMonthDays() {
   const today = new Date();
-  const year  = today.getFullYear();
-  const month = today.getMonth();
-  const last  = new Date(year, month + 1, 0).getDate();
-  const days  = [];
+  const year = today.getFullYear(), month = today.getMonth();
+  const last = new Date(year, month + 1, 0).getDate();
+  const days = [];
   for (let i = 1; i <= last; i++) days.push(new Date(year, month, i));
   return days;
 }
@@ -884,16 +693,11 @@ function getMesAno() {
 }
 
 function formatDate(d) {
-  return String(d.getDate()).padStart(2, '0') + '/' +
-         String(d.getMonth() + 1).padStart(2, '0') + '/' +
-         d.getFullYear();
+  return String(d.getDate()).padStart(2, '0') + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + d.getFullYear();
 }
 
-/* ── Cache helpers ────────────────────────────────────────────── */
 function saveSemanaCache(data) {
-  try {
-    localStorage.setItem(LS_SEMANA_CACHE, JSON.stringify({ ts: Date.now(), data }));
-  } catch (_) {}
+  try { localStorage.setItem(LS_SEMANA_CACHE, JSON.stringify({ ts: Date.now(), data })); } catch (_) {}
 }
 
 function loadSemanaCache() {
@@ -901,11 +705,8 @@ function loadSemanaCache() {
     const raw = localStorage.getItem(LS_SEMANA_CACHE);
     if (!raw) return null;
     const parsed = JSON.parse(raw);
-    const salvoEm = new Date(parsed.ts);
-    const agora   = new Date();
-    const mesmoDia = salvoEm.getDate()     === agora.getDate()  &&
-                     salvoEm.getMonth()    === agora.getMonth() &&
-                     salvoEm.getFullYear() === agora.getFullYear();
+    const salvoEm = new Date(parsed.ts), agora = new Date();
+    const mesmoDia = salvoEm.getDate() === agora.getDate() && salvoEm.getMonth() === agora.getMonth() && salvoEm.getFullYear() === agora.getFullYear();
     if (!mesmoDia) return null;
     if (Date.now() - parsed.ts < SEMANA_TTL) return parsed;
     return null;
@@ -935,13 +736,11 @@ function invalidatePresenca(data, horario) {
   delete presenceCache[presencaCacheKey(data, horario)];
 }
 
-/* ── UI helpers ───────────────────────────────────────────────── */
 function delayedLoader(el, delay = 250) {
   const t = setTimeout(() => { el.innerHTML = '<p class="loading">Carregando…</p>'; }, delay);
   return () => clearTimeout(t);
 }
 
-/* ── Skeleton helpers ─────────────────────────────────────────── */
 function showAlunoSkeleton() {
   document.getElementById('aNome').innerHTML        = '<span class="skeleton sk-title"></span>';
   document.getElementById('aFaixa').innerHTML       = '<span class="skeleton sk-line-sm"></span>';
@@ -954,28 +753,20 @@ function showAlunoSkeleton() {
 
 function showSessoesSkeleton(listaId) {
   const lista = document.getElementById(listaId);
-  lista.innerHTML = [1,2,3].map(() =>
-    `<div class="sk-card skeleton"></div>`
-  ).join('');
+  lista.innerHTML = [1,2,3].map(() => `<div class="sk-card skeleton"></div>`).join('');
   lista.classList.remove('hidden');
 }
 
 function showPresencaSkeleton() {
-  document.getElementById('sessaoPresencaLista').innerHTML =
-    [1,2,3].map(() =>
-      `<div class="presenca-item"><span class="skeleton sk-line"></span></div>`
-    ).join('');
+  document.getElementById('sessaoPresencaLista').innerHTML = [1,2,3].map(() => `<div class="presenca-item"><span class="skeleton sk-line"></span></div>`).join('');
 }
 
-/* ── Navigation ───────────────────────────────────────────────── */
 function showTab(tab) {
   sessionStorage.setItem(SS_PAGE, tab);
   sessionStorage.removeItem(SS_SESSAO);
-  ['cardLogin', 'cardContrato', 'cardAluno', 'cardAgendar', 'cardProf', 'cardBioLock', 'cardNoSupport', 'cardNotificacoes', 'cardSessao', 'cardProfSessao', 'cardSobre'].forEach(hide);
-  ['navHome', 'navAgendar', 'navSobre'].forEach(id => $(id).classList.remove('on'));
-
+  ['cardLogin','cardContrato','cardAluno','cardAgendar','cardProf','cardBioLock','cardNoSupport','cardNotificacoes','cardSessao','cardProfSessao','cardSobre'].forEach(hide);
+  ['navHome','navAgendar','navSobre'].forEach(id => $(id).classList.remove('on'));
   if (alunoData) show('mainNav'); else hide('mainNav');
-
   if (tab === 'Home') {
     $('navHome').classList.add('on');
     if (profData) { showProfPage(); return; }
@@ -989,14 +780,13 @@ function showTab(tab) {
 }
 
 function showProfPage() {
-  ['cardLogin', 'cardAluno', 'cardAgendar'].forEach(hide);
+  ['cardLogin','cardAluno','cardAgendar'].forEach(hide);
   show('cardProf');
   hide('mainNav');
   $('pNome').textContent = profData ? (profData.nome || 'Professor') : '—';
   loadSemanaProfessor();
 }
 
-/* ── Week schedule ────────────────────────────────────────────── */
 async function revalidateSemana(onSuccess) {
   if (semanaInFlight) return;
   semanaInFlight = true;
@@ -1010,13 +800,7 @@ async function revalidateSemana(onSuccess) {
 async function loadSemana(ctx) {
   const rowId  = ctx === 'prof' ? 'profDiasRow' : 'diasRow';
   const cached = getCachedSemana();
-
-  if (cached) {
-    renderDias(ctx, cached);
-    revalidateSemana(data => renderDias(ctx, data));
-    return;
-  }
-
+  if (cached) { renderDias(ctx, cached); revalidateSemana(data => renderDias(ctx, data)); return; }
   if (semanaInFlight) return;
   semanaInFlight = true;
   showSessoesSkeleton(ctx === 'prof' ? 'profSessoesLista' : 'sessoesLista');
@@ -1024,19 +808,10 @@ async function loadSemana(ctx) {
   try {
     const r = await fbTreinosSemana();
     cancel();
-    if (r.ok) {
-      semanaCache = { ts: Date.now(), data: r.data };
-      saveSemanaCache(r.data);
-      renderDias(ctx, r.data);
-    } else {
-      $(rowId).innerHTML = '<p class="msg err">Erro ao carregar treinos.</p>';
-    }
-  } catch (e) {
-    cancel();
-    $(rowId).innerHTML = '<p class="msg err">Falha na conexão. Tente novamente.</p>';
-  } finally {
-    semanaInFlight = false;
-  }
+    if (r.ok) { semanaCache = { ts: Date.now(), data: r.data }; saveSemanaCache(r.data); renderDias(ctx, r.data); }
+    else $(rowId).innerHTML = '<p class="msg err">Erro ao carregar treinos.</p>';
+  } catch (e) { cancel(); $(rowId).innerHTML = '<p class="msg err">Falha na conexão. Tente novamente.</p>'; }
+  finally { semanaInFlight = false; }
 }
 
 function renderDias(ctx, semana) {
@@ -1044,49 +819,23 @@ function renderDias(ctx, semana) {
   const labelId = ctx === 'prof' ? 'profDiasMesLabel' : 'diasMesLabel';
   const row     = $(rowId);
   row.innerHTML = '';
-
   $(labelId).textContent = getMesAno();
-
   const treinosByDow = {};
   semana.forEach(d => { treinosByDow[d.diaSemana] = d.treinos || []; });
-
-  const monthDays = getMonthDays().map(date => ({
-    data:      formatDate(date),
-    diaSemana: date.getDay(),
-    nomeDia:   NOMES_DIA_PT[date.getDay()],
-    treinos:   treinosByDow[date.getDay()] || [],
-  }));
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const monthDays = getMonthDays().map(date => ({ data: formatDate(date), diaSemana: date.getDay(), nomeDia: NOMES_DIA_PT[date.getDay()], treinos: treinosByDow[date.getDay()] || [] }));
+  const today = new Date(); today.setHours(0,0,0,0);
   const todayStr = formatDate(today);
-
   let defaultIdx = monthDays.findIndex(d => d.data === todayStr && d.treinos.length > 0);
-  if (defaultIdx < 0) {
-    defaultIdx = monthDays.findIndex(d => {
-      const [dd, mm, yyyy] = d.data.split('/');
-      return new Date(+yyyy, +mm - 1, +dd) > today && d.treinos.length > 0;
-    });
-  }
+  if (defaultIdx < 0) defaultIdx = monthDays.findIndex(d => { const [dd,mm,yyyy] = d.data.split('/'); return new Date(+yyyy,+mm-1,+dd) > today && d.treinos.length > 0; });
   if (defaultIdx < 0) defaultIdx = monthDays.findIndex(d => d.treinos.length > 0);
-
-  monthDays.forEach((dia) => {
+  monthDays.forEach(dia => {
     const hasTreinos = dia.treinos.length > 0;
     const btn = document.createElement('button');
     btn.className = hasTreinos ? 'dia-btn' : 'dia-btn disabled';
-    btn.innerHTML =
-      `<span class="dia-nome">${dia.nomeDia}</span>` +
-      `<span class="dia-data">${dia.data.slice(0, 5)}</span>`;
-    if (hasTreinos) {
-      btn.addEventListener('click', () => {
-        row.querySelectorAll('.dia-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        selectDia(ctx, dia);
-      });
-    }
+    btn.innerHTML = `<span class="dia-nome">${dia.nomeDia}</span><span class="dia-data">${dia.data.slice(0,5)}</span>`;
+    if (hasTreinos) btn.addEventListener('click', () => { row.querySelectorAll('.dia-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); selectDia(ctx, dia); });
     row.appendChild(btn);
   });
-
   if (defaultIdx >= 0) {
     const defaultBtn = row.children[defaultIdx];
     defaultBtn.classList.add('active');
@@ -1104,13 +853,7 @@ function renderDias(ctx, semana) {
 async function loadSemanaProfessor() {
   const rowId  = 'profDiasRow';
   const cached = getCachedSemana();
-
-  if (cached) {
-    renderDias('prof', cached);
-    revalidateSemana(data => renderDias('prof', data));
-    return;
-  }
-
+  if (cached) { renderDias('prof', cached); revalidateSemana(data => renderDias('prof', data)); return; }
   if (semanaInFlight) return;
   semanaInFlight = true;
   showSessoesSkeleton('profSessoesLista');
@@ -1118,81 +861,47 @@ async function loadSemanaProfessor() {
   try {
     const r = await fbTreinosSemana();
     cancel();
-    if (!r.ok) {
-      $(rowId).innerHTML = '<p class="msg err">Erro ao carregar treinos.</p>';
-      return;
-    }
-    semanaCache = { ts: Date.now(), data: r.data };
-    saveSemanaCache(r.data);
-    renderDias('prof', r.data);
-  } catch (e) {
-    cancel();
-    $(rowId).innerHTML = '<p class="msg err">Falha na conexão. Tente novamente.</p>';
-  } finally {
-    semanaInFlight = false;
-  }
+    if (!r.ok) { $(rowId).innerHTML = '<p class="msg err">Erro ao carregar treinos.</p>'; return; }
+    semanaCache = { ts: Date.now(), data: r.data }; saveSemanaCache(r.data); renderDias('prof', r.data);
+  } catch (e) { cancel(); $(rowId).innerHTML = '<p class="msg err">Falha na conexão. Tente novamente.</p>'; }
+  finally { semanaInFlight = false; }
 }
 
 function selectDia(ctx, dia) {
   if (ctx === 'prof') { pSelDia = dia; pSelSessao = null; hide('profPresencaBox'); }
-  else                { aSelDia = dia; aSelSessao = null; hide('presencaBox');     }
+  else                { aSelDia = dia; aSelSessao = null; hide('presencaBox'); }
   renderSessoes(ctx, dia);
 }
 
 function renderSessoes(ctx, dia) {
   const listaId = ctx === 'prof' ? 'profSessoesLista' : 'sessoesLista';
   const lista   = $(listaId);
-  lista.innerHTML = '';
-  show(listaId);
-
+  lista.innerHTML = ''; show(listaId);
   if (!dia.treinos.length) {
     lista.innerHTML = '<p class="presenca-vazia">Sem treinos neste dia.</p>';
     if (ctx === 'prof') pSelSessao = null; else aSelSessao = null;
     return;
   }
-
   const diaDiff = ctx !== 'prof' ? diasDiferenca(dia.data) : 0;
   dia.treinos.forEach(t => {
     const card = document.createElement('div');
     card.className = 'sessao-card';
     const btnLabel = ctx === 'prof' ? 'Aprovar Check-ins' : (diaDiff > 0 ? 'Ver treino' : 'Agendar');
-    card.innerHTML =
-      `<div class="sessao-info">` +
-        `<span class="sessao-hor">${t.horario}</span>` +
-        `<span class="sessao-nome">${t.nome}</span>` +
-      `</div>` +
-      `<button class="btn-sessao-action">${btnLabel}</button>`;
-    const setActive = () => {
-      lista.querySelectorAll('.sessao-card').forEach(c => c.classList.remove('active'));
-      card.classList.add('active');
-    };
-    const navegarSessao = () => {
-      setActive();
-      const sessao = { data: dia.data, horario: t.horario, nome: t.nome };
-      if (ctx === 'prof') showSessaoProf(sessao);
-      else showSessaoAluno(sessao);
-    };
+    card.innerHTML = `<div class="sessao-info"><span class="sessao-hor">${t.horario}</span><span class="sessao-nome">${t.nome}</span></div><button class="btn-sessao-action">${btnLabel}</button>`;
+    const setActive = () => { lista.querySelectorAll('.sessao-card').forEach(c => c.classList.remove('active')); card.classList.add('active'); };
+    const navegarSessao = () => { setActive(); const sessao = { data: dia.data, horario: t.horario, nome: t.nome }; if (ctx === 'prof') showSessaoProf(sessao); else showSessaoAluno(sessao); };
     card.addEventListener('click', navegarSessao);
-    card.querySelector('.btn-sessao-action').addEventListener('click', e => {
-      e.stopPropagation();
-      navegarSessao();
-    });
+    card.querySelector('.btn-sessao-action').addEventListener('click', e => { e.stopPropagation(); navegarSessao(); });
     lista.appendChild(card);
   });
-
-  if (dia.treinos.length > 0) {
-    lista.children[0].classList.add('active');
-  }
+  if (dia.treinos.length > 0) lista.children[0].classList.add('active');
 }
 
-/* ── Session screens ──────────────────────────────────────────── */
 function showSessaoAluno(sessao) {
   aSelSessao = sessao;
   sessionStorage.setItem(SS_PAGE, 'sessaoAluno');
   sessionStorage.setItem(SS_SESSAO, JSON.stringify(sessao));
-  hide('cardAgendar');
-  hide('mainNav');
-  show('cardSessao');
+  hide('cardAgendar'); hide('mainNav'); show('cardSessao');
   loadPresencaSessao('aluno', sessao);
 }
 
@@ -1200,100 +909,40 @@ function showSessaoProf(sessao) {
   pSelSessao = sessao;
   sessionStorage.setItem(SS_PAGE, 'sessaoProf');
   sessionStorage.setItem(SS_SESSAO, JSON.stringify(sessao));
-  hide('cardProf');
-  show('cardProfSessao');
+  hide('cardProf'); show('cardProfSessao');
   loadPresencaSessao('prof', sessao);
 }
 
 async function loadPresencaSessao(ctx, sessao) {
   const k = presencaCacheKey(sessao.data, sessao.horario);
   if (presencaInFlight[k]) return;
-
   const listaId  = ctx === 'prof' ? 'profSessaoPresencaLista' : 'sessaoPresencaLista';
   const tituloId = ctx === 'prof' ? 'profSessaoTitulo'        : 'sessaoTitulo';
-
-  $(tituloId).textContent = `${sessao.data.slice(0, 5)} · ${sessao.horario} · ${sessao.nome}`;
-
-  const daysAgo    = diasDiferenca(sessao.data);
+  $(tituloId).textContent = `${sessao.data.slice(0,5)} · ${sessao.horario} · ${sessao.nome}`;
+  const daysAgo = diasDiferenca(sessao.data);
   sessao.isPast    = ctx !== 'prof' && daysAgo > 0;
   sessao.isArquivo = ctx !== 'prof' && daysAgo > 2;
-
   presencaInFlight[k] = true;
-
-  const cached = getCachedPresenca(sessao.data, sessao.horario);
-  if (cached) {
-    renderPresencaLista(ctx, cached, sessao);
-    try {
-      const r = await (sessao.isArquivo ? fbListaPresencaArquivo(sessao.data, sessao.horario) : fbListaPresenca(sessao.data, sessao.horario));
-      if (r.ok) {
-        setCachedPresenca(sessao.data, sessao.horario, r.data || []);
-        renderPresencaLista(ctx, r.data || [], sessao);
-      }
-    } catch (_) {}
-    finally { delete presencaInFlight[k]; }
-    return;
-  }
-
-  const cancel = delayedLoader($(listaId));
-  if (ctx !== 'prof') { hide('btnSessaoCheckin'); hide('btnSessaoDeletarCheckin'); }
-
-  try {
-    const r = await (sessao.isArquivo ? fbListaPresencaArquivo(sessao.data, sessao.horario) : fbListaPresenca(sessao.data, sessao.horario));
-    cancel();
-    if (!r.ok) { $(listaId).innerHTML = `<p class="msg err">${r.erro || 'Erro'}</p>`; return; }
-    setCachedPresenca(sessao.data, sessao.horario, r.data || []);
-    renderPresencaLista(ctx, r.data || [], sessao);
-  } catch (e) {
-    cancel();
-    $(listaId).innerHTML = '<p class="msg err">Erro de conexão.</p>';
-  } finally {
-    delete presencaInFlight[k];
-  }
-}
-
-/* ── Presence list ────────────────────────────────────────────── */
-async function loadPresenca(ctx, sessao) {
-  const k = presencaCacheKey(sessao.data, sessao.horario);
-  if (presencaInFlight[k]) return;
-
-  const boxId    = ctx === 'prof' ? 'profPresencaBox'    : 'presencaBox';
-  const listaId  = ctx === 'prof' ? 'profPresencaLista'  : 'presencaLista';
-  const tituloId = ctx === 'prof' ? 'profPresencaTitulo' : 'presencaTitulo';
-
-  $(tituloId).textContent = `${sessao.data.slice(0, 5)} · ${sessao.horario} · ${sessao.nome}`;
-  show(boxId);
-
-  presencaInFlight[k] = true;
-
   const cached = getCachedPresenca(sessao.data, sessao.horario);
   if (cached) {
     renderPresencaLista(ctx, cached, sessao);
     try {
       const r = await fbListaPresenca(sessao.data, sessao.horario);
-      if (r.ok) {
-        setCachedPresenca(sessao.data, sessao.horario, r.data || []);
-        renderPresencaLista(ctx, r.data || [], sessao);
-      }
+      if (r.ok) { setCachedPresenca(sessao.data, sessao.horario, r.data || []); renderPresencaLista(ctx, r.data || [], sessao); }
     } catch (_) {}
     finally { delete presencaInFlight[k]; }
     return;
   }
-
   const cancel = delayedLoader($(listaId));
-  if (ctx !== 'prof') { showPresencaSkeleton(); hide('btnCheckin'); hide('btnDeletarCheckin'); }
-
+  if (ctx !== 'prof') { hide('btnSessaoCheckin'); hide('btnSessaoDeletarCheckin'); }
   try {
     const r = await fbListaPresenca(sessao.data, sessao.horario);
     cancel();
     if (!r.ok) { $(listaId).innerHTML = `<p class="msg err">${r.erro || 'Erro'}</p>`; return; }
     setCachedPresenca(sessao.data, sessao.horario, r.data || []);
     renderPresencaLista(ctx, r.data || [], sessao);
-  } catch (e) {
-    cancel();
-    $(listaId).innerHTML = '<p class="msg err">Erro de conexão.</p>';
-  } finally {
-    delete presencaInFlight[k];
-  }
+  } catch (e) { cancel(); $(listaId).innerHTML = '<p class="msg err">Erro de conexão.</p>'; }
+  finally { delete presencaInFlight[k]; }
 }
 
 function statusCls(s) {
@@ -1304,312 +953,154 @@ function statusCls(s) {
 
 function renderPresencaLista(ctx, lista, sessao) {
   const listaId = ctx === 'prof' ? 'profSessaoPresencaLista' : 'sessaoPresencaLista';
-  const el      = $(listaId);
-
+  const el = $(listaId);
   if (!lista.length) {
     el.innerHTML = `<p class="presenca-vazia">${sessao.isArquivo ? 'Nenhum check-in registrado.' : 'Nenhum check-in ainda.'}</p>`;
   } else {
     el.innerHTML = lista.map(item => {
-      const sc      = statusCls(item.status);
+      const sc = statusCls(item.status);
       const actions = (ctx === 'prof' && item.status.includes('PENDENTE'))
-        ? `<div class="prof-actions">
-             <button class="btn-ap aprovar" data-linha="${item.linha}">✓ Aprovar</button>
-             <button class="btn-ap reprovar" data-linha="${item.linha}">✗ Reprovar</button>
-           </div>`
+        ? `<div class="prof-actions"><button class="btn-ap aprovar" data-linha="${item.linha}">✓ Aprovar</button><button class="btn-ap reprovar" data-linha="${item.linha}">✗ Reprovar</button></div>`
         : '';
-
       const avatarHtml = ctx === 'prof'
         ? (item.foto_url
             ? `<img src="${item.foto_url}" alt="" style="width:48px;height:48px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1.5px solid #444;" />`
             : `<div style="width:48px;height:48px;border-radius:50%;background:#2a2a2a;border:1.5px solid #444;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#888;flex-shrink:0;">${(item.nome||'?')[0].toUpperCase()}</div>`)
         : '';
-
-      return `<div class="presenca-item">
-        <div class="presenca-info" style="${ctx === 'prof' ? 'align-items:center;gap:10px;' : ''}">
-          ${avatarHtml}
-          <span class="presenca-nome">${item.nome}</span>
-          <span class="presenca-status ${sc}">${item.status}</span>
-        </div>
-        ${actions}
-      </div>`;
+      return `<div class="presenca-item"><div class="presenca-info" style="${ctx==='prof'?'align-items:center;gap:10px;':''}">${avatarHtml}<span class="presenca-nome">${item.nome}</span><span class="presenca-status ${sc}">${item.status}</span></div>${actions}</div>`;
     }).join('');
-
     if (ctx === 'prof') {
-      el.querySelectorAll('.btn-ap.aprovar').forEach(btn =>
-        btn.addEventListener('click', () => profAprovar(btn.dataset.linha, sessao, btn)));
-      el.querySelectorAll('.btn-ap.reprovar').forEach(btn =>
-        btn.addEventListener('click', () => profReprovar(btn.dataset.linha, sessao, btn)));
+      el.querySelectorAll('.btn-ap.aprovar').forEach(btn => btn.addEventListener('click', () => profAprovar(btn.dataset.linha, sessao, btn)));
+      el.querySelectorAll('.btn-ap.reprovar').forEach(btn => btn.addEventListener('click', () => profReprovar(btn.dataset.linha, sessao, btn)));
     }
   }
-
   if (ctx !== 'prof' && alunoData) {
-    if (sessao.isPast) {
-      hide('btnSessaoCheckin');
-      hide('btnSessaoDeletarCheckin');
-    } else {
-      const meu = lista.find(i =>
-        i.nome.trim().toLowerCase() === (alunoData.nome || '').trim().toLowerCase());
-      if (meu) {
-        hide('btnSessaoCheckin');
-        meu.status.includes('PENDENTE') ? show('btnSessaoDeletarCheckin') : hide('btnSessaoDeletarCheckin');
-      } else {
-        show('btnSessaoCheckin');
-        hide('btnSessaoDeletarCheckin');
-      }
+    if (sessao.isPast) { hide('btnSessaoCheckin'); hide('btnSessaoDeletarCheckin'); }
+    else {
+      const meu = lista.find(i => i.nome.trim().toLowerCase() === (alunoData.nome || '').trim().toLowerCase());
+      if (meu) { hide('btnSessaoCheckin'); meu.status.includes('PENDENTE') ? show('btnSessaoDeletarCheckin') : hide('btnSessaoDeletarCheckin'); }
+      else { show('btnSessaoCheckin'); hide('btnSessaoDeletarCheckin'); }
     }
   }
 }
 
-/* ── Student check-in / cancel ────────────────────────────────── */
 async function fazerCheckin() {
   if (!aSelSessao || !alunoData) return;
   $('btnSessaoCheckin').disabled = true;
-
   const lista = $('sessaoPresencaLista');
-  const novoItem = document.createElement('div');
-  novoItem.className = 'presenca-item';
-  const info = document.createElement('div');
-  info.className = 'presenca-info';
-  const spanNome = document.createElement('span');
-  spanNome.className = 'presenca-nome';
-  spanNome.textContent = alunoData.nome;
-  const spanStatus = document.createElement('span');
-  spanStatus.className = 'presenca-status status-pend';
-  spanStatus.textContent = 'PENDENTE ⏳';
-  info.appendChild(spanNome);
-  info.appendChild(spanStatus);
-  novoItem.appendChild(info);
+  const novoItem = document.createElement('div'); novoItem.className = 'presenca-item';
+  const info = document.createElement('div'); info.className = 'presenca-info';
+  const spanNome = document.createElement('span'); spanNome.className = 'presenca-nome'; spanNome.textContent = alunoData.nome;
+  const spanStatus = document.createElement('span'); spanStatus.className = 'presenca-status status-pend'; spanStatus.textContent = 'PENDENTE ⏳';
+  info.appendChild(spanNome); info.appendChild(spanStatus); novoItem.appendChild(info);
   if (lista) lista.appendChild(novoItem);
-  hide('btnSessaoCheckin');
-  show('btnSessaoDeletarCheckin');
-
+  hide('btnSessaoCheckin'); show('btnSessaoDeletarCheckin');
   try {
     const r = await fbCheckin(localStorage.getItem(LS_EMAIL) || '', alunoData.nome, aSelSessao.horario, aSelSessao.data, alunoData.id || '');
-    if (r.ok) {
-      invalidatePresenca(aSelSessao.data, aSelSessao.horario);
-    } else {
-      if (lista && novoItem) novoItem.remove();
-      show('btnSessaoCheckin');
-      hide('btnSessaoDeletarCheckin');
-      alert(r.erro || 'Erro ao fazer check-in.');
-    }
-  } catch (e) {
-    if (lista && novoItem) novoItem.remove();
-    show('btnSessaoCheckin');
-    hide('btnSessaoDeletarCheckin');
-    alert('Falha na conexão. Tente novamente.');
-  } finally {
-    $('btnSessaoCheckin').disabled = false;
-  }
+    if (r.ok) { invalidatePresenca(aSelSessao.data, aSelSessao.horario); }
+    else { if (lista && novoItem) novoItem.remove(); show('btnSessaoCheckin'); hide('btnSessaoDeletarCheckin'); alert(r.erro || 'Erro ao fazer check-in.'); }
+  } catch (e) { if (lista && novoItem) novoItem.remove(); show('btnSessaoCheckin'); hide('btnSessaoDeletarCheckin'); alert('Falha na conexão. Tente novamente.'); }
+  finally { $('btnSessaoCheckin').disabled = false; }
 }
 
 async function deletarCheckin() {
   if (!aSelSessao || !alunoData) return;
   if (!confirm('Cancelar seu check-in neste treino?')) return;
   $('btnSessaoDeletarCheckin').disabled = true;
-
   const lista = $('sessaoPresencaLista');
-  let itemRemovido = null;
-  let proximoSibling = null;
+  let itemRemovido = null, proximoSibling = null;
   if (lista) {
-    const items = lista.querySelectorAll('.presenca-item');
-    items.forEach(item => {
+    lista.querySelectorAll('.presenca-item').forEach(item => {
       const nome = item.querySelector('.presenca-nome');
-      if (nome && nome.textContent.trim().toLowerCase() === alunoData.nome.trim().toLowerCase()) {
-        itemRemovido = item;
-        proximoSibling = item.nextSibling;
-      }
+      if (nome && nome.textContent.trim().toLowerCase() === alunoData.nome.trim().toLowerCase()) { itemRemovido = item; proximoSibling = item.nextSibling; }
     });
     if (itemRemovido) itemRemovido.remove();
   }
-  show('btnSessaoCheckin');
-  hide('btnSessaoDeletarCheckin');
-
+  show('btnSessaoCheckin'); hide('btnSessaoDeletarCheckin');
   try {
     const r = await fbDeletarCheckin(localStorage.getItem(LS_EMAIL) || '', aSelSessao.data, aSelSessao.horario);
-    if (r.ok) {
-      invalidatePresenca(aSelSessao.data, aSelSessao.horario);
-    } else {
-      if (lista && itemRemovido) lista.insertBefore(itemRemovido, proximoSibling);
-      hide('btnSessaoCheckin');
-      show('btnSessaoDeletarCheckin');
-      alert(r.erro || 'Erro ao cancelar check-in.');
-    }
-  } catch (e) {
-    if (lista && itemRemovido) lista.insertBefore(itemRemovido, proximoSibling);
-    hide('btnSessaoCheckin');
-    show('btnSessaoDeletarCheckin');
-    alert('Falha na conexão. Tente novamente.');
-  } finally {
-    $('btnSessaoDeletarCheckin').disabled = false;
-  }
+    if (r.ok) { invalidatePresenca(aSelSessao.data, aSelSessao.horario); }
+    else { if (lista && itemRemovido) lista.insertBefore(itemRemovido, proximoSibling); hide('btnSessaoCheckin'); show('btnSessaoDeletarCheckin'); alert(r.erro || 'Erro ao cancelar check-in.'); }
+  } catch (e) { if (lista && itemRemovido) lista.insertBefore(itemRemovido, proximoSibling); hide('btnSessaoCheckin'); show('btnSessaoDeletarCheckin'); alert('Falha na conexão. Tente novamente.'); }
+  finally { $('btnSessaoDeletarCheckin').disabled = false; }
 }
 
-/* ── Professor approve / reject ───────────────────────────────── */
 async function profAprovar(linha, sessao, btn) {
-  const item      = btn.closest('.presenca-item');
-  const statusEl  = item ? item.querySelector('.presenca-status') : null;
+  const item = btn.closest('.presenca-item');
+  const statusEl = item ? item.querySelector('.presenca-status') : null;
   const actionsEl = item ? item.querySelector('.prof-actions') : null;
-
-  if (statusEl) {
-    statusEl.textContent = 'VALIDADO ✓';
-    statusEl.className   = 'presenca-status status-ok';
-  }
+  if (statusEl) { statusEl.textContent = 'VALIDADO ✓'; statusEl.className = 'presenca-status status-ok'; }
   if (actionsEl) actionsEl.remove();
-
   try {
     const r = await fbAprovar(linha);
-    if (!r.ok) {
-      if (statusEl) {
-        statusEl.textContent = 'PENDENTE';
-        statusEl.className   = 'presenca-status status-pend';
-      }
-      if (item && actionsEl) item.appendChild(actionsEl);
-      alert(r.erro || 'Erro ao aprovar.');
-    }
-  } catch (e) {
-    if (statusEl) {
-      statusEl.textContent = 'PENDENTE';
-      statusEl.className   = 'presenca-status status-pend';
-    }
-    if (item && actionsEl) item.appendChild(actionsEl);
-    alert('Erro de conexão.');
-  }
+    if (!r.ok) { if (statusEl) { statusEl.textContent = 'PENDENTE'; statusEl.className = 'presenca-status status-pend'; } if (item && actionsEl) item.appendChild(actionsEl); alert(r.erro || 'Erro ao aprovar.'); }
+  } catch (e) { if (statusEl) { statusEl.textContent = 'PENDENTE'; statusEl.className = 'presenca-status status-pend'; } if (item && actionsEl) item.appendChild(actionsEl); alert('Erro de conexão.'); }
 }
 
 async function profReprovar(linha, sessao, btn) {
-  const item      = btn.closest('.presenca-item');
-  const statusEl  = item ? item.querySelector('.presenca-status') : null;
+  const item = btn.closest('.presenca-item');
+  const statusEl = item ? item.querySelector('.presenca-status') : null;
   const actionsEl = item ? item.querySelector('.prof-actions') : null;
-
-  if (statusEl) {
-    statusEl.textContent = 'REPROVADO ✗';
-    statusEl.className   = 'presenca-status status-err';
-  }
+  if (statusEl) { statusEl.textContent = 'REPROVADO ✗'; statusEl.className = 'presenca-status status-err'; }
   if (actionsEl) actionsEl.remove();
-
   try {
     const r = await fbReprovar(linha);
-    if (!r.ok) {
-      if (statusEl) {
-        statusEl.textContent = 'PENDENTE';
-        statusEl.className   = 'presenca-status status-pend';
-      }
-      if (item && actionsEl) item.appendChild(actionsEl);
-      alert(r.erro || 'Erro ao reprovar.');
-    }
-  } catch (e) {
-    if (statusEl) {
-      statusEl.textContent = 'PENDENTE';
-      statusEl.className   = 'presenca-status status-pend';
-    }
-    if (item && actionsEl) item.appendChild(actionsEl);
-    alert('Erro de conexão.');
-  }
+    if (!r.ok) { if (statusEl) { statusEl.textContent = 'PENDENTE'; statusEl.className = 'presenca-status status-pend'; } if (item && actionsEl) item.appendChild(actionsEl); alert(r.erro || 'Erro ao reprovar.'); }
+  } catch (e) { if (statusEl) { statusEl.textContent = 'PENDENTE'; statusEl.className = 'presenca-status status-pend'; } if (item && actionsEl) item.appendChild(actionsEl); alert('Erro de conexão.'); }
 }
 
-/* ── Notifications ────────────────────────────────────────────── */
 function notifAprovTs(n) {
-  try {
-    const [datePart, timePart] = n.dataAprovacao.split(' • ');
-    const [d, m, y] = datePart.split('/');
-    const [hh, mm] = timePart.split(':');
-    return new Date(+y, +m - 1, +d, +hh, +mm).getTime();
-  } catch (_) { return 0; }
+  try { const [datePart, timePart] = n.dataAprovacao.split(' • '); const [d,m,y] = datePart.split('/'); const [hh,mm] = timePart.split(':'); return new Date(+y,+m-1,+d,+hh,+mm).getTime(); }
+  catch (_) { return 0; }
 }
 
 function checkBellBadge() {
   const email = localStorage.getItem(LS_EMAIL);
   if (!email) return;
-
   function evaluate(notifs) {
     const visto = parseInt(localStorage.getItem(LS_NOTIF_VISTO) || '0', 10);
-    const hasUnread = notifs.some(n => notifAprovTs(n) > visto);
-    hasUnread ? show('bellBadge') : hide('bellBadge');
+    notifs.some(n => notifAprovTs(n) > visto) ? show('bellBadge') : hide('bellBadge');
   }
-
-  if (notifCache && Date.now() - notifCache.ts < NOTIF_TTL) {
-    evaluate(notifCache.data);
-    return;
-  }
-
+  if (notifCache && Date.now() - notifCache.ts < NOTIF_TTL) { evaluate(notifCache.data); return; }
   if (notifInFlight) return;
   notifInFlight = true;
-  fbNotificacoes(email)
-    .then(r => {
-      if (r && r.ok) {
-        notifCache = { ts: Date.now(), data: r.data || [] };
-        evaluate(notifCache.data);
-      }
-    })
-    .catch(() => {})
-    .finally(() => { notifInFlight = false; });
+  fbNotificacoes(email).then(r => { if (r && r.ok) { notifCache = { ts: Date.now(), data: r.data || [] }; evaluate(notifCache.data); } }).catch(() => {}).finally(() => { notifInFlight = false; });
 }
 
 async function loadNotificacoes() {
   const email = localStorage.getItem(LS_EMAIL);
   if (!email) return;
-
   sessionStorage.setItem(SS_PAGE, 'notificacoes');
-  ['cardAluno', 'cardAgendar'].forEach(hide);
-  show('cardNotificacoes');
-
-  localStorage.setItem(LS_NOTIF_VISTO, String(Date.now()));
-  hide('bellBadge');
-
-  if (notifCache) {
-    renderNotificacoes(notifCache.data);
-    if (Date.now() - notifCache.ts < NOTIF_TTL) return;
-  }
-
+  ['cardAluno','cardAgendar'].forEach(hide); show('cardNotificacoes');
+  localStorage.setItem(LS_NOTIF_VISTO, String(Date.now())); hide('bellBadge');
+  if (notifCache) { renderNotificacoes(notifCache.data); if (Date.now() - notifCache.ts < NOTIF_TTL) return; }
   if (notifInFlight) return;
   notifInFlight = true;
   const cancel = delayedLoader($('notifLista'));
   try {
-    const r = await fbNotificacoes(email);
-    cancel();
+    const r = await fbNotificacoes(email); cancel();
     if (!r.ok) { $('notifLista').innerHTML = `<p class="msg err">${r.erro || 'Erro'}</p>`; return; }
-    notifCache = { ts: Date.now(), data: r.data || [] };
-    renderNotificacoes(notifCache.data);
-  } catch (e) {
-    cancel();
-    $('notifLista').innerHTML = '<p class="msg err">Erro de conexão.</p>';
-  } finally {
-    notifInFlight = false;
-  }
+    notifCache = { ts: Date.now(), data: r.data || [] }; renderNotificacoes(notifCache.data);
+  } catch (e) { cancel(); $('notifLista').innerHTML = '<p class="msg err">Erro de conexão.</p>'; }
+  finally { notifInFlight = false; }
 }
 
 function renderNotificacoes(notifs) {
   const el = $('notifLista');
-  if (!notifs.length) {
-    el.innerHTML = '<p class="presenca-vazia">Nenhuma notificação nos últimos 30 dias.</p>';
-    return;
-  }
+  if (!notifs.length) { el.innerHTML = '<p class="presenca-vazia">Nenhuma notificação nos últimos 30 dias.</p>'; return; }
   el.innerHTML = notifs.map(n => {
-    const isOk  = n.status.startsWith('VALIDADO');
-    const emoji = isOk ? '✅' : '❌';
-    const cls   = isOk ? 'ok' : 'err';
-    const label = isOk ? 'Presença Aprovada!' : 'Presença Reprovada!';
-    return `<div class="notif-item">
-      <div class="notif-status ${cls}">${emoji} ${label}</div>
-      <div class="notif-detalhe">Treino de ${n.horario} • ${n.dataTreino}</div>
-      <div class="notif-data">Aprovação: ${n.dataAprovacao}</div>
-    </div>`;
+    const isOk = n.status.startsWith('VALIDADO');
+    return `<div class="notif-item"><div class="notif-status ${isOk?'ok':'err'}">${isOk?'✅':'❌'} ${isOk?'Presença Aprovada!':'Presença Reprovada!'}</div><div class="notif-detalhe">Treino de ${n.horario} • ${n.dataTreino}</div><div class="notif-data">Aprovação: ${n.dataAprovacao}</div></div>`;
   }).join('');
 }
 
-/* ── Date formatting helper ───────────────────────────────────── */
 function formatarDataBR(val) {
   if (!val || String(val).trim() === '' || String(val).trim() === 'undefined') return '—';
   const s = String(val).trim();
-  if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
-    const [y, m, d] = s.substring(0, 10).split('-');
-    return `${d}/${m}/${y}`;
-  }
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) { const [y,m,d] = s.substring(0,10).split('-'); return `${d}/${m}/${y}`; }
   return s;
 }
 
-/* ── Student card ─────────────────────────────────────────────── */
 function preencherCard(d) {
   $('aNome').textContent  = d.nome  || '—';
   const faixaNorm = (d.faixa || '').replace(' e ', '/').replace(' E ', '/');
@@ -1617,144 +1108,79 @@ function preencherCard(d) {
   const g = (d.grau != null && d.grau !== '') ? Number(d.grau) : null;
   $('aGrau').textContent = (g === 0) ? 'Iniciante' : (g != null ? String(g) : '—');
   $('aData').textContent  = d.dataGrau ? formatarDataBR(d.dataGrau) : '—';
-
   const statusEl = $('aStatus');
   statusEl.className = 'status';
-  if (d.status === 'INATIVO') {
-    statusEl.innerHTML   = 'INATIVO';
-    statusEl.style.color = '#e74c3c';
-  } else {
-    statusEl.innerHTML   = (faixaNorm && g != null)
-      ? gerarStatusHTML(faixaNorm, g)
-      : (d.statusExame || d.status || '—');
-    statusEl.style.color = '';
-  }
-
+  if (d.status === 'INATIVO') { statusEl.innerHTML = 'INATIVO'; statusEl.style.color = '#e74c3c'; }
+  else { statusEl.innerHTML = (faixaNorm && g != null) ? gerarStatusHTML(faixaNorm, g) : (d.statusExame || d.status || '—'); statusEl.style.color = ''; }
   if (d.aulasNoGrau != null) {
     $('statAulasNum').textContent = d.aulasNoGrau;
-    const restantes = (d.aulasRestantes != null)
-      ? d.aulasRestantes
-      : (d.metaGrau != null ? Math.max(0, d.metaGrau - d.aulasNoGrau) : '—');
+    const restantes = (d.aulasRestantes != null) ? d.aulasRestantes : (d.metaGrau != null ? Math.max(0, d.metaGrau - d.aulasNoGrau) : '—');
     $('statRestantesNum').textContent = restantes;
-  } else {
-    $('statAulasNum').textContent = '—';
-    $('statRestantesNum').textContent = '—';
-  }
-
+  } else { $('statAulasNum').textContent = '—'; $('statRestantesNum').textContent = '—'; }
   atualizarAvatar(d.fotoUrl || d.foto_url || '', d.nome || '');
 }
 
-/* ── Generic login ────────────────────────────────────────────── */
 async function loginGeneric() {
   const email = $('email').value.trim().toLowerCase();
   if (!email || email.indexOf('@') < 1) { $('err').textContent = 'Email inválido.'; return; }
-  $('err').textContent  = '';
-  $('info').textContent = 'Buscando…';
-  $('btnLogin').disabled = true;
+  $('err').textContent = ''; $('info').textContent = 'Buscando…'; $('btnLogin').disabled = true;
   try {
     const r = await fbLogin(email);
     if (!r.ok) { $('err').textContent = r.erro || 'Email não encontrado.'; $('info').textContent = ''; return; }
-
     if (r.tipo === 'prof') {
-      profData = r.data;
-      localStorage.setItem(LS_PROF_EMAIL, email);
-      localStorage.setItem(LS_PROF_NOME, profData.nome || '');
+      profData = r.data; localStorage.setItem(LS_PROF_EMAIL, email); localStorage.setItem(LS_PROF_NOME, profData.nome || '');
       semanaCache = null; pSelDia = null; pSelSessao = null;
     } else {
-      alunoData = r.data;
-      localStorage.setItem(LS_EMAIL, email);
-      localStorage.setItem(LS_NOME, alunoData.nome || '');
+      alunoData = r.data; localStorage.setItem(LS_EMAIL, email); localStorage.setItem(LS_NOME, alunoData.nome || '');
       preencherCard(alunoData);
     }
-    $('info').textContent = '';
-    afterLoginSuccess();
-  } catch (e) {
-    $('err').textContent = 'Erro de conexão.';
-  } finally {
-    $('info').textContent  = '';
-    $('btnLogin').disabled = false;
-  }
+    $('info').textContent = ''; afterLoginSuccess();
+  } catch (e) { $('err').textContent = 'Erro de conexão.'; }
+  finally { $('info').textContent = ''; $('btnLogin').disabled = false; }
 }
 
 function logout() {
-  alunoData   = null;
-  semanaCache = null;
-  presenceCache = {};
-  notifCache = null;
-  aSelDia = null; aSelSessao = null;
-  localStorage.removeItem(LS_EMAIL);
-  localStorage.removeItem(LS_NOME);
-  localStorage.removeItem(LS_BIO_TS);
-  sessionStorage.removeItem(SS_PAGE);
-  sessionStorage.removeItem(SS_SESSAO);
-  localStorage.removeItem('rv_foto_url');
-  $('email').value = '';
-  hide('mainNav');
-  showTab('Home');
+  alunoData = null; semanaCache = null; presenceCache = {}; notifCache = null; aSelDia = null; aSelSessao = null;
+  localStorage.removeItem(LS_EMAIL); localStorage.removeItem(LS_NOME); localStorage.removeItem(LS_BIO_TS);
+  sessionStorage.removeItem(SS_PAGE); sessionStorage.removeItem(SS_SESSAO); localStorage.removeItem('rv_foto_url');
+  $('email').value = ''; hide('mainNav'); showTab('Home');
 }
 
-/* ── Professor logout ─────────────────────────────────────────── */
 function profLogout() {
-  profData     = null;
-  semanaCache  = null;
-  presenceCache = {};
-  pSelDia = null; pSelSessao = null;
-  localStorage.removeItem(LS_PROF_EMAIL);
-  localStorage.removeItem(LS_PROF_NOME);
-  localStorage.removeItem(LS_BIO_TS);
-  sessionStorage.removeItem(SS_PAGE);
-  sessionStorage.removeItem(SS_SESSAO);
-  hide('cardProf');
-  showTab('Home');
+  profData = null; semanaCache = null; presenceCache = {}; pSelDia = null; pSelSessao = null;
+  localStorage.removeItem(LS_PROF_EMAIL); localStorage.removeItem(LS_PROF_NOME); localStorage.removeItem(LS_BIO_TS);
+  sessionStorage.removeItem(SS_PAGE); sessionStorage.removeItem(SS_SESSAO);
+  hide('cardProf'); showTab('Home');
 }
 
-/* ── init ─────────────────────────────────────────── */
 function init() {
   if (!webAuthnAvailable()) {
-    ['cardLogin', 'cardAluno', 'cardAgendar', 'cardProf'].forEach(hide);
-    hide('mainNav');
-    show('cardNoSupport');
-    return;
+    ['cardLogin','cardAluno','cardAgendar','cardProf'].forEach(hide); hide('mainNav'); show('cardNoSupport'); return;
   }
 
   $('btnBioAction').addEventListener('click', onBioAction);
-
   $('btnLogin').addEventListener('click', loginGeneric);
   $('email').addEventListener('keydown', e => { if (e.key === 'Enter') loginGeneric(); });
   $('btnSair').addEventListener('click', logout);
   $('btnSessaoCheckin').addEventListener('click', fazerCheckin);
   $('btnSessaoDeletarCheckin').addEventListener('click', deletarCheckin);
-  $('btnSessaoBack').addEventListener('click', () => {
-    hide('cardSessao');
-    hide('cardSobre');
-    show('cardAgendar');
-    show('mainNav');
-  });
+  $('btnSessaoBack').addEventListener('click', () => { hide('cardSessao'); hide('cardSobre'); show('cardAgendar'); show('mainNav'); });
   $('btnBell').addEventListener('click', loadNotificacoes);
   $('btnNotifBack').addEventListener('click', () => showTab('Home'));
-
   $('btnProfSair').addEventListener('click', profLogout);
-  $('btnProfSessaoBack').addEventListener('click', () => {
-    hide('cardProfSessao');
-    show('cardProf');
-  });
-
+  $('btnProfSessaoBack').addEventListener('click', () => { hide('cardProfSessao'); show('cardProf'); });
   $('navHome').addEventListener('click',    () => showTab('Home'));
   $('navAgendar').addEventListener('click', () => showTab('Agendar'));
-
   $('navSobre').addEventListener('click', () => {
     sessionStorage.removeItem(SS_PAGE);
     ['cardAluno','cardAgendar','cardNotificacoes','cardSessao','cardSobre'].forEach(hide);
     ['navHome','navAgendar','navSobre'].forEach(id => $(id).classList.remove('on'));
-    $('navSobre').classList.add('on');
-    show('cardSobre');
+    $('navSobre').classList.add('on'); show('cardSobre');
   });
-
   $('btnSobreBack').addEventListener('click', () => {
     sessionStorage.removeItem(SS_PAGE);
     ['navHome','navAgendar','navSobre'].forEach(id => $(id).classList.remove('on'));
-    $('navHome').classList.add('on');
-    showTab('Home');
+    $('navHome').classList.add('on'); showTab('Home');
   });
 
   const fotoInput = document.getElementById('fotoInput');
@@ -1762,22 +1188,14 @@ function init() {
     fotoInput.addEventListener('change', async function () {
       const file = this.files && this.files[0];
       if (!file || !alunoData || !alunoData.id) return;
-      if (file.size > 5 * 1024 * 1024) {
-        alert('Imagem muito grande. Máximo 5 MB.');
-        return;
-      }
+      if (file.size > 5 * 1024 * 1024) { alert('Imagem muito grande. Máximo 5 MB.'); return; }
       const localUrl = URL.createObjectURL(file);
       atualizarAvatar(localUrl, alunoData.nome || '');
       try {
         const url = await uploadFotoPerfil(file, alunoData.id);
-        alunoData.foto_url = url;
-        atualizarAvatar(url, alunoData.nome || '');
-      } catch (e) {
-        atualizarAvatar(alunoData.foto_url || '', alunoData.nome || '');
-        alert('Erro ao salvar foto. Tente novamente.');
-      } finally {
-        this.value = '';
-      }
+        alunoData.foto_url = url; atualizarAvatar(url, alunoData.nome || '');
+      } catch (e) { atualizarAvatar(alunoData.foto_url || '', alunoData.nome || ''); alert('Erro ao salvar foto. Tente novamente.'); }
+      finally { this.value = ''; }
     });
   }
 
@@ -1787,42 +1205,21 @@ function init() {
   document.getElementById('chkContratoLeitura').addEventListener('change', verificarBotaoContrato);
   const contratoInput    = document.getElementById('contratoInputAssinatura');
   const contratoTextoAss = document.getElementById('contratoTextoAssinatura');
-  contratoInput.addEventListener('input', () => {
-    const val = contratoInput.value.trim();
-    contratoTextoAss.textContent = val || '—';
-    verificarBotaoContrato();
-  });
+  contratoInput.addEventListener('input', () => { const val = contratoInput.value.trim(); contratoTextoAss.textContent = val || '—'; verificarBotaoContrato(); });
   document.getElementById('btnAssinarContrato').addEventListener('click', async () => {
     if (!alunoData) return;
     document.getElementById('btnAssinarContrato').disabled = true;
     document.getElementById('contratoInfo').textContent = 'Salvando assinatura…';
     try {
       await salvarAssinaturaContrato(alunoData);
-      const snap = await getDoc(doc(db, 'alunos', alunoData.id));
+      const snap = await getDoc(doc_('alunos', alunoData.id));
       if (snap.exists()) {
         const d = snap.data();
-        alunoData = {
-          id:             snap.id,
-          nome:           d.nome_aluno || '',
-          nome_aluno:     d.nome_aluno || '',
-          faixa:          d.faixa || '',
-          grau:           d.grau_atual ?? 0,
-          dataGrau:       d.data_ultimo_grau || '',
-          status:         d.status || '',
-          statusExame:    d.statusExame || '',
-          aulasNoGrau:    d.aulas_no_grau ?? 0,
-          aulasRestantes: d.aulas_restantes ?? null,
-          metaGrau:       d.meta_grau ?? 0,
-          email:          d.email || alunoData.email,
-          foto_url:       d.foto_url || '',
-          contrato_assinado: d.contrato_assinado || false,
-        };
+        alunoData = { id: snap.id, nome: d.nome_aluno||'', nome_aluno: d.nome_aluno||'', faixa: d.faixa||'', grau: d.grau_atual??0, dataGrau: d.data_ultimo_grau||'', status: d.status||'', statusExame: d.statusExame||'', aulasNoGrau: d.aulas_no_grau??0, aulasRestantes: d.aulas_restantes??null, metaGrau: d.meta_grau??0, email: d.email||alunoData.email, foto_url: d.foto_url||'', contrato_assinado: d.contrato_assinado||false };
         preencherCard(alunoData);
       }
       document.getElementById('contratoInfo').textContent = '';
-      hide('cardContrato');
-      show('cardAluno');
-      show('mainNav');
+      hide('cardContrato'); show('cardAluno'); show('mainNav');
     } catch(e) {
       document.getElementById('contratoErr').textContent  = 'Erro ao salvar. Tente novamente.';
       document.getElementById('contratoInfo').textContent = '';
@@ -1839,23 +1236,10 @@ function init() {
   const bioTs    = parseInt(localStorage.getItem(LS_BIO_TS) || '0', 10);
   const bioGrace = Date.now() - bioTs < BIO_GRACE_MS;
 
-  if (email && nome) {
-    alunoData = { nome };
-    preencherCard(alunoData);
-    if (bioOk && credId && bioGrace) { afterBioSuccess(false); return; }
-    showBioLock(bioOk && credId ? 'unlock' : 'register');
-    return;
-  }
-
-  if (pEmail && pNome) {
-    profData = { nome: pNome, email: pEmail };
-    if (bioOk && credId && bioGrace) { afterBioSuccess(false); return; }
-    showBioLock(bioOk && credId ? 'unlock' : 'register');
-    return;
-  }
+  if (email && nome) { alunoData = { nome }; preencherCard(alunoData); if (bioOk && credId && bioGrace) { afterBioSuccess(false); return; } showBioLock(bioOk && credId ? 'unlock' : 'register'); return; }
+  if (pEmail && pNome) { profData = { nome: pNome, email: pEmail }; if (bioOk && credId && bioGrace) { afterBioSuccess(false); return; } showBioLock(bioOk && credId ? 'unlock' : 'register'); return; }
 
   show('cardLogin');
-
-} // fecha function init()
+}
 
 document.addEventListener('DOMContentLoaded', init);
