@@ -1,4 +1,4 @@
-const CACHE = "riva-bjj-v20260423185600";
+const CACHE = "bjjflowhub-v10260423185600";
 const ASSETS = [
   "./",
   "./index.html",
@@ -13,7 +13,8 @@ const ASSETS = [
   "./firebase-config.js",
   "./manifest.webmanifest",
   "./icon-192.png",
-  "./icon-512.png"
+  "./icon-512.png",
+  "./logo.png"
 ];
 
 self.addEventListener("install", (event) => {
