@@ -2,7 +2,6 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta http-equiv="Content-Language" content="pt-BR" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#3D5A80" />
   <title>Cadastrar Aluno – BJJFlowHub</title>
@@ -86,7 +85,7 @@
       <input id="fAulasNoGrau" class="input" type="number" min="0" placeholder="0" value="0" />
 
       <label class="label" for="fData">Data do Último Grau (opcional)</label>
-      <input id="fData" class="input" type="date" lang="pt-BR" />
+      <input id="fData" class="input" type="date" />
 
       <label class="label" for="fCategoria">Categoria</label>
       <select id="fCategoria" class="input">
@@ -112,11 +111,10 @@
       <input id="fCpf" class="input" type="tel" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" autocomplete="off" />
 
       <label class="label" for="fDataNasc">Data de Nascimento</label>
-      <input id="fDataNasc" class="input" type="date" lang="pt-BR" />
+      <input id="fDataNasc" class="input" type="date" />
 
       <label class="label" for="fDataInicio">Data de Início</label>
-      <input id="fDataInicio" class="input" type="date" lang="pt-BR" />
-    
+      <input id="fDataInicio" class="input" type="date" />
 
       <label class="label" for="fTelefone">Telefone</label>
       <input id="fTelefone" class="input" type="tel" placeholder="(00) 00000-0000" />
@@ -171,7 +169,7 @@
           <input id="fGrupoFamiliar" class="input" type="text" placeholder="Ex: Família Silva" />
 
           <label class="label" for="fDataContrato">Data de Início do Contrato</label>
-          <input id="fDataContrato" class="input" type="date" lang="pt-BR" />
+          <input id="fDataContrato" class="input" type="date" />
         </div>
       </div>
 
@@ -299,19 +297,19 @@
           aulas_no_grau:    aulasNoGrau,
           aulas_restantes:  Math.max(0, metaGrau - aulasNoGrau),
           meta_grau:        metaGrau,
-          data_ultimo_grau: toDateBR(data) || '',
+          data_ultimo_grau: data || '',
           statusExame:      gerarStatusCad(faixa, parseInt(grau) || 0),
           telefone:         document.getElementById('fTelefone').value.trim(),
           cpf:              document.getElementById('fCpf').value.trim(),
-          data_nasc:        document.getElementById('fDataNasc').value,
-          data_inicio:      document.getElementById('fDataInicio').value,
+          data_nasc:        dataBRparaISO(document.getElementById('fDataNasc').value),
+          data_inicio:      dataBRparaISO(document.getElementById('fDataInicio').value),
           categoria,
           plano,
           pago_ate:         '',
           avista_valor:     0,
           avista_forma_pag: '',
           grupo_familiar:   plano !== 'VIP' ? document.getElementById('fGrupoFamiliar').value.trim() : '',
-          data_contrato:    plano !== 'VIP' ? document.getElementById('fDataContrato').value : '',
+          data_contrato:    plano !== 'VIP' ? dataBRparaISO(document.getElementById('fDataContrato').value) : '',
           cep:              document.getElementById('fCep').value.replace(/\D/g,''),
           numero:           document.getElementById('fNumero').value.trim(),
           rua:              document.getElementById('fRua').value.trim(),
@@ -366,6 +364,25 @@
       document.getElementById('secaoResponsavel').style.display = ehMenor ? '' : 'none';
     });
     document.getElementById('fRespCpf').addEventListener('input', function() { this.value = formatarCpf(this.value); });
+
+    // Máscara de data DD/MM/AAAA
+    function mascaraData(val) {
+      return val.replace(/\D/g,'').slice(0,8)
+        .replace(/(\d{2})(\d)/,'$1/$2')
+        .replace(/(\d{2}\/\d{2})(\d)/,'$1/$2');
+    }
+    function dataBRparaISO(val) {
+      // Converte DD/MM/AAAA para YYYY-MM-DD para salvar no Firestore
+      if (!val || val.length < 10) return val;
+      const [d, m, y] = val.split('/');
+      if (!d || !m || !y) return val;
+      return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+    }
+    ['fData','fDataNasc','fDataInicio','fDataContrato'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', function() { this.value = mascaraData(this.value); });
+    });
+
   </script>
 </body>
 </html>
