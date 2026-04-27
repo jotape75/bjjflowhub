@@ -1,0 +1,606 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <title>BJJFlowHub – Painel de Suporte</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #111111;
+      --surface2: #171717;
+      --surface3: #1e1e1e;
+      --border: rgba(255,255,255,0.07);
+      --text: #f0f0f0;
+      --muted: #666;
+      --accent: #3D5A80;
+      --accent-dim: rgba(61,90,128,0.1);
+      --accent-glow: rgba(61,90,128,0.2);
+      --green: #27ae60;
+      --yellow: #f39c12;
+      --red: #e74c3c;
+      --sidebar-w: 320px;
+      --header-h: 60px;
+      --font: 'Geist', sans-serif;
+    }
+
+    body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; overflow-x: hidden; }
+
+    /* ── LOGIN ── */
+    #loginScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; }
+    #loginScreen::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(61,90,128,0.15) 0%, transparent 70%); pointer-events: none; }
+    .login-box { width: 100%; max-width: 380px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 40px 32px; position: relative; z-index: 1; animation: fadeUp 0.4s ease both; }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    .login-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 28px; }
+    .login-brand-icon { width: 36px; height: 36px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .login-brand-name { font-size: 16px; font-weight: 900; color: #fff; }
+    .login-brand-sub { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .login-title { font-size: 24px; font-weight: 700; color: #fff; margin-bottom: 6px; letter-spacing: -0.5px; }
+    .login-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 11px; font-weight: 700; color: #999; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 7px; }
+    .field input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 15px; color: #fff; font-family: var(--font); outline: none; transition: border-color 0.2s; }
+    .field input:focus { border-color: var(--accent); }
+    .field input::placeholder { color: #444; }
+    .btn-login { width: 100%; padding: 13px; background: var(--accent); color: #fff; border: none; border-radius: 10px; font-family: var(--font); font-size: 15px; font-weight: 700; cursor: pointer; transition: opacity 0.2s; margin-top: 4px; }
+    .btn-login:hover { opacity: 0.9; }
+    .btn-login:disabled { opacity: 0.4; cursor: not-allowed; }
+    .login-err  { margin-top: 10px; font-size: 13px; color: #ff6b6b; text-align: center; min-height: 18px; }
+    .login-info { margin-top: 10px; font-size: 13px; color: #aaa; text-align: center; min-height: 18px; }
+
+    /* ── SHELL ── */
+    #appScreen { display: none; min-height: 100vh; }
+    #appScreen.visible { display: flex; }
+
+    /* ── SIDEBAR ── */
+    .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 200; transition: transform 0.3s; }
+    .sidebar-top { padding: 18px 16px; border-bottom: 1px solid var(--border); }
+    .sidebar-brand { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+    .sidebar-brand-icon { width: 32px; height: 32px; background: var(--accent); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; }
+    .sidebar-brand-name { font-size: 14px; font-weight: 900; color: #fff; }
+    .sidebar-brand-sub  { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Filtros de status */
+    .filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .filter-chip { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font); transition: all 0.15s; white-space: nowrap; }
+    .filter-chip:hover { border-color: rgba(255,255,255,0.15); color: #ccc; }
+    .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    /* Lista de tickets */
+    .sidebar-list-header { padding: 12px 16px 8px; font-size: 10px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; display: flex; align-items: center; justify-content: space-between; }
+    .ticket-count { font-size: 10px; color: var(--muted); font-weight: 500; }
+    .tickets-list { flex: 1; overflow-y: auto; }
+    .ticket-item { padding: 13px 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; position: relative; }
+    .ticket-item:hover { background: var(--accent-dim); }
+    .ticket-item.active { background: var(--accent-dim); border-left: 3px solid var(--accent); }
+    .ticket-item-academia { font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+    .ticket-item-titulo { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 20px; }
+    .ticket-item-meta { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+    .unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); position: absolute; top: 13px; right: 14px; }
+
+    /* Badges */
+    .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; white-space: nowrap; }
+    .badge-aberto       { background: rgba(61,90,128,0.2);  color: #7fafd4; border: 1px solid rgba(61,90,128,0.4); }
+    .badge-em_andamento { background: rgba(243,156,18,0.15); color: #f39c12; border: 1px solid rgba(243,156,18,0.4); }
+    .badge-resolvido    { background: rgba(39,174,96,0.15); color: #2ecc71; border: 1px solid rgba(39,174,96,0.3); }
+    .badge-baixa  { background: rgba(39,174,96,0.1);  color: #2ecc71; border: 1px solid rgba(39,174,96,0.25); }
+    .badge-media  { background: rgba(243,156,18,0.1); color: #f39c12; border: 1px solid rgba(243,156,18,0.25); }
+    .badge-alta   { background: rgba(231,76,60,0.12); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
+
+    .sidebar-footer { padding: 14px 16px; border-top: 1px solid var(--border); }
+    .sidebar-user { font-size: 12px; color: var(--muted); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .sidebar-user strong { color: #ccc; }
+    .btn-logout { width: 100%; display: flex; align-items: center; gap: 8px; padding: 9px 14px; background: transparent; border: 1px solid var(--border); border-radius: 9px; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: border-color 0.2s, color 0.2s; }
+    .btn-logout:hover { border-color: rgba(255,255,255,0.15); color: #fff; }
+
+    /* ── MAIN ── */
+    .main-area { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+    .topbar { height: var(--header-h); background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 28px; gap: 14px; position: sticky; top: 0; z-index: 100; }
+    .topbar-title { font-size: 15px; font-weight: 800; color: #fff; flex: 1; }
+    .btn-menu-toggle { display: none; background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; }
+    .content-area { flex: 1; padding: 28px; }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: calc(100vh - var(--header-h) - 56px); text-align: center; }
+    .empty-icon { font-size: 52px; margin-bottom: 16px; opacity: 0.4; }
+    .empty-title { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+    .empty-sub { font-size: 14px; color: var(--muted); }
+
+    /* ── TICKET DETAIL ── */
+    .detail-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; max-width: 760px; }
+
+    .detail-header { padding: 22px 24px 18px; border-bottom: 1px solid var(--border); }
+    .detail-academia { font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+    .detail-titulo { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -0.4px; margin-bottom: 10px; }
+    .detail-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .detail-info { font-size: 12px; color: var(--muted); }
+
+    /* Status selector */
+    .status-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .status-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; }
+    .status-btn { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: all 0.15s; }
+    .status-btn:hover { border-color: rgba(255,255,255,0.15); color: #ccc; }
+    .status-btn.sel-aberto       { background: rgba(61,90,128,0.2);  border-color: rgba(61,90,128,0.5); color: #7fafd4; }
+    .status-btn.sel-em_andamento { background: rgba(243,156,18,0.15); border-color: rgba(243,156,18,0.4); color: #f39c12; }
+    .status-btn.sel-resolvido    { background: rgba(39,174,96,0.15); border-color: rgba(39,174,96,0.35); color: #2ecc71; }
+
+    /* Mensagens */
+    .mensagens-area { padding: 20px 24px; max-height: 420px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: var(--bg); }
+    .msg-bubble { max-width: 72%; padding: 12px 14px; border-radius: 12px; font-size: 13px; line-height: 1.65; }
+    .msg-bubble.cliente  { align-self: flex-end; background: var(--accent); color: #fff; border-bottom-right-radius: 4px; }
+    .msg-bubble.suporte  { align-self: flex-start; background: var(--surface); color: #ddd; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+    .msg-de { font-size: 10px; font-weight: 700; opacity: 0.7; margin-bottom: 3px; }
+    .msg-meta { font-size: 10px; margin-top: 5px; opacity: 0.55; }
+
+    /* Reply area */
+    .reply-area { padding: 16px 24px; border-top: 1px solid var(--border); }
+    .reply-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 14px; color: #fff; font-family: var(--font); outline: none; resize: vertical; min-height: 90px; line-height: 1.55; transition: border-color 0.2s; }
+    .reply-input:focus { border-color: rgba(61,90,128,0.5); }
+    .reply-input::placeholder { color: #444; }
+    .reply-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; flex-wrap: wrap; gap: 10px; }
+    .reply-hint { font-size: 12px; color: var(--muted); }
+    .btn-reply { background: var(--accent); border: none; color: #fff; border-radius: 9px; padding: 10px 24px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); transition: opacity 0.15s, transform 0.1s; }
+    .btn-reply:hover { opacity: 0.9; }
+    .btn-reply:active { transform: scale(0.97); }
+    .btn-reply:disabled { opacity: 0.4; cursor: not-allowed; }
+    .reply-msg { font-size: 13px; margin-top: 6px; min-height: 18px; }
+    .reply-msg.err { color: #ff6b6b; }
+    .reply-msg.ok  { color: #2ecc71; }
+
+    /* Stats no header */
+    .stats-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px 20px; min-width: 110px; }
+    .stat-num { font-size: 28px; font-weight: 900; color: #fff; line-height: 1; }
+    .stat-num.blue   { color: #7fafd4; }
+    .stat-num.yellow { color: #f39c12; }
+    .stat-num.green  { color: #2ecc71; }
+    .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    /* Skeleton */
+    .skel { background: var(--surface2); border-radius: 6px; animation: shimmer 1.2s infinite; }
+    @keyframes shimmer { 0%,100%{opacity:.3} 50%{opacity:.7} }
+    .loading-row { padding: 13px 16px; border-bottom: 1px solid var(--border); }
+
+    /* Mobile */
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 199; }
+    .sidebar-overlay.visible { display: block; }
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-area { margin-left: 0; }
+      .btn-menu-toggle { display: block; }
+      .content-area { padding: 16px; }
+    }
+
+    .tickets-empty { padding: 32px 16px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; }
+  </style>
+</head>
+<body>
+
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <div class="login-box">
+      <div class="login-brand">
+        <div class="login-brand-icon">🛟</div>
+        <div>
+          <div class="login-brand-name">BJJFlowHub</div>
+          <span class="login-brand-sub">Painel de Suporte</span>
+        </div>
+      </div>
+      <div class="login-title">Acesso restrito</div>
+      <div class="login-sub">Somente equipe BJJFlowHub.</div>
+      <div class="field">
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" type="email" inputmode="email" autocomplete="email" placeholder="suporte@bjjflowhub.com" />
+      </div>
+      <div class="field">
+        <label for="loginSenha">Senha</label>
+        <input id="loginSenha" type="password" autocomplete="current-password" placeholder="••••••••" />
+      </div>
+      <button class="btn-login" id="btnEntrar">Entrar</button>
+      <p class="login-err"  id="loginErr"></p>
+      <p class="login-info" id="loginInfo"></p>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="appScreen">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <nav class="sidebar" id="sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-icon">🛟</div>
+          <div>
+            <div class="sidebar-brand-name">BJJFlowHub</div>
+            <div class="sidebar-brand-sub">Suporte interno</div>
+          </div>
+        </div>
+        <div class="filter-row" id="filterRow">
+          <button class="filter-chip active" data-status="todos">Todos</button>
+          <button class="filter-chip" data-status="aberto">Abertos</button>
+          <button class="filter-chip" data-status="em_andamento">Em andamento</button>
+          <button class="filter-chip" data-status="resolvido">Resolvidos</button>
+        </div>
+      </div>
+
+      <div class="sidebar-list-header">
+        <span>Tickets</span>
+        <span class="ticket-count" id="ticketCount">—</span>
+      </div>
+      <div class="tickets-list" id="ticketsList">
+        <div class="loading-row"><div class="skel" style="height:13px;width:50%;margin-bottom:6px;"></div><div class="skel" style="height:10px;width:70%;"></div></div>
+        <div class="loading-row"><div class="skel" style="height:13px;width:65%;margin-bottom:6px;"></div><div class="skel" style="height:10px;width:55%;"></div></div>
+        <div class="loading-row"><div class="skel" style="height:13px;width:45%;margin-bottom:6px;"></div><div class="skel" style="height:10px;width:60%;"></div></div>
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="sidebar-user">🟢 <strong id="sidebarUserEmail">—</strong></div>
+        <button class="btn-logout" id="btnLogout">⬅️ &nbsp; Sair</button>
+      </div>
+    </nav>
+
+    <div class="main-area">
+      <div class="topbar">
+        <button class="btn-menu-toggle" id="btnMenuToggle">☰</button>
+        <div class="topbar-title" id="topbarTitle">Painel de Suporte</div>
+      </div>
+
+      <div class="content-area" id="contentArea">
+
+        <!-- DASHBOARD STATS -->
+        <div id="dashStats" class="stats-row">
+          <div class="stat-card"><div class="stat-num blue" id="statAbertos">—</div><div class="stat-label">Abertos</div></div>
+          <div class="stat-card"><div class="stat-num yellow" id="statAndamento">—</div><div class="stat-label">Em andamento</div></div>
+          <div class="stat-card"><div class="stat-num green" id="statResolvidos">—</div><div class="stat-label">Resolvidos</div></div>
+          <div class="stat-card"><div class="stat-num" id="statNaoLidos">—</div><div class="stat-label">Não lidos</div></div>
+        </div>
+
+        <!-- EMPTY / DETAIL -->
+        <div class="empty-state" id="emptyState">
+          <div class="empty-icon">🎫</div>
+          <div class="empty-title">Selecione um ticket</div>
+          <div class="empty-sub">Escolha um ticket na lista ao lado para ver os detalhes e responder.</div>
+        </div>
+
+        <div id="ticketDetail" style="display:none;"></div>
+
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+    import {
+      getFirestore, collection, doc, query, orderBy,
+      onSnapshot, updateDoc, arrayUnion, serverTimestamp, getDocs
+    } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+
+    // Usa o mesmo Firebase do projeto
+    const firebaseConfig = {
+      apiKey: "AIzaSyD1j3WuBpRwS1LreI32DFJAFu07LODvs7s",
+      authDomain: "bjjflowhub-821fe.firebaseapp.com",
+      projectId: "bjjflowhub-821fe",
+      storageBucket: "bjjflowhub-821fe.firebasestorage.app",
+      messagingSenderId: "218946505499",
+      appId: "1:218946505499:web:7ea73d1c745a53cc42a1be"
+    };
+    const app  = initializeApp(firebaseConfig);
+    const db   = getFirestore(app);
+    const auth = getAuth(app);
+
+    /* ── STAFF CHECK ──
+       Verifica se o email logado está na coleção flowhub_staff.
+       Para adicionar um membro da equipe, crie um doc em flowhub_staff
+       com o campo email: "suporte@seudominio.com"
+    ── */
+    async function isStaff(email) {
+      try {
+        const snap = await getDocs(collection(db, 'flowhub_staff'));
+        return snap.docs.some(d => (d.data().email || '').toLowerCase() === email.toLowerCase());
+      } catch(e) { return false; }
+    }
+
+    let currentUser = null;
+    let currentTicketId = null;
+    let unsubTickets = null;
+    let unsubDetail  = null;
+    let filtroStatus = 'todos';
+    let todosTickets = [];
+
+    /* ── Utils ── */
+    function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function formatTs(ts) {
+      if (!ts) return '';
+      try {
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      } catch(e) { return String(ts).slice(0, 16); }
+    }
+    function statusLabel(s) {
+      return { aberto: 'Aberto', em_andamento: 'Em andamento', resolvido: 'Resolvido' }[s] || s;
+    }
+    function categoriaLabel(c) {
+      return { financeiro: '💰 Financeiro', tecnico: '🔧 Técnico', alunos: '👥 Alunos', checkin: '✅ Check-in', outro: '💬 Outro' }[c] || c;
+    }
+
+    /* ── Auth ── */
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const ok = await isStaff(user.email);
+        if (!ok) {
+          await signOut(auth);
+          document.getElementById('loginErr').textContent = 'Acesso negado. Conta não autorizada.';
+          showLogin();
+          return;
+        }
+        currentUser = user;
+        showApp(user.email);
+      } else {
+        showLogin();
+      }
+    });
+
+    function showLogin() {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('appScreen').classList.remove('visible');
+    }
+    function showApp(email) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('appScreen').classList.add('visible');
+      document.getElementById('sidebarUserEmail').textContent = email;
+      iniciarListeners();
+    }
+
+    /* ── Login ── */
+    async function tryLogin() {
+      const email  = document.getElementById('loginEmail').value.trim().toLowerCase();
+      const senha  = document.getElementById('loginSenha').value;
+      const errEl  = document.getElementById('loginErr');
+      const infoEl = document.getElementById('loginInfo');
+      const btn    = document.getElementById('btnEntrar');
+
+      errEl.textContent = '';
+      if (!email || !email.includes('@')) { errEl.textContent = 'Email inválido.'; return; }
+      if (!senha) { errEl.textContent = 'Digite a senha.'; return; }
+
+      infoEl.textContent = 'Verificando…';
+      btn.disabled = true;
+      try {
+        await signInWithEmailAndPassword(auth, email, senha);
+        infoEl.textContent = '';
+      } catch(e) {
+        const isCredErr = ['auth/invalid-credential','auth/wrong-password','auth/user-not-found'].includes(e.code);
+        errEl.textContent = isCredErr ? 'Credenciais inválidas.' : 'Erro de conexão.';
+        infoEl.textContent = '';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById('btnEntrar').addEventListener('click', tryLogin);
+    document.getElementById('loginSenha').addEventListener('keydown', e => { if (e.key === 'Enter') tryLogin(); });
+    document.getElementById('loginEmail').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('loginSenha').focus(); });
+    document.getElementById('btnLogout').addEventListener('click', () => { signOut(auth); });
+
+    /* ── Mobile menu ── */
+    document.getElementById('btnMenuToggle').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.add('open');
+      document.getElementById('sidebarOverlay').classList.add('visible');
+    });
+    document.getElementById('sidebarOverlay').addEventListener('click', () => {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('visible');
+    });
+
+    /* ── Filtros ── */
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        filtroStatus = chip.dataset.status;
+        renderTicketsList();
+      });
+    });
+
+    /* ── Listeners de tickets (tempo real) ── */
+    function iniciarListeners() {
+      if (unsubTickets) unsubTickets();
+      const q = query(collection(db, 'tickets'), orderBy('atualizadoEm', 'desc'));
+      unsubTickets = onSnapshot(q, (snap) => {
+        todosTickets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderTicketsList();
+        atualizarStats();
+      }, (err) => {
+        document.getElementById('ticketsList').innerHTML = '<div class="tickets-empty">Erro ao carregar tickets.<br>Verifique as regras do Firestore.</div>';
+      });
+    }
+
+    /* ── Stats ── */
+    function atualizarStats() {
+      const abertos    = todosTickets.filter(t => t.status === 'aberto').length;
+      const andamento  = todosTickets.filter(t => t.status === 'em_andamento').length;
+      const resolvidos = todosTickets.filter(t => t.status === 'resolvido').length;
+      const naoLidos   = todosTickets.filter(t => t.lidoPeloSuporte === false).length;
+      document.getElementById('statAbertos').textContent    = abertos;
+      document.getElementById('statAndamento').textContent  = andamento;
+      document.getElementById('statResolvidos').textContent = resolvidos;
+      document.getElementById('statNaoLidos').textContent   = naoLidos;
+    }
+
+    /* ── Render lista ── */
+    function renderTicketsList() {
+      const lista = filtroStatus === 'todos'
+        ? todosTickets
+        : todosTickets.filter(t => t.status === filtroStatus);
+
+      document.getElementById('ticketCount').textContent = lista.length + ' ticket' + (lista.length !== 1 ? 's' : '');
+
+      const container = document.getElementById('ticketsList');
+      if (!lista.length) {
+        container.innerHTML = '<div class="tickets-empty">Nenhum ticket neste filtro.</div>';
+        return;
+      }
+
+      container.innerHTML = lista.map(t => {
+        const isActive = t.id === currentTicketId;
+        const temNovo  = t.lidoPeloSuporte === false;
+        return `
+          <div class="ticket-item${isActive ? ' active' : ''}" data-id="${esc(t.id)}">
+            ${temNovo ? '<div class="unread-dot"></div>' : ''}
+            <div class="ticket-item-academia">${esc(t.academiaNome || t.academiaId)}</div>
+            <div class="ticket-item-titulo">${esc(t.titulo)}</div>
+            <div class="ticket-item-meta">
+              <span class="badge badge-${esc(t.status)}">${statusLabel(t.status)}</span>
+              <span class="badge badge-${esc(t.prioridade)}">${esc(t.prioridade)}</span>
+              <span>${esc(t.criadoPor || '')}</span>
+            </div>
+          </div>`;
+      }).join('');
+
+      container.querySelectorAll('.ticket-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const ticket = todosTickets.find(t => t.id === item.dataset.id);
+          if (ticket) abrirTicket(ticket);
+          document.getElementById('sidebar').classList.remove('open');
+          document.getElementById('sidebarOverlay').classList.remove('visible');
+        });
+      });
+    }
+
+    /* ── Abrir ticket ── */
+    function abrirTicket(ticket) {
+      currentTicketId = ticket.id;
+      document.querySelectorAll('.ticket-item').forEach(el => el.classList.toggle('active', el.dataset.id === ticket.id));
+      document.getElementById('dashStats').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('ticketDetail').style.display = '';
+      document.getElementById('topbarTitle').textContent = ticket.titulo;
+
+      // Marcar como lido pelo suporte
+      updateDoc(doc(db, 'tickets', ticket.id), { lidoPeloSuporte: true }).catch(() => {});
+
+      // Listener em tempo real do ticket
+      if (unsubDetail) unsubDetail();
+      unsubDetail = onSnapshot(doc(db, 'tickets', ticket.id), (snap) => {
+        if (!snap.exists()) return;
+        renderTicketDetail({ id: snap.id, ...snap.data() });
+      });
+    }
+
+    /* ── Render detalhe ── */
+    function renderTicketDetail(t) {
+      const statusAtual = t.status || 'aberto';
+      const mensagens   = t.mensagens || [];
+
+      document.getElementById('ticketDetail').innerHTML = `
+        <div class="detail-card">
+          <div class="detail-header">
+            <div class="detail-academia">🏫 ${esc(t.academiaNome || t.academiaId)} · ${esc(t.criadoPor || '')}</div>
+            <div class="detail-titulo">${esc(t.titulo)}</div>
+            <div class="detail-meta">
+              <span class="badge badge-${esc(t.prioridade)}">${esc(t.prioridade)}</span>
+              <span class="badge badge-${esc(statusAtual)}">${statusLabel(statusAtual)}</span>
+              <span class="detail-info">${esc(categoriaLabel(t.categoria))}</span>
+              <span class="detail-info">· Aberto em ${formatTs(t.criadoEm)}</span>
+            </div>
+            <div class="status-row">
+              <span class="status-label">Status:</span>
+              <button class="status-btn${statusAtual === 'aberto' ? ' sel-aberto' : ''}" data-s="aberto">Aberto</button>
+              <button class="status-btn${statusAtual === 'em_andamento' ? ' sel-em_andamento' : ''}" data-s="em_andamento">Em andamento</button>
+              <button class="status-btn${statusAtual === 'resolvido' ? ' sel-resolvido' : ''}" data-s="resolvido">Resolvido</button>
+            </div>
+          </div>
+
+          <div class="mensagens-area" id="mensagensArea">
+            <!-- Descrição inicial -->
+            <div class="msg-bubble cliente">
+              <div class="msg-de">📌 Descrição do chamado</div>
+              ${esc(t.descricao)}
+              <div class="msg-meta">${formatTs(t.criadoEm)}</div>
+            </div>
+            ${mensagens.map(m => `
+              <div class="msg-bubble ${esc(m.de)}">
+                <div class="msg-de">${m.de === 'suporte' ? '🛟 Suporte BJJFlowHub' : '🏫 ' + esc(t.academiaNome || 'Academia')}</div>
+                ${esc(m.texto)}
+                <div class="msg-meta">${m.criadoEm ? formatTs(m.criadoEm) : ''}</div>
+              </div>`).join('')}
+          </div>
+
+          <div class="reply-area">
+            <textarea class="reply-input" id="replyInput" placeholder="Escreva sua resposta para a academia…"></textarea>
+            <div class="reply-footer">
+              <span class="reply-hint">Resposta visível para a academia em tempo real.</span>
+              <button class="btn-reply" id="btnReply">Responder</button>
+            </div>
+            <p class="reply-msg" id="replyMsg"></p>
+          </div>
+        </div>
+      `;
+
+      // Scroll para fim
+      const area = document.getElementById('mensagensArea');
+      if (area) setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
+
+      // Status buttons
+      document.querySelectorAll('.status-btn').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const novoStatus = btn.dataset.s;
+          try {
+            await updateDoc(doc(db, 'tickets', t.id), {
+              status: novoStatus,
+              atualizadoEm: serverTimestamp(),
+            });
+          } catch(e) {
+            console.error('Erro ao atualizar status:', e);
+          }
+        });
+      });
+
+      // Responder
+      document.getElementById('btnReply').addEventListener('click', () => enviarResposta(t.id));
+    }
+
+    /* ── Enviar resposta (suporte → academia) ── */
+    async function enviarResposta(ticketId) {
+      const input = document.getElementById('replyInput');
+      const msgEl = document.getElementById('replyMsg');
+      const btn   = document.getElementById('btnReply');
+      const texto = input?.value.trim();
+
+      if (!texto) return;
+      btn.disabled = true;
+      msgEl.textContent = '';
+
+      try {
+        await updateDoc(doc(db, 'tickets', ticketId), {
+          mensagens: arrayUnion({
+            de: 'suporte',
+            texto,
+            criadoEm: new Date().toISOString(),
+          }),
+          atualizadoEm: serverTimestamp(),
+          lidoPelaAcademia: false,
+          // Se estava aberto, muda para em andamento automaticamente
+          ...(todosTickets.find(t => t.id === ticketId)?.status === 'aberto' ? { status: 'em_andamento' } : {}),
+        });
+        input.value = '';
+        msgEl.textContent = '✅ Resposta enviada!';
+        msgEl.className = 'reply-msg ok';
+        setTimeout(() => { msgEl.textContent = ''; }, 2000);
+      } catch(e) {
+        msgEl.textContent = 'Erro ao enviar. Tente novamente.';
+        msgEl.className = 'reply-msg err';
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
