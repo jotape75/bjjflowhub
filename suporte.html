@@ -41,16 +41,13 @@
     }
     @media (max-width: 768px) { .admin-hdr-inner { justify-content: center; } }
 
-    /* ── LAYOUT ── */
     .suporte-layout { display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: start; }
     @media (max-width: 900px) { .suporte-layout { grid-template-columns: 1fr; } }
 
-    /* ── PAGE HEADER ── */
     .page-eyebrow { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); margin-bottom: 4px; }
     .page-title { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.4px; margin-bottom: 4px; }
     .page-sub { font-size: 13px; color: var(--muted); margin-bottom: 24px; }
 
-    /* ── SIDEBAR TICKETS ── */
     .tickets-sidebar { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
     .sidebar-header { padding: 16px 16px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
     .sidebar-title { font-size: 13px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.8px; }
@@ -66,39 +63,33 @@
     .ticket-item-meta { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .unread-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); position: absolute; top: 14px; right: 14px; flex-shrink: 0; }
 
-    /* ── STATUS BADGES ── */
     .badge { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.3px; white-space: nowrap; }
-    .badge-aberto     { background: rgba(61,90,128,0.2);  color: #7fafd4; border: 1px solid rgba(61,90,128,0.4); }
+    .badge-aberto       { background: rgba(61,90,128,0.2);  color: #7fafd4; border: 1px solid rgba(61,90,128,0.4); }
     .badge-em_andamento { background: rgba(243,156,18,0.15); color: #f39c12; border: 1px solid rgba(243,156,18,0.4); }
-    .badge-resolvido  { background: rgba(39,174,96,0.15); color: #2ecc71; border: 1px solid rgba(39,174,96,0.3); }
-    .badge-baixa  { background: rgba(39,174,96,0.1);  color: #2ecc71; border: 1px solid rgba(39,174,96,0.25); }
-    .badge-media  { background: rgba(243,156,18,0.1); color: #f39c12; border: 1px solid rgba(243,156,18,0.25); }
-    .badge-alta   { background: rgba(231,76,60,0.12); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
+    .badge-resolvido    { background: rgba(39,174,96,0.15);  color: #2ecc71; border: 1px solid rgba(39,174,96,0.3); }
+    .badge-baixa { background: rgba(39,174,96,0.1);  color: #2ecc71; border: 1px solid rgba(39,174,96,0.25); }
+    .badge-media { background: rgba(243,156,18,0.1); color: #f39c12; border: 1px solid rgba(243,156,18,0.25); }
+    .badge-alta  { background: rgba(231,76,60,0.12); color: #e74c3c; border: 1px solid rgba(231,76,60,0.3); }
 
-    /* ── MAIN AREA ── */
     .ticket-main { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
 
-    /* ── EMPTY STATE ── */
     .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; text-align: center; }
     .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
     .empty-title { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 6px; }
     .empty-sub { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
 
-    /* ── TICKET DETAIL ── */
     .ticket-detail-header { padding: 20px; border-bottom: 1px solid var(--border); }
     .ticket-detail-titulo { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 8px; letter-spacing: -0.3px; }
     .ticket-detail-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
     .ticket-detail-categoria { font-size: 12px; color: var(--muted); }
 
-    /* ── MENSAGENS ── */
     .mensagens-area { padding: 16px; max-height: 400px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
     .msg-bubble { max-width: 75%; padding: 12px 14px; border-radius: 12px; font-size: 13px; line-height: 1.6; }
-    .msg-bubble.cliente  { align-self: flex-end; background: var(--blue); color: #fff; border-bottom-right-radius: 4px; }
-    .msg-bubble.suporte  { align-self: flex-start; background: var(--surface2); color: #ddd; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
+    .msg-bubble.cliente { align-self: flex-end; background: var(--blue); color: #fff; border-bottom-right-radius: 4px; }
+    .msg-bubble.suporte { align-self: flex-start; background: var(--surface2); color: #ddd; border: 1px solid var(--border); border-bottom-left-radius: 4px; }
     .msg-meta { font-size: 10px; margin-top: 5px; opacity: 0.65; }
     .msg-de { font-weight: 700; margin-bottom: 2px; font-size: 11px; opacity: 0.75; }
 
-    /* ── INPUT AREA ── */
     .reply-area { padding: 16px; border-top: 1px solid var(--border); }
     .reply-area.disabled { opacity: 0.5; pointer-events: none; }
     .reply-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; font-size: 14px; color: #fff; font-family: inherit; outline: none; resize: vertical; min-height: 80px; transition: border-color 0.2s; line-height: 1.5; }
@@ -111,7 +102,6 @@
     .btn-enviar:disabled { opacity: 0.4; cursor: not-allowed; }
     .resolved-notice { font-size: 13px; color: #2ecc71; display: flex; align-items: center; gap: 6px; }
 
-    /* ── FORM NOVO TICKET ── */
     .form-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 50; align-items: flex-end; justify-content: center; }
     .form-overlay.open { display: flex; }
     .form-box { background: #141414; border: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 24px 20px calc(24px + env(safe-area-inset-bottom,0px)); width: 100%; max-width: 540px; max-height: 90vh; overflow-y: auto; }
@@ -127,9 +117,9 @@
     .form-textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
     .prioridade-row { display: flex; gap: 8px; }
     .prio-btn { flex: 1; padding: 9px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: #888; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; text-align: center; }
-    .prio-btn.sel-baixa  { background: rgba(39,174,96,0.15);  border-color: var(--green); color: #2ecc71; }
-    .prio-btn.sel-media  { background: rgba(243,156,18,0.15); border-color: var(--yellow); color: #f39c12; }
-    .prio-btn.sel-alta   { background: rgba(231,76,60,0.15);  border-color: var(--red); color: #e74c3c; }
+    .prio-btn.sel-baixa { background: rgba(39,174,96,0.15);  border-color: var(--green); color: #2ecc71; }
+    .prio-btn.sel-media { background: rgba(243,156,18,0.15); border-color: var(--yellow); color: #f39c12; }
+    .prio-btn.sel-alta  { background: rgba(231,76,60,0.15);  border-color: var(--red); color: #e74c3c; }
     .form-btns { display: flex; gap: 10px; margin-top: 20px; }
     .btn-cancelar { flex: 1; padding: 12px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: #888; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; }
     .btn-submit { flex: 2; padding: 12px; background: var(--blue); border: none; border-radius: 10px; color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
@@ -139,13 +129,9 @@
     .form-msg.err { color: #ff6b6b; }
     .form-msg.ok  { color: #2ecc71; }
 
-    /* ── SKELETON ── */
     .skel { background: var(--surface2); border-radius: 6px; animation: shimmer 1.2s infinite; }
     @keyframes shimmer { 0%,100%{opacity:.3} 50%{opacity:.7} }
-
-    /* ── EMPTY TICKETS ── */
     .tickets-empty { padding: 32px 16px; text-align: center; color: var(--muted); font-size: 13px; }
-
     .loading-row { padding: 14px 16px; border-bottom: 1px solid var(--border); }
     .loading-row:last-child { border-bottom: none; }
   </style>
@@ -173,8 +159,6 @@
     <div class="page-sub">Abra um chamado ou acompanhe tickets existentes.</div>
 
     <div class="suporte-layout">
-
-      <!-- SIDEBAR -->
       <div class="tickets-sidebar">
         <div class="sidebar-header">
           <span class="sidebar-title">Meus Tickets</span>
@@ -187,7 +171,6 @@
         </div>
       </div>
 
-      <!-- MAIN -->
       <div class="ticket-main" id="ticketMain">
         <div class="empty-state" id="emptyState">
           <div class="empty-icon">🎫</div>
@@ -197,7 +180,6 @@
         </div>
         <div id="ticketDetail" style="display:none;"></div>
       </div>
-
     </div>
   </main>
 
@@ -205,14 +187,12 @@
   <div class="form-overlay" id="formOverlay">
     <div class="form-box">
       <div class="form-title">🎫 Novo Chamado</div>
-
       <div class="form-field">
-        <label class="form-label">Título *</label>
+        <label class="form-label" for="fTitulo">Título *</label>
         <input id="fTitulo" class="form-input" type="text" placeholder="Descreva o problema resumidamente" />
       </div>
-
       <div class="form-field">
-        <label class="form-label">Categoria</label>
+        <label class="form-label" for="fCategoria">Categoria</label>
         <select id="fCategoria" class="form-select">
           <option value="financeiro">💰 Financeiro</option>
           <option value="tecnico">🔧 Técnico</option>
@@ -221,7 +201,6 @@
           <option value="outro">💬 Outro</option>
         </select>
       </div>
-
       <div class="form-field">
         <label class="form-label">Prioridade</label>
         <div class="prioridade-row" id="prioRow">
@@ -230,14 +209,11 @@
           <button class="prio-btn" data-prio="alta">🔴 Alta</button>
         </div>
       </div>
-
       <div class="form-field">
-        <label class="form-label">Descrição *</label>
+        <label class="form-label" for="fDescricao">Descrição *</label>
         <textarea id="fDescricao" class="form-textarea" placeholder="Explique o problema com detalhes…"></textarea>
       </div>
-
       <p class="form-msg" id="formMsg"></p>
-
       <div class="form-btns">
         <button class="btn-cancelar" id="btnCancelarForm">Cancelar</button>
         <button class="btn-submit" id="btnSubmitForm">Abrir Chamado</button>
@@ -248,7 +224,7 @@
   <script type="module">
     import { db, auth, academiaId } from './firebase-config.js';
     import {
-      collection, doc, addDoc, query, where, orderBy,
+      collection, doc, addDoc, query, where,
       onSnapshot, updateDoc, arrayUnion, serverTimestamp, getDocs
     } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
@@ -261,12 +237,13 @@
     let prioSelecionada = 'baixa';
     let academiaNome = 'Academia';
 
-    /* ── Utils ── */
     function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function formatTs(ts) {
       if (!ts) return '';
-      const d = ts.toDate ? ts.toDate() : new Date(ts);
-      return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      try {
+        const d = ts.toDate ? ts.toDate() : new Date(ts);
+        return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      } catch(e) { return ''; }
     }
     function statusLabel(s) {
       return { aberto: 'Aberto', em_andamento: 'Em andamento', resolvido: 'Resolvido' }[s] || s;
@@ -279,7 +256,7 @@
     onAuthStateChanged(auth, async (user) => {
       console.log('Auth state:', user ? user.email : 'null');
       if (!user) { location.href = './administrativo.html'; return; }
-        // Buscar nome da academia
+      currentUser = user;
       try {
         const snap = await getDocs(query(collection(db, 'academias', academiaId, 'professores'), where('email', '==', user.email)));
         if (!snap.empty) academiaNome = snap.docs[0].data().nome || user.email;
@@ -293,22 +270,28 @@
       location.href = './administrativo.html';
     });
 
-    /* ── Listeners de tickets ── */
+    /* ── Listeners — sem orderBy para evitar índice composto ── */
     function iniciarListeners() {
       if (unsubTickets) unsubTickets();
       const q = query(
         collection(db, 'tickets'),
-        where('academiaId', '==', academiaId),
-        orderBy('atualizadoEm', 'desc')
+        where('academiaId', '==', academiaId)
       );
       unsubTickets = onSnapshot(q, (snap) => {
-        renderTicketsList(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-      }, () => {
+        const tickets = snap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .sort((a, b) => {
+            const ta = a.atualizadoEm?.toDate?.() || new Date(0);
+            const tb = b.atualizadoEm?.toDate?.() || new Date(0);
+            return tb - ta;
+          });
+        renderTicketsList(tickets);
+      }, (err) => {
+        console.error('Erro tickets:', err);
         document.getElementById('ticketsList').innerHTML = '<div class="tickets-empty">Erro ao carregar tickets.</div>';
       });
     }
 
-    /* ── Render lista ── */
     function renderTicketsList(tickets) {
       const container = document.getElementById('ticketsList');
       if (!tickets.length) {
@@ -316,8 +299,8 @@
         return;
       }
       container.innerHTML = tickets.map(t => {
-        const isActive  = t.id === currentTicketId;
-        const temNovo   = t.lidoPelaAcademia === false && t.mensagens && t.mensagens.some(m => m.de === 'suporte');
+        const isActive = t.id === currentTicketId;
+        const temNovo  = t.lidoPelaAcademia === false && t.mensagens && t.mensagens.some(m => m.de === 'suporte');
         return `
           <div class="ticket-item${isActive ? ' active' : ''}" data-id="${esc(t.id)}">
             ${temNovo ? '<div class="unread-dot"></div>' : ''}
@@ -329,22 +312,17 @@
             </div>
           </div>`;
       }).join('');
-
       container.querySelectorAll('.ticket-item').forEach(item => {
         item.addEventListener('click', () => abrirTicket(item.dataset.id, tickets.find(t => t.id === item.dataset.id)));
       });
     }
 
-    /* ── Abrir ticket ── */
     function abrirTicket(id, ticket) {
       currentTicketId = id;
       document.querySelectorAll('.ticket-item').forEach(el => el.classList.toggle('active', el.dataset.id === id));
       document.getElementById('emptyState').style.display = 'none';
       document.getElementById('ticketDetail').style.display = '';
-
-      // Marcar como lido pela academia
       updateDoc(doc(db, 'tickets', id), { lidoPelaAcademia: true }).catch(() => {});
-
       if (unsubDetail) unsubDetail();
       unsubDetail = onSnapshot(doc(db, 'tickets', id), (snap) => {
         if (!snap.exists()) return;
@@ -352,11 +330,9 @@
       });
     }
 
-    /* ── Render detalhe ── */
     function renderTicketDetail(t) {
       const isResolvido = t.status === 'resolvido';
       const mensagens   = t.mensagens || [];
-
       document.getElementById('ticketDetail').innerHTML = `
         <div class="ticket-detail-header">
           <div class="ticket-detail-titulo">${esc(t.titulo)}</div>
@@ -367,9 +343,7 @@
             <span class="ticket-detail-categoria">· Aberto em ${formatTs(t.criadoEm)}</span>
           </div>
         </div>
-
         <div class="mensagens-area" id="mensagensArea">
-          <!-- Mensagem inicial como primeira bolha -->
           <div class="msg-bubble cliente">
             <div class="msg-de">Você</div>
             ${esc(t.descricao)}
@@ -382,7 +356,6 @@
               <div class="msg-meta">${m.criadoEm ? formatTs(m.criadoEm) : ''}</div>
             </div>`).join('')}
         </div>
-
         <div class="reply-area${isResolvido ? ' disabled' : ''}" id="replyArea">
           ${isResolvido
             ? `<div class="resolved-notice">✅ Este ticket foi resolvido.</div>`
@@ -392,36 +365,24 @@
                </div>
                <p class="form-msg" id="replyMsg"></p>`
           }
-        </div>
-      `;
-
-      // Scroll para o fim das mensagens
+        </div>`;
       const area = document.getElementById('mensagensArea');
       if (area) area.scrollTop = area.scrollHeight;
-
-      // Bind enviar
       const btnEnviar = document.getElementById('btnEnviarReply');
       if (btnEnviar) btnEnviar.addEventListener('click', () => enviarResposta(t.id));
     }
 
-    /* ── Enviar resposta ── */
     async function enviarResposta(ticketId) {
       const input = document.getElementById('replyInput');
       const msgEl = document.getElementById('replyMsg');
       const btn   = document.getElementById('btnEnviarReply');
       const texto = input?.value.trim();
-
       if (!texto) return;
       btn.disabled = true;
       msgEl.textContent = '';
-
       try {
         await updateDoc(doc(db, 'tickets', ticketId), {
-          mensagens: arrayUnion({
-            de: 'cliente',
-            texto,
-            criadoEm: new Date().toISOString(),
-          }),
+          mensagens: arrayUnion({ de: 'cliente', texto, criadoEm: new Date().toISOString() }),
           atualizadoEm: serverTimestamp(),
           lidoPeloSuporte: false,
         });
@@ -434,7 +395,6 @@
       }
     }
 
-    /* ── Novo ticket ── */
     function abrirForm() {
       document.getElementById('fTitulo').value = '';
       document.getElementById('fDescricao').value = '';
@@ -467,13 +427,10 @@
       const categoria = document.getElementById('fCategoria').value;
       const msgEl     = document.getElementById('formMsg');
       const btn       = document.getElementById('btnSubmitForm');
-
-      if (!titulo) { msgEl.textContent = 'Informe um título.'; msgEl.className = 'form-msg err'; return; }
-      if (!descricao) { msgEl.textContent = 'Descreva o problema.'; msgEl.className = 'form-msg err'; return; }
-
+      if (!titulo)    { msgEl.textContent = 'Informe um título.';      msgEl.className = 'form-msg err'; return; }
+      if (!descricao) { msgEl.textContent = 'Descreva o problema.';    msgEl.className = 'form-msg err'; return; }
       msgEl.textContent = 'Abrindo chamado…'; msgEl.className = 'form-msg';
       btn.disabled = true;
-
       try {
         await addDoc(collection(db, 'tickets'), {
           academiaId,
@@ -493,6 +450,7 @@
         msgEl.textContent = '✅ Chamado aberto!'; msgEl.className = 'form-msg ok';
         setTimeout(() => document.getElementById('formOverlay').classList.remove('open'), 800);
       } catch(e) {
+        console.error('Erro ao criar ticket:', e);
         msgEl.textContent = 'Erro ao abrir chamado. Tente novamente.'; msgEl.className = 'form-msg err';
       } finally {
         btn.disabled = false;
