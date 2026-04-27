@@ -445,8 +445,7 @@
       try {
         const snap = await getDocs(query(
           collection(db, 'tickets'),
-          // where('academiaId', '==', academiaId)
-          where('academiaId', '==', 'demo')
+          where('academiaId', '==', academiaId)
         ));
         const naoLidos = snap.docs.filter(d => {
           const data = d.data();
