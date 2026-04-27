@@ -277,9 +277,9 @@
 
     /* ── Auth ── */
     onAuthStateChanged(auth, async (user) => {
+      console.log('Auth state:', user ? user.email : 'null');
       if (!user) { location.href = './administrativo.html'; return; }
-      currentUser = user;
-      // Buscar nome da academia
+        // Buscar nome da academia
       try {
         const snap = await getDocs(query(collection(db, 'academias', academiaId, 'professores'), where('email', '==', user.email)));
         if (!snap.empty) academiaNome = snap.docs[0].data().nome || user.email;
