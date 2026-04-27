@@ -364,7 +364,7 @@
       const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
       document.getElementById('dashDate').textContent = now.toLocaleDateString('pt-BR', opts);
       carregarDashboard();
-      carregarNotifSuporte();
+      setTimeout(carregarNotifSuporte, 500);
     }
 
     async function buscarNome(email) {
