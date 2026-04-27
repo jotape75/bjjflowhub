@@ -1,4 +1,4 @@
-const CACHE = "bjjflowhub-v20260427193856";
+const CACHE = "bjjflowhub-v20260427194240";
 const ASSETS = [
   "./",
   "./index.html",
