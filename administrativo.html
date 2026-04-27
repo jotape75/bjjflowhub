@@ -70,11 +70,13 @@
     .sidebar-user-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
     .sidebar-user-name { font-size: 14px; font-weight: 600; color: #ddd; }
     .sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
+    
     .nav-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #bbb; padding: 14px 20px 4px; font-weight: 800; }
     .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; cursor: pointer; transition: background 0.15s; border-left: 3px solid transparent; text-decoration: none; color: #aaa; font-size: 14px; font-weight: 500; user-select: none; }
     .nav-item:hover { background: var(--blue-dim); color: #fff; }
     .nav-item.active { background: var(--blue-dim); border-left-color: var(--blue); color: #fff; }
     .nav-item-icon { font-size: 18px; width: 24px; text-align: center; flex-shrink: 0; }
+    .nav-item-badge { background: var(--blue); color: #fff; font-size: 10px; font-weight: 800; border-radius: 999px; padding: 1px 7px; margin-left: auto; flex-shrink: 0; }
     .nav-item-label { flex: 1; }
     .sidebar-footer { padding: 14px 20px; border-top: 1px solid var(--border); }
     .btn-sair { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: #888; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; }
@@ -96,6 +98,15 @@
     .dash-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--blue) !important; margin-bottom: 6px; }
     .dash-title { font-size: 26px; font-weight: 700; color: #fff !important; letter-spacing: -0.6px; }
     .dash-date { font-size: 13px; color: #888 !important; margin-top: 3px; }
+    
+    /* ── CARD SUPORTE NOTIFICAÇÃO ── */
+    .suporte-notif-card { display: none; background: linear-gradient(135deg, rgba(74,122,181,0.15), rgba(74,122,181,0.05)); border: 1px solid rgba(74,122,181,0.35); border-radius: 14px; padding: 16px 20px; margin-bottom: 22px; cursor: pointer; transition: border-color 0.2s; }
+    .suporte-notif-card:hover { border-color: rgba(74,122,181,0.6); }
+    .suporte-notif-top { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .suporte-notif-icon { font-size: 20px; }
+    .suporte-notif-titulo { font-size: 15px; font-weight: 700; color: #fff; }
+    .suporte-notif-sub { font-size: 13px; color: #aaa; }
+    .suporte-notif-btn { margin-top: 12px; display: inline-block; background: var(--blue); color: #fff; border: none; border-radius: 8px; padding: 8px 18px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font-body); }
 
     .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
     .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 20px; color: #fff !important; }
@@ -240,9 +251,10 @@
         <div class="nav-item" data-href="./fluxo.html" data-label="Fluxo de Caixa">
           <span class="nav-item-icon">💹</span><span class="nav-item-label">Fluxo de Caixa</span>
         </div>
-        <div class="nav-section-label">Suporte</div>
         <div class="nav-item" data-href="./suporte.html" data-label="Suporte">
-          <span class="nav-item-icon">💬</span><span class="nav-item-label">Suporte</span>
+          <span class="nav-item-icon">💬</span>
+          <span class="nav-item-label">Suporte</span>
+          <span class="nav-item-badge" id="suporteBadge" style="display:none;">0</span>
         </div>
       </div>
       <div class="sidebar-footer">
@@ -265,6 +277,14 @@
             <div class="dash-eyebrow">BJJFlowHub · Portal Admin</div>
             <div class="dash-title" id="welcomeHeading">Olá!</div>
             <div class="dash-date" id="dashDate"></div>
+          </div>
+          <div id="suporteNotifCard" class="suporte-notif-card">
+            <div class="suporte-notif-top">
+              <span class="suporte-notif-icon">💬</span>
+              <span class="suporte-notif-titulo">Você tem respostas novas do suporte</span>
+            </div>
+            <div class="suporte-notif-sub" id="suporteNotifSub">—</div>
+            <button class="suporte-notif-btn" id="btnIrSuporteNotif">Ver chamados →</button>
           </div>
 
           <div class="charts-grid">
@@ -344,6 +364,7 @@
       const opts = { weekday:'long', day:'numeric', month:'long', year:'numeric' };
       document.getElementById('dashDate').textContent = now.toLocaleDateString('pt-BR', opts);
       carregarDashboard();
+      carregarNotifSuporte();
     }
 
     async function buscarNome(email) {
@@ -404,6 +425,9 @@
     document.querySelector('.nav-item[data-panel="welcome"]').addEventListener('click', goHome);
     document.getElementById('btnBack').addEventListener('click', goHome);
     document.getElementById('btnLogout').addEventListener('click', doLogout);
+    document.getElementById('btnIrSuporteNotif').addEventListener('click', () => {
+      navigateTo('./suporte.html', 'Suporte');
+    });
 
     /* ── DASHBOARD ── */
     async function carregarDashboard() {
@@ -417,7 +441,34 @@
       { key: 'Marrom',  dot: 'dot-marrom',  fill: 'fill-marrom'  },
       { key: 'Preta',   dot: 'dot-preta',   fill: 'fill-preta'   },
     ];
-
+    async function carregarNotifSuporte() {
+      try {
+        const snap = await getDocs(query(
+          collection(db, 'tickets'),
+          where('academiaId', '==', academiaId),
+          where('lidoPelaAcademia', '==', false)
+        ));
+        const naoLidos = snap.docs.filter(d => {
+          const msgs = d.data().mensagens || [];
+          return msgs.some(m => m.de === 'suporte');
+        });
+        const count = naoLidos.length;
+        const badge = document.getElementById('suporteBadge');
+        const card  = document.getElementById('suporteNotifCard');
+        const sub   = document.getElementById('suporteNotifSub');
+        if (count > 0) {
+          badge.textContent = count;
+          badge.style.display = '';
+          card.style.display = '';
+          sub.textContent = count === 1
+            ? '1 chamado aguarda sua leitura.'
+            : `${count} chamados aguardam sua leitura.`;
+        } else {
+          badge.style.display = 'none';
+          card.style.display  = 'none';
+        }
+      } catch(e) {}
+    }
     async function carregarFaixas() {
       const container = document.getElementById('chartFaixas');
       try {
