@@ -59,18 +59,26 @@
 
     /* ── SIDEBAR ── */
     .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 200; transition: transform 0.3s; }
-    .sidebar-top { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); }
+    .sidebar-top { padding: 20px 18px 0; border-bottom: 1px solid var(--border); }
     .sidebar-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
     .sidebar-brand-icon { width: 36px; height: 36px; background: var(--accent); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 17px; flex-shrink: 0; }
     .sidebar-brand-name { font-size: 15px; font-weight: 900; color: #fff; }
     .sidebar-brand-sub  { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
 
-    .filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    /* filtros de academia */
+    .filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
     .filter-chip { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); transition: all 0.15s; white-space: nowrap; }
     .filter-chip:hover { border-color: rgba(255,255,255,0.2); color: #fff; }
     .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
-    .sidebar-list-header { padding: 14px 18px 10px; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; display: flex; align-items: center; justify-content: space-between; }
+    /* abas ativos/histórico */
+    .tabs-row { display: flex; }
+    .tab-btn { flex: 1; padding: 10px 0; background: transparent; border: none; border-bottom: 2px solid transparent; color: var(--muted); font-size: 13px; font-weight: 700; cursor: pointer; font-family: var(--font); transition: color 0.15s, border-color 0.15s; }
+    .tab-btn:hover { color: var(--text2); }
+    .tab-btn.active { color: #fff; border-bottom-color: var(--accent); }
+    .tab-badge { display: inline-block; background: var(--accent); color: #fff; font-size: 10px; font-weight: 800; border-radius: 999px; padding: 1px 6px; margin-left: 5px; vertical-align: middle; }
+
+    .sidebar-list-header { padding: 12px 18px 8px; font-size: 11px; font-weight: 800; color: var(--muted); text-transform: uppercase; letter-spacing: 1.2px; display: flex; align-items: center; justify-content: space-between; }
     .ticket-count { font-size: 12px; color: var(--muted); font-weight: 500; }
 
     .tickets-list { flex: 1; overflow-y: auto; }
@@ -121,14 +129,12 @@
 
     /* ── TICKET DETAIL ── */
     .detail-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; max-width: 800px; }
-
     .detail-header { padding: 24px 28px 20px; border-bottom: 1px solid var(--border); }
     .detail-academia { font-size: 12px; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
     .detail-email { font-size: 13px; color: var(--text2); font-weight: 400; text-transform: none; letter-spacing: 0; margin-left: 6px; }
     .detail-titulo { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.4px; margin-bottom: 12px; line-height: 1.3; }
     .detail-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
     .detail-info { font-size: 13px; color: var(--text2); }
-
     .status-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .status-label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.6px; }
     .status-btn { padding: 8px 18px; border-radius: 9px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font); transition: all 0.15s; }
@@ -218,11 +224,20 @@
             <div class="sidebar-brand-sub">Suporte interno</div>
           </div>
         </div>
+        <!-- Filtro por academia -->
         <div class="filter-row" id="filterRow">
           <button class="filter-chip active" data-status="todos">Todos</button>
           <button class="filter-chip" data-status="aberto">Abertos</button>
           <button class="filter-chip" data-status="em_andamento">Em andamento</button>
-          <button class="filter-chip" data-status="resolvido">Resolvidos</button>
+        </div>
+        <!-- Abas Ativos / Histórico -->
+        <div class="tabs-row">
+          <button class="tab-btn active" id="tabAtivos">
+            Ativos <span class="tab-badge" id="badgeAtivos" style="display:none">0</span>
+          </button>
+          <button class="tab-btn" id="tabHistorico">
+            Histórico <span class="tab-badge" id="badgeHistorico" style="display:none">0</span>
+          </button>
         </div>
       </div>
 
@@ -294,12 +309,13 @@
       } catch(e) { return false; }
     }
 
-    let currentUser = null;
+    let currentUser     = null;
     let currentTicketId = null;
-    let unsubTickets = null;
-    let unsubDetail  = null;
-    let filtroStatus = 'todos';
-    let todosTickets = [];
+    let unsubTickets    = null;
+    let unsubDetail     = null;
+    let filtroStatus    = 'todos'; // todos | aberto | em_andamento
+    let abaAtiva        = 'ativos'; // ativos | historico
+    let todosTickets    = [];
 
     function esc(s) { return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
     function formatTs(ts) {
@@ -364,6 +380,7 @@
       document.getElementById('sidebarOverlay').classList.remove('visible');
     });
 
+    // Filtro de status (apenas para ativos)
     document.querySelectorAll('.filter-chip').forEach(chip => {
       chip.addEventListener('click', () => {
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
@@ -372,6 +389,25 @@
         renderTicketsList();
       });
     });
+
+    // Abas
+    document.getElementById('tabAtivos').addEventListener('click', () => setAba('ativos'));
+    document.getElementById('tabHistorico').addEventListener('click', () => setAba('historico'));
+
+    function setAba(aba) {
+      abaAtiva = aba;
+      document.getElementById('tabAtivos').classList.toggle('active', aba === 'ativos');
+      document.getElementById('tabHistorico').classList.toggle('active', aba === 'historico');
+      // filtros só fazem sentido nos ativos
+      document.getElementById('filterRow').style.display = aba === 'ativos' ? '' : 'none';
+      currentTicketId = null;
+      if (unsubDetail) { unsubDetail(); unsubDetail = null; }
+      document.getElementById('dashStats').style.display = '';
+      document.getElementById('emptyState').style.display = '';
+      document.getElementById('ticketDetail').style.display = 'none';
+      document.getElementById('topbarTitle').textContent = 'Painel de Suporte';
+      renderTicketsList();
+    }
 
     function iniciarListeners() {
       if (unsubTickets) unsubTickets();
@@ -384,8 +420,9 @@
             const tb = b.atualizadoEm?.toDate?.() || new Date(0);
             return tb - ta;
           });
-        renderTicketsList();
         atualizarStats();
+        atualizarBadges();
+        renderTicketsList();
       }, (err) => {
         console.error('Erro tickets:', err);
         document.getElementById('ticketsList').innerHTML = '<div class="tickets-empty">Erro ao carregar.<br>Verifique as regras do Firestore.</div>';
@@ -399,11 +436,37 @@
       document.getElementById('statNaoLidos').textContent   = todosTickets.filter(t => t.lidoPeloSuporte === false).length;
     }
 
+    function atualizarBadges() {
+      const ativos    = todosTickets.filter(t => t.status !== 'resolvido');
+      const historico = todosTickets.filter(t => t.status === 'resolvido');
+      const badgeAt = document.getElementById('badgeAtivos');
+      const badgeHi = document.getElementById('badgeHistorico');
+      if (ativos.length > 0) { badgeAt.textContent = ativos.length; badgeAt.style.display = ''; }
+      else { badgeAt.style.display = 'none'; }
+      if (historico.length > 0) { badgeHi.textContent = historico.length; badgeHi.style.display = ''; }
+      else { badgeHi.style.display = 'none'; }
+    }
+
     function renderTicketsList() {
-      const lista = filtroStatus === 'todos' ? todosTickets : todosTickets.filter(t => t.status === filtroStatus);
+      // Primeiro filtra por aba
+      let lista = abaAtiva === 'ativos'
+        ? todosTickets.filter(t => t.status !== 'resolvido')
+        : todosTickets.filter(t => t.status === 'resolvido');
+
+      // Depois aplica filtro de status (só relevante em ativos)
+      if (abaAtiva === 'ativos' && filtroStatus !== 'todos') {
+        lista = lista.filter(t => t.status === filtroStatus);
+      }
+
       document.getElementById('ticketCount').textContent = lista.length + ' ticket' + (lista.length !== 1 ? 's' : '');
       const container = document.getElementById('ticketsList');
-      if (!lista.length) { container.innerHTML = '<div class="tickets-empty">Nenhum ticket neste filtro.</div>'; return; }
+      if (!lista.length) {
+        const msg = abaAtiva === 'ativos'
+          ? 'Nenhum ticket neste filtro.'
+          : 'Nenhum ticket resolvido ainda.';
+        container.innerHTML = `<div class="tickets-empty">${msg}</div>`;
+        return;
+      }
       container.innerHTML = lista.map(t => {
         const isActive = t.id === currentTicketId;
         const temNovo  = t.lidoPeloSuporte === false;
@@ -447,6 +510,7 @@
     function renderTicketDetail(t) {
       const statusAtual = t.status || 'aberto';
       const mensagens   = t.mensagens || [];
+      const isResolvido = statusAtual === 'resolvido';
       document.getElementById('ticketDetail').innerHTML = `
         <div class="detail-card">
           <div class="detail-header">
@@ -484,12 +548,14 @@
           </div>
 
           <div class="reply-area">
-            <textarea class="reply-input" id="replyInput" placeholder="Escreva sua resposta para a academia…"></textarea>
-            <div class="reply-footer">
-              <span class="reply-hint">Resposta visível para a academia em tempo real.</span>
-              <button class="btn-reply" id="btnReply">Responder</button>
-            </div>
-            <p class="reply-msg" id="replyMsg"></p>
+            ${isResolvido
+              ? `<div style="color:#2ecc71;font-size:15px;display:flex;align-items:center;gap:8px;">✅ Ticket resolvido. Mude o status para reabrir.</div>`
+              : `<textarea class="reply-input" id="replyInput" placeholder="Escreva sua resposta para a academia…"></textarea>
+                 <div class="reply-footer">
+                   <span class="reply-hint">Resposta visível para a academia em tempo real.</span>
+                   <button class="btn-reply" id="btnReply">Responder</button>
+                 </div>
+                 <p class="reply-msg" id="replyMsg"></p>`}
           </div>
         </div>`;
 
@@ -504,7 +570,8 @@
         });
       });
 
-      document.getElementById('btnReply').addEventListener('click', () => enviarResposta(t.id));
+      const btnReply = document.getElementById('btnReply');
+      if (btnReply) btnReply.addEventListener('click', () => enviarResposta(t.id));
     }
 
     async function enviarResposta(ticketId) {
