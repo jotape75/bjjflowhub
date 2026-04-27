@@ -8,6 +8,7 @@ const ASSETS = [
   "./alunos.html",
   "./aniversariantes.html",
   "./financeiro.html",
+  "./suporte.html",
   "./styles.css",
   "./app.js",
   "./firebase-config.js",
