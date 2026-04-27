@@ -37,14 +37,14 @@
     .login-logo { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
     .login-logo img { width: 44px; height: 44px; object-fit: contain; }
     .login-logo-text { font-size: 17px; font-weight: 700; color: #fff; }
-    .login-logo-sub { font-size: 11px; color: var(--muted); display: block; letter-spacing: 1px; text-transform: uppercase; }
+    .login-logo-sub { font-size: 11px; color: #ccc; display: block; letter-spacing: 1px; text-transform: uppercase; }
     .login-title { font-size: 28px; font-weight: 600; color: #fff; margin-bottom: 6px; letter-spacing: -0.5px; }
-    .login-subtitle { font-size: 14px; color: var(--muted); margin-bottom: 28px; }
+    .login-subtitle { font-size: 14px; color: #ccc; margin-bottom: 28px; }
     .field { margin-bottom: 16px; }
     .field label { display: block; font-size: 12px; font-weight: 600; color: #fff; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 7px; }
     .field input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; font-size: 15px; color: #fff; font-family: var(--font-body); outline: none; transition: border-color 0.2s; }
     .field input:focus { border-color: var(--blue); }
-    .field input::placeholder { color: #444; }
+    .field input::placeholder { color: #666; }
     .btn-login { width: 100%; margin-top: 8px; padding: 14px; background: var(--blue); color: #fff; border: none; border-radius: 10px; font-family: var(--font-body); font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; }
     .btn-login:hover { opacity: 0.9; }
     .btn-login:active { transform: scale(0.98); }
@@ -62,15 +62,15 @@
 
     /* ─── SIDEBAR ─── */
     .sidebar { width: var(--sidebar-w); height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 200; transition: transform 0.3s cubic-bezier(.4,0,.2,1); overflow: hidden; }
-    .sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
-    .sidebar-brand img { width: 36px; height: 36px; object-fit: contain; }
+    .sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .sidebar-brand img { width: 48px; height: 48px; object-fit: contain; flex-shrink: 0; } /* ← logo maior */
     .sidebar-brand-name { font-family: var(--font-head); font-size: 15px; font-weight: 900; color: #fff; }
-    .sidebar-brand-sub { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .sidebar-brand-sub { font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 1px; } /* ← branco */
     .sidebar-user { padding: 14px 20px; border-bottom: 1px solid var(--border); }
-    .sidebar-user-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; }
+    .sidebar-user-label { font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px; } /* ← branco */
     .sidebar-user-name { font-size: 14px; font-weight: 600; color: #fff; }
     .sidebar-nav { flex: 1; padding: 12px 0; overflow-y: auto; }
-    
+
     .nav-section-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #bbb; padding: 14px 20px 4px; font-weight: 800; }
     .nav-item { display: flex; align-items: center; gap: 12px; padding: 11px 20px; cursor: pointer; transition: background 0.15s; border-left: 3px solid transparent; text-decoration: none; color: #fff; font-size: 14px; font-weight: 500; user-select: none; }
     .nav-item:hover { background: var(--blue-dim); color: #fff; }
@@ -79,14 +79,14 @@
     .nav-item-badge { background: var(--blue); color: #fff; font-size: 10px; font-weight: 800; border-radius: 999px; padding: 1px 7px; margin-left: auto; flex-shrink: 0; }
     .nav-item-label { flex: 1; }
     .sidebar-footer { padding: 14px 20px; border-top: 1px solid var(--border); }
-    .btn-sair { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: #888; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; }
+    .btn-sair { width: 100%; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: #ccc; font-size: 13px; font-weight: 600; cursor: pointer; font-family: var(--font-body); transition: border-color 0.2s, color 0.2s; }
     .btn-sair:hover { border-color: var(--blue); color: #fff; }
 
     /* ─── MAIN ─── */
     .main-area { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
     .topbar { height: var(--header-h); background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 14px; position: sticky; top: 0; z-index: 100; }
     .btn-menu-toggle { display: none; background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; padding: 4px; line-height: 1; }
-    .topbar-back { display: flex; align-items: center; gap: 8px; background: none; border: none; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 8px; font-family: var(--font-body); transition: color 0.15s, background 0.15s; }
+    .topbar-back { display: flex; align-items: center; gap: 8px; background: none; border: none; color: #ccc; font-size: 13px; font-weight: 600; cursor: pointer; padding: 6px 12px; border-radius: 8px; font-family: var(--font-body); transition: color 0.15s, background 0.15s; }
     .topbar-back:hover { color: #fff; background: var(--blue-dim); }
     .topbar-back.hidden { opacity: 0; pointer-events: none; }
     .topbar-title { font-family: var(--font-head); font-size: 16px; font-weight: 800; color: #fff; flex: 1; }
@@ -95,10 +95,10 @@
     /* ─── DASHBOARD ─── */
     #panelWelcome { animation: fadeUp 0.35s ease both; color: #fff; }
     .dash-header { margin-bottom: 28px; }
-    .dash-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--blue) !important; margin-bottom: 6px; }
+    .dash-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: #fff !important; margin-bottom: 6px; } /* ← branco */
     .dash-title { font-size: 26px; font-weight: 700; color: #fff !important; letter-spacing: -0.6px; }
-    .dash-date { font-size: 13px; color: #888 !important; margin-top: 3px; }
-    
+    .dash-date { font-size: 13px; color: #aaa !important; margin-top: 3px; }
+
     /* ── CARD SUPORTE NOTIFICAÇÃO ── */
     .suporte-notif-card { display: none; background: linear-gradient(135deg, rgba(74,122,181,0.15), rgba(74,122,181,0.05)); border: 1px solid rgba(74,122,181,0.35); border-radius: 14px; padding: 16px 20px; margin-bottom: 22px; cursor: pointer; transition: border-color 0.2s; }
     .suporte-notif-card:hover { border-color: rgba(74,122,181,0.6); }
@@ -134,7 +134,7 @@
     .dot-kids,   .fill-kids   { background: linear-gradient(90deg,#f39c12,#e67e22); }
 
     .day-selector { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
-    .day-btn { padding: 5px 11px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: #888; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font-body); transition: background 0.15s, color 0.15s, border-color 0.15s; white-space: nowrap; }
+    .day-btn { padding: 5px 11px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: #ccc; font-size: 11px; font-weight: 700; cursor: pointer; font-family: var(--font-body); transition: background 0.15s, color 0.15s, border-color 0.15s; white-space: nowrap; }
     .day-btn:hover { border-color: var(--blue); color: #fff; }
     .day-btn.active { background: var(--blue); border-color: var(--blue); color: #fff; }
     .day-btn.hoje { border-color: rgba(61,90,128,0.4); color: #fff; }
@@ -345,7 +345,6 @@
     import { signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
     import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-    // Multi-tenant helper
     const col = (nome) => collection(db, 'academias', academiaId, nome);
 
     const TOKEN_KEY = 'rv_prof_token';
@@ -441,6 +440,7 @@
       { key: 'Marrom',  dot: 'dot-marrom',  fill: 'fill-marrom'  },
       { key: 'Preta',   dot: 'dot-preta',   fill: 'fill-preta'   },
     ];
+
     async function carregarNotifSuporte() {
       try {
         const snap = await getDocs(query(
@@ -458,9 +458,9 @@
         const card  = document.getElementById('suporteNotifCard');
         const sub   = document.getElementById('suporteNotifSub');
         if (count > 0) {
-          badge.textContent   = count;
+          badge.textContent  = count;
           badge.style.display = '';
-          card.style.display = 'block';
+          card.style.display  = 'block';
           sub.textContent = count === 1
             ? '1 chamado aguarda sua leitura.'
             : `${count} chamados aguardam sua leitura.`;
@@ -470,6 +470,7 @@
         }
       } catch(e) { console.error('notif suporte:', e); }
     }
+
     async function carregarFaixas() {
       const container = document.getElementById('chartFaixas');
       try {
@@ -498,7 +499,7 @@
           container.querySelectorAll('.bar-h-fill').forEach(el => { el.style.width = el.dataset.pct + '%'; });
         });
       } catch(e) {
-        container.innerHTML = '<p style="color:var(--muted);font-size:12px;">Erro ao carregar.</p>';
+        container.innerHTML = '<p style="color:#888;font-size:12px;">Erro ao carregar.</p>';
       }
     }
 
@@ -544,7 +545,7 @@
       const total = lista.reduce((s, x) => s + x[1], 0);
       subtitle.textContent = total > 0 ? `${total} check-in${total > 1 ? 's' : ''} em ${dataStr}` : `Sem check-ins em ${dataStr}`;
       if (!lista.length) {
-        container.innerHTML = '<p style="color:var(--muted);font-size:12px;padding:16px 0;text-align:center;">Nenhum check-in neste dia.</p>';
+        container.innerHTML = '<p style="color:#888;font-size:12px;padding:16px 0;text-align:center;">Nenhum check-in neste dia.</p>';
         return;
       }
       const max = Math.max(...lista.map(x => x[1]));
@@ -580,7 +581,7 @@
           });
         });
       } catch(e) {
-        container.innerHTML = '<p style="color:var(--muted);font-size:12px;">Erro ao carregar.</p>';
+        container.innerHTML = '<p style="color:#888;font-size:12px;">Erro ao carregar.</p>';
       }
     }
 
