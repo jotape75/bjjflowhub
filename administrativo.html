@@ -455,6 +455,7 @@
           return msgs.some(m => m.de === 'suporte');
         });
         const count = naoLidos.length;
+        console.log('notif snap.size:', snap.size, 'count:', count);
         const badge = document.getElementById('suporteBadge');
         const card  = document.getElementById('suporteNotifCard');
         const sub   = document.getElementById('suporteNotifSub');
