@@ -463,6 +463,7 @@
           badge.textContent   = count;
           badge.style.display = '';
           card.style.display = 'block';
+          console.log('card display após set:', card.style.display, 'parentVisible:', card.parentElement?.style.display);
           sub.textContent = count === 1
             ? '1 chamado aguarda sua leitura.'
             : `${count} chamados aguardam sua leitura.`;
