@@ -57,7 +57,7 @@
     #dashScreen.visible { display: flex; }
 
     /* ─── SIDEBAR ─── */
-    .sidebar { width: var(--sidebar-w); min-height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 200; transition: transform 0.3s cubic-bezier(.4,0,.2,1); }
+    .sidebar { width: var(--sidebar-w); height: 100vh; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 200; transition: transform 0.3s cubic-bezier(.4,0,.2,1); overflow: hidden; }
     .sidebar-brand { display: flex; align-items: center; gap: 12px; padding: 20px 20px 16px; border-bottom: 1px solid var(--border); }
     .sidebar-brand img { width: 36px; height: 36px; object-fit: contain; }
     .sidebar-brand-name { font-family: var(--font-head); font-size: 15px; font-weight: 900; color: #fff; }
