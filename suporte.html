@@ -162,7 +162,6 @@
       <div class="tickets-sidebar">
         <div class="sidebar-header">
           <span class="sidebar-title">Meus Tickets</span>
-          <button class="btn-novo" id="btnNovoTicket">+ Novo</button>
         </div>
         <div class="tickets-list" id="ticketsList">
           <div class="loading-row"><div class="skel" style="height:14px;width:70%;margin-bottom:6px;"></div><div class="skel" style="height:10px;width:40%;"></div></div>
@@ -407,7 +406,6 @@
       document.getElementById('formOverlay').classList.add('open');
     }
 
-    document.getElementById('btnNovoTicket').addEventListener('click', abrirForm);
     document.getElementById('btnNovoTicketEmpty').addEventListener('click', abrirForm);
     document.getElementById('btnCancelarForm').addEventListener('click', () => document.getElementById('formOverlay').classList.remove('open'));
     document.getElementById('formOverlay').addEventListener('click', function(e) { if (e.target === this) this.classList.remove('open'); });
