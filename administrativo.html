@@ -445,11 +445,12 @@
       try {
         const snap = await getDocs(query(
           collection(db, 'tickets'),
-          where('academiaId', '==', academiaId),
-          where('lidoPelaAcademia', '==', false)
+          where('academiaId', '==', academiaId)
         ));
         const naoLidos = snap.docs.filter(d => {
-          const msgs = d.data().mensagens || [];
+          const data = d.data();
+          if (data.lidoPelaAcademia !== false) return false;
+          const msgs = data.mensagens || [];
           return msgs.some(m => m.de === 'suporte');
         });
         const count = naoLidos.length;
@@ -457,9 +458,9 @@
         const card  = document.getElementById('suporteNotifCard');
         const sub   = document.getElementById('suporteNotifSub');
         if (count > 0) {
-          badge.textContent = count;
+          badge.textContent   = count;
           badge.style.display = '';
-          card.style.display = '';
+          card.style.display  = '';
           sub.textContent = count === 1
             ? '1 chamado aguarda sua leitura.'
             : `${count} chamados aguardam sua leitura.`;
@@ -467,7 +468,7 @@
           badge.style.display = 'none';
           card.style.display  = 'none';
         }
-      } catch(e) {}
+      } catch(e) { console.error('notif suporte:', e); }
     }
     async function carregarFaixas() {
       const container = document.getElementById('chartFaixas');
