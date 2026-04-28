@@ -4,11 +4,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#c0392b" />
-  <title>Fluxo de Caixa – Riva BJJ</title>
+  <title>Lembretes de Pagamento – Riva BJJ</title>
   <link rel="stylesheet" href="./styles.css" />
   <style>
-    html.embed-mode header, html.embed-mode .hdr { display: none !important; }
-    html.embed-mode .admin-page { padding-top: 8px !important; }
     .admin-hdr-left { display: flex; align-items: center; gap: 14px; }
     .admin-hdr-titulo { display: none; }
     .admin-hdr-sair { display: none; }
@@ -22,800 +20,359 @@
       .admin-page { max-width: 1100px; padding: 32px 32px 64px; }
     }
     @media (max-width: 768px) { .admin-hdr-inner { justify-content: center; } }
-    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
-    .page-header-left { display: flex; flex-direction: column; }
-    .page-eyebrow { font-size: 11px; font-weight: 600; color: #c0392b; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px; }
-    .page-title-txt { font-size: 22px; font-weight: 900; color: #fff; }
-    .mes-selector { display: flex; align-items: center; gap: 8px; }
-    .select-input { background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 9px 12px; font-size: 14px; color: #fff; font-family: inherit; outline: none; appearance: none; }
-    .select-input:focus { border-color: var(--red); }
-    .btn-carregar { background: var(--red); border: none; color: #fff; border-radius: 10px; padding: 9px 16px; font-size: 14px; font-weight: 800; cursor: pointer; font-family: inherit; white-space: nowrap; }
-    .btn-carregar:active { opacity: .8; }
-    .resumo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
-    .resumo-card { background: #111; border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 18px 16px; position: relative; overflow: hidden; }
-    .resumo-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; border-radius:14px 14px 0 0; }
-    .resumo-card.verde::before   { background: #2ecc71; }
-    .resumo-card.vermelho::before{ background: #e74c3c; }
-    .resumo-card.azul::before    { background: #3498db; }
-    .resumo-label { font-size: 11px; color: #fff; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 600; }
-    .resumo-valor { font-size: 26px; font-weight: 900; color: #fff; line-height: 1; }
-    .resumo-valor.verde   { color: #2ecc71; }
-    .resumo-valor.vermelho{ color: #e74c3c; }
-    .resumo-valor.azul    { color: #3498db; }
-    .resumo-sub { font-size: 11px; color: #fff; margin-top: 6px; }
-    @media (max-width: 480px) { .resumo-grid { grid-template-columns: 1fr; } }
-    .grafico-card { background: #111; border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
-    .grafico-titulo { font-size: 12px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-    .grafico-sub { font-size: 11px; color: #fff; margin-bottom: 20px; }
-    .grafico-legenda { display: flex; gap: 16px; margin-bottom: 14px; }
-    .leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #fff; }
-    .leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
-    .leg-dot.verde   { background: #2ecc71; }
-    .leg-dot.vermelho{ background: #e74c3c; }
-    .grafico-barras { display: flex; align-items: flex-end; gap: 8px; height: 150px; padding-top: 20px; }
-    .grafico-col { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; min-width: 0; }
-    .grafico-barras-pair { display: flex; gap: 3px; align-items: flex-end; width: 100%; }
-    .barra { border-radius: 4px 4px 0 0; transition: height 0.6s cubic-bezier(.4,0,.2,1); min-height: 2px; flex: 1; }
-    .barra.entrada { background: #2ecc71; opacity: 0.85; }
-    .barra.saida   { background: #e74c3c; opacity: 0.85; }
-    .barra:hover   { opacity: 1; }
-    .grafico-label { font-size: 10px; color: #fff; text-align: center; white-space: nowrap; }
-    .filtros-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; justify-content: space-between; }
-    .filtros-esquerda { display: flex; gap: 6px; flex-wrap: wrap; }
-    .btn-filtro { background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; transition: all 0.15s; }
-    .btn-filtro.ativo { background: var(--red); border-color: var(--red); color: #fff; }
-    .btn-filtro:active { opacity: .75; }
-    .btn-nova-despesa { background: #e74c3c; border: none; color: #fff; border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
-    .btn-nova-despesa:active { opacity: .8; }
-    /* ── MOV CARD ── */
-    .mov-card { background: #111; border: 1px solid rgba(255,255,255,0.07); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
-    .mov-card-top { display: flex; align-items: center; gap: 12px; }
-    .mov-tipo-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .mov-tipo-dot.entrada { background: #2ecc71; }
-    .mov-tipo-dot.saida   { background: #e74c3c; }
-    .mov-info { flex: 1; min-width: 0; }
-    .mov-nome { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .mov-meta { font-size: 11px; color: #fff; margin-top: 2px; }
-    .mov-valor { font-size: 15px; font-weight: 900; white-space: nowrap; }
-    .mov-valor.entrada { color: #2ecc71; }
-    .mov-valor.saida   { color: #e74c3c; }
-    .mov-valor.riscado { color: #fff; font-size: 12px; text-decoration: line-through; font-weight: 400; }
-    .mov-valor-liquido { font-size: 15px; font-weight: 900; white-space: nowrap; }
-    .mov-valor-liquido.entrada { color: #2ecc71; }
-    .mov-taxa-badge { font-size: 11px; color: #e67e22; white-space: nowrap; }
-    .mov-valores { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
-    .mov-acoes { display: flex; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #1e1e1e; }
-    .btn-mov-acao { background: transparent; border: 1px solid #333; color: #fff; border-radius: 7px; padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; }
-    .btn-mov-acao.editar:hover  { border-color: #3498db; color: #3498db; background: rgba(52,152,219,0.08); }
-    .btn-mov-acao.deletar:hover { border-color: #e74c3c; color: #e74c3c; background: rgba(231,76,60,0.08); }
-    .btn-mov-acao:active { opacity: .7; }
-    .mov-delete { background: transparent; border: none; color: #444; font-size: 14px; cursor: pointer; padding: 4px; flex-shrink: 0; }
-    .mov-delete:hover { color: #e74c3c; }
-    .lista-vazia { text-align: center; padding: 32px 0; color: #444; font-size: 14px; }
-    /* ── MODAIS ── */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 50; align-items: flex-end; justify-content: center; }
-    .modal-overlay.open { display: flex; }
-    .modal-box { background: #141414; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px 20px 0 0; padding: 24px 20px calc(24px + env(safe-area-inset-bottom,0px)); width: 100%; max-width: 480px; }
-    @media (min-width: 769px) { .modal-overlay { align-items: center; } .modal-box { border-radius: 20px; max-width: 420px; } }
-    .modal-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 18px; }
-    .modal-btns { display: flex; gap: 10px; margin-top: 16px; }
-    .modal-btns .btn { margin-top: 0; flex: 1; }
-    .form-label { font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; display: block; }
-    .form-input { width: 100%; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 11px 12px; font-size: 14px; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; margin-bottom: 12px; }
-    .form-input:focus { border-color: var(--red); }
-    .form-input::placeholder { color: #444; }
-    .cat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-    .cat-chip { padding: 5px 12px; border-radius: 20px; border: 1px solid #333; background: transparent; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; }
-    .cat-chip.selected { background: #e74c3c; border-color: #e74c3c; color: #fff; }
-    /* ── MODAL EDITAR MOV ── */
-    .modal-edit-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 60; align-items: flex-end; justify-content: center; }
-    .modal-edit-overlay.open { display: flex; }
-    .modal-edit-box { background: #141414; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px 20px 0 0; padding: 24px 16px calc(20px + env(safe-area-inset-bottom,0px)); width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
-    @media (min-width: 769px) { .modal-edit-overlay { align-items: center; } .modal-edit-box { border-radius: 20px; max-width: 440px; } }
-    .modal-edit-title    { font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 4px; }
-    .modal-edit-subtitle { font-size: 12px; color: #fff; margin-bottom: 20px; }
-    .edit-field-label { font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; display: block; }
-    .edit-resumo { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; }
-    .edit-resumo-nome    { font-size: 14px; font-weight: 700; color: #fff; }
-    .edit-resumo-detalhe { font-size: 12px; color: #fff; margin-top: 3px; }
-    /* ── FORMA PILLS ── */
-    .forma-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 4px; }
-    .forma-pill { padding: 10px; background: #1a1a1a; border: 2px solid #333; border-radius: 10px; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
-    .forma-pill.selected { border-color: var(--red); background: rgba(192,57,43,0.1); }
-    .forma-pill-icon  { font-size: 18px; display: block; margin-bottom: 2px; }
-    .forma-pill-label { font-size: 11px; font-weight: 700; color: #fff; }
-    .forma-pill.selected .forma-pill-label { color: #fff; }
-    /* ── TAXA MAQUININHA ── */
-    .taxa-wrap { background: #1a1a1a; border: 1px solid #332200; border-radius: 10px; padding: 12px 14px; margin-top: 14px; }
-    .taxa-wrap-title { font-size: 11px; font-weight: 700; color: #e67e22; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
-    .taxa-row { display: flex; align-items: center; gap: 10px; }
-    .taxa-input-inner { position: relative; width: 90px; flex-shrink: 0; }
-    .taxa-input-field { width: 100%; background: #111; border: 1px solid #444; border-radius: 8px; padding: 9px 26px 9px 10px; font-size: 16px; font-weight: 700; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; }
-    .taxa-input-field:focus { border-color: #e67e22; }
-    .taxa-pct { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #fff; pointer-events: none; }
-    .taxa-breakdown { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-    .taxa-line { display: flex; justify-content: space-between; font-size: 12px; }
-    .taxa-line .lbl { color: #fff; }
-    .taxa-line .val { color: #fff; font-weight: 600; }
-    .taxa-line.recebe .lbl { color: #fff; font-weight: 700; }
-    .taxa-line.recebe .val { color: #2ecc71; font-size: 14px; font-weight: 900; }
-    .taxa-line.desc .val { color: #e67e22; }
-    /* ── MISC ── */
-    .msg { font-size: 13px; margin-top: 4px; min-height: 18px; }
-    .msg.err  { color: #ff6b6b; }
-    .msg.info { color: #fff; }
-    .msg.ok   { color: #2ecc71; }
-    .skel { background: #1a1a1a; border-radius: 6px; animation: shimmer 1.2s infinite; }
-    @keyframes shimmer { 0%,100%{opacity:.3} 50%{opacity:.7} }
+
+    .page-title { font-size: 24px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+    .page-subtitle { font-size: 14px; color: #fff; margin-bottom: 20px; }
+
+    /* ── Seção título ── */
+    .secao-titulo {
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin: 24px 0 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .secao-titulo:first-child { margin-top: 0; }
+
+    /* ── Lembrete item ── */
+    .lembrete-item {
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .lembrete-item.avista { border-color: rgba(52,152,219,0.3); background: rgba(52,152,219,0.05); }
+    .lembrete-info { flex: 1; min-width: 0; }
+    .lembrete-nome { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lembrete-detalhe { font-size: 12px; color: #fff; }
+    .lembrete-venc { font-size: 12px; color: #f39c12; font-weight: 700; margin-top: 2px; }
+    .lembrete-venc.azul { color: #3498db; }
+
+    .btn-wpp {
+      background: #25D366;
+      border: none;
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-wpp:active { opacity: .75; }
+
+    .resumo-box {
+      background: #1a1a1a;
+      border: 1px solid #2a2a2a;
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .resumo-num { font-size: 28px; font-weight: 900; color: #f39c12; }
+    .resumo-label { font-size: 13px; color: #fff; margin-top: 2px; }
+
+    .lista-lembretes { padding-bottom: 24px; }
+    .presenca-vazia { color: #555; font-size: 13px; padding: 12px 0; }
   </style>
 </head>
 <body>
-  <script>
-    if (new URLSearchParams(location.search).get('embed') === '1') {
-      document.documentElement.classList.add('embed-mode');
-    }
-  </script>
-
   <header class="hdr admin-hdr">
     <div class="hdr-inner admin-hdr-inner">
       <div class="admin-hdr-left">
         <img class="logo admin-logo" src="./logo.png" alt="Riva BJJ" />
-        <span class="admin-hdr-titulo">Fluxo de Caixa</span>
+        <span class="admin-hdr-titulo">Portal Administrativo</span>
       </div>
       <button class="btn-logout admin-hdr-sair" id="btnHdrSair">Sair</button>
     </div>
   </header>
 
   <main class="page admin-page">
-    <section id="sectionFluxo" class="hidden">
-      <div class="page-header">
-        <div class="page-header-left">
-          <div class="page-eyebrow">Riva BJJ · Financeiro</div>
-          <div class="page-title-txt">💹 Fluxo de Caixa</div>
+    <section id="sectionLembretes">
+      <div class="page-title">📲 Lembretes de Pagamento</div>
+
+      <!-- ── Mensalidades vencendo (próximos 3 dias) ── -->
+      <div class="secao-titulo">📅 Mensalidades vencendo em breve</div>
+      <div class="page-subtitle" style="margin-bottom:12px;">Plano Mensal com vencimento nos próximos 3 dias</div>
+
+      <div class="resumo-box" id="resumoBox" style="display:none;">
+        <div>
+          <div class="resumo-num" id="resumoCount">0</div>
+          <div class="resumo-label">alunos para lembrar hoje</div>
         </div>
-        <div class="mes-selector">
-          <select class="select-input" id="selMes">
-            <option value="1">Janeiro</option><option value="2">Fevereiro</option>
-            <option value="3">Março</option><option value="4">Abril</option>
-            <option value="5">Maio</option><option value="6">Junho</option>
-            <option value="7">Julho</option><option value="8">Agosto</option>
-            <option value="9">Setembro</option><option value="10">Outubro</option>
-            <option value="11">Novembro</option><option value="12">Dezembro</option>
-          </select>
-          <select class="select-input" id="selAno" style="max-width:90px;"></select>
-          <button class="btn-carregar" id="btnCarregar">Ver</button>
-        </div>
+        <button class="btn primary" id="btnEnviarTodos" style="margin-top:0;">📲 Enviar todos</button>
       </div>
 
-      <div class="resumo-grid">
-        <div class="resumo-card verde">
-          <div class="resumo-label">Entradas</div>
-          <div class="resumo-valor verde" id="totalEntradas">R$ 0</div>
-          <div class="resumo-sub" id="subEntradas">—</div>
-        </div>
-        <div class="resumo-card vermelho">
-          <div class="resumo-label">Saídas</div>
-          <div class="resumo-valor vermelho" id="totalSaidas">R$ 0</div>
-          <div class="resumo-sub" id="subSaidas">—</div>
-        </div>
-        <div class="resumo-card azul">
-          <div class="resumo-label">Saldo</div>
-          <div class="resumo-valor azul" id="totalSaldo">R$ 0</div>
-          <div class="resumo-sub" id="subSaldo">do mês</div>
-        </div>
-      </div>
+      <p class="msg info" id="pageInfo">Carregando…</p>
+      <div id="listaLembretes" class="lista-lembretes"></div>
 
-      <div class="grafico-card">
-        <div class="grafico-titulo">Últimos 6 meses</div>
-        <div class="grafico-sub">Entradas vs Saídas</div>
-        <div class="grafico-legenda">
-          <div class="leg-item"><div class="leg-dot verde"></div> Entradas</div>
-          <div class="leg-item"><div class="leg-dot vermelho"></div> Saídas</div>
-        </div>
-        <div class="grafico-barras" id="graficoBarras">
-          <div class="skel" style="width:100%;height:100%;border-radius:6px;"></div>
-        </div>
-      </div>
+      <!-- ── Planos À Vista vencendo (próximos 30 dias) ── -->
+      <div class="secao-titulo">💳 Planos À Vista vencendo em breve</div>
+      <div class="page-subtitle" style="margin-bottom:12px;">Alunos com plano À Vista encerrando nos próximos 30 dias</div>
 
-      <div class="filtros-row">
-        <div class="filtros-esquerda">
-          <button class="btn-filtro ativo" data-filtro="tudo">Tudo</button>
-          <button class="btn-filtro" data-filtro="mensalidade">Mensalidades</button>
-          <button class="btn-filtro" data-filtro="loja">Lojinha</button>
-          <button class="btn-filtro" data-filtro="despesa">Despesas</button>
-        </div>
-        <button class="btn-nova-despesa" id="btnNovaDespesa">＋ Despesa</button>
-      </div>
+      <p class="msg info" id="avistaInfo">Carregando…</p>
+      <div id="listaAvista" class="lista-lembretes"></div>
 
-      <div id="listaMov"><div class="lista-vazia">Carregando…</div></div>
     </section>
   </main>
 
-  <!-- MODAL NOVA DESPESA -->
-  <div class="modal-overlay" id="modalDespesa">
-    <div class="modal-box">
-      <div class="modal-title">➖ Nova Despesa</div>
-      <label class="form-label">Categoria</label>
-      <div class="cat-chips" id="catChips">
-        <button class="cat-chip selected" data-cat="Aluguel">Aluguel</button>
-        <button class="cat-chip" data-cat="Água/Luz">Água/Luz</button>
-        <button class="cat-chip" data-cat="Material">Material</button>
-        <button class="cat-chip" data-cat="Equipamento">Equipamento</button>
-        <button class="cat-chip" data-cat="Salário">Salário</button>
-        <button class="cat-chip" data-cat="Marketing">Marketing</button>
-        <button class="cat-chip" data-cat="Manutenção">Manutenção</button>
-        <button class="cat-chip" data-cat="Outro">Outro</button>
-      </div>
-      <label class="form-label" for="despesaDescricao">Descrição *</label>
-      <input id="despesaDescricao" class="form-input" type="text" placeholder="Ex: Aluguel de março" />
-      <label class="form-label" for="despesaValor">Valor (R$) *</label>
-      <input id="despesaValor" class="form-input" type="number" min="0" step="0.01" placeholder="0,00" />
-      <label class="form-label" for="despesaData">Data</label>
-      <input id="despesaData" class="form-input" type="date" />
-      <p class="msg" id="despesaMsg"></p>
-      <div class="modal-btns">
-        <button class="btn secondary" id="btnCancelarDespesa">Cancelar</button>
-        <button class="btn primary"   id="btnSalvarDespesa">Salvar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL EDITAR MOVIMENTAÇÃO (loja / mensalidade) -->
-  <div class="modal-edit-overlay" id="modalEditMov">
-    <div class="modal-edit-box">
-      <div class="modal-edit-title">✏️ Editar Movimentação</div>
-      <div class="modal-edit-subtitle" id="editMovSubtitle">Corrija os dados</div>
-
-      <div class="edit-resumo">
-        <div class="edit-resumo-nome"    id="editMovNome">—</div>
-        <div class="edit-resumo-detalhe" id="editMovDetalhe">—</div>
-      </div>
-
-      <label class="edit-field-label" style="margin-bottom:8px;">Forma de Pagamento</label>
-      <div class="forma-grid" id="editMovFormaGrid">
-        <div class="forma-pill" data-forma="dinheiro"><span class="forma-pill-icon">💵</span><span class="forma-pill-label">Dinheiro</span></div>
-        <div class="forma-pill" data-forma="pix"><span class="forma-pill-icon">📲</span><span class="forma-pill-label">Pix</span></div>
-        <div class="forma-pill" data-forma="debito"><span class="forma-pill-icon">💳</span><span class="forma-pill-label">Débito</span></div>
-        <div class="forma-pill" data-forma="credito"><span class="forma-pill-icon">💳</span><span class="forma-pill-label">Crédito</span></div>
-      </div>
-
-      <!-- TAXA MAQUININHA -->
-      <div class="taxa-wrap" id="editMovTaxaWrap">
-        <div class="taxa-wrap-title">🏧 Taxa da Maquininha (opcional)</div>
-        <div class="taxa-row">
-          <div class="taxa-input-inner">
-            <input type="number" class="taxa-input-field" id="editMovTaxaPct"
-              min="0" max="100" step="0.01" placeholder="0" />
-            <span class="taxa-pct">%</span>
-          </div>
-          <div class="taxa-breakdown">
-            <div class="taxa-line">
-              <span class="lbl">Bruto cobrado</span>
-              <span class="val" id="editMovTaxaBruto">—</span>
-            </div>
-            <div class="taxa-line desc">
-              <span class="lbl">Taxa (R$)</span>
-              <span class="val" id="editMovTaxaDesconto">—</span>
-            </div>
-            <div class="taxa-line recebe">
-              <span class="lbl">Você recebe</span>
-              <span class="val" id="editMovTaxaLiquido">—</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div style="margin-top:14px;background:#1a1a1a;border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:12px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;">Total</span>
-        <span style="font-size:20px;font-weight:900;color:#2ecc71;" id="editMovTotal">R$ 0,00</span>
-      </div>
-
-      <p class="msg" id="editMovMsg"></p>
-      <div class="modal-btns">
-        <button class="btn secondary" id="btnCancelarEditMov">Cancelar</button>
-        <button class="btn primary"   id="btnSalvarEditMov">💾 Salvar Alterações</button>
-      </div>
-    </div>
-  </div>
-
   <script type="module">
     import { db, auth } from './firebase-config.js';
-    import { collection, doc, addDoc, getDocs, deleteDoc, updateDoc, query, where, serverTimestamp }
-      from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
     import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-    const TOKEN_KEY = 'rv_prof_token';
-    let mesSel      = new Date().getMonth() + 1;
-    let anoSel      = new Date().getFullYear();
-    let filtroAtivo = 'tudo';
-    let catAtual    = 'Aluguel';
-    let todasMovs   = [];
+    const TOKEN_KEY  = 'rv_prof_token';
+    const CHAVE_PIX  = '66.256.625/0001-27';
+    const DIAS_AVISO = 3;
+    const DIAS_AVISO_AVISTA = 30;
 
-    // ── estado do modal de edição ──
-    let movEditando     = null;   // objeto da mov em edição
-    let editFormaAtual  = 'dinheiro';
-
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        document.getElementById('sectionFluxo').classList.remove('hidden');
-        preencherSeletores();
-        carregarTudo();
-      } else {
-        location.href = './administrativo.html';
+    function esc(str) {
+      return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function formatarDataBR(dateStr) {
+      if (!dateStr) return '—';
+      if (/^\d{4}-\d{2}-\d{2}/.test(dateStr)) {
+        const [y,m,d] = dateStr.slice(0,10).split('-');
+        return `${d}/${m}/${y}`;
       }
+      // YYYY-MM → MM/YYYY
+      if (/^\d{4}-\d{2}$/.test(dateStr)) {
+        const [y,m] = dateStr.split('-');
+        return `${m}/${y}`;
+      }
+      return dateStr;
+    }
+
+    function calcularProxVencimento(dataContrato) {
+      if (!dataContrato) return null;
+      const dc = new Date(dataContrato + 'T00:00:00');
+      if (isNaN(dc.getTime())) return null;
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      const venc = new Date(dc); venc.setHours(0,0,0,0);
+      while (venc <= hoje) venc.setDate(venc.getDate() + 30);
+      return venc;
+    }
+
+    function diasAteData(data) {
+      const hoje = new Date(); hoje.setHours(0,0,0,0);
+      data.setHours(0,0,0,0);
+      return Math.round((data - hoje) / (1000 * 60 * 60 * 24));
+    }
+
+    function montarMensagem(aluno, vencimento) {
+      const nomeAluno = aluno.nome_aluno || '—';
+      const dataVenc  = formatarDataBR(vencimento.toISOString().slice(0,10));
+      return `Olá ${nomeAluno}! 😊 Sua mensalidade da Riva BJJ vence no dia ${dataVenc}. Você pode realizar o pagamento via PIX utilizando a chave: *${CHAVE_PIX}* ou passar na academia para pagar no débito. Qualquer dúvida estamos à disposição! 🥋`;
+    }
+
+    function montarMensagemAvista(aluno, mesAno) {
+      const nomeAluno = aluno.nome_aluno || '—';
+      return `Olá ${nomeAluno}! 😊 Seu plano À Vista na Riva BJJ está encerrando em ${mesAno}. Entre em contato para renovar e continuar treinando! 🥋`;
+    }
+
+    function abrirWhatsApp(telefone, mensagem) {
+      const tel = (telefone || '').replace(/\D/g,'');
+      if (!tel) { alert('Telefone não cadastrado.'); return; }
+      window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(mensagem)}`, '_blank');
+    }
+
+    let lembretes = [];
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) { carregarLembretes(); carregarAvistaVencendo(); }
+      else location.href = './administrativo.html';
     });
+
+    /* ── Mensalidades Mensais vencendo em 3 dias ── */
+    async function carregarLembretes() {
+      const info  = document.getElementById('pageInfo');
+      const lista = document.getElementById('listaLembretes');
+
+      try {
+        const hoje     = new Date();
+        const mesAtual = hoje.getMonth() + 1;
+        const anoAtual = hoje.getFullYear();
+
+        const [snap, pagSnap] = await Promise.all([
+          getDocs(query(collection(db, 'alunos'), where('status', '==', 'ATIVO'), where('plano', '==', 'Mensal'))),
+          getDocs(query(collection(db, 'pagamentos'), where('mes', '==', mesAtual), where('ano', '==', anoAtual))),
+        ]);
+
+        const alunosPagos = new Set();
+        pagSnap.forEach(d => alunosPagos.add(d.data().alunoId));
+
+        lembretes = [];
+        snap.forEach(d => {
+          const a = d.data();
+          if (!a.data_contrato) return;
+          if (alunosPagos.has(d.id)) return;
+          const venc = calcularProxVencimento(a.data_contrato);
+          if (!venc) return;
+          const dias = diasAteData(new Date(venc));
+          if (dias >= 0 && dias <= DIAS_AVISO) {
+            lembretes.push({
+              id: d.id, nome_aluno: a.nome_aluno || '',
+              telefone: a.telefone || '', plano: a.plano || '',
+              vencimento: new Date(venc), dias,
+            });
+          }
+        });
+
+        lembretes.sort((a, b) => a.dias - b.dias);
+        info.textContent = '';
+
+        if (!lembretes.length) {
+          lista.innerHTML = '<p class="presenca-vazia">Nenhum aluno com vencimento nos próximos dias.</p>';
+          return;
+        }
+
+        document.getElementById('resumoCount').textContent = lembretes.length;
+        document.getElementById('resumoBox').style.display = '';
+        renderListaMensal();
+
+      } catch(e) {
+        info.textContent = '';
+        lista.innerHTML = `<p class="msg err">Erro ao carregar: ${esc(e.message)}</p>`;
+      }
+    }
+
+    function renderListaMensal() {
+      const lista = document.getElementById('listaLembretes');
+      lista.innerHTML = lembretes.map(a => {
+        const dataVencStr = formatarDataBR(a.vencimento.toISOString().slice(0,10));
+        const diasLabel   = a.dias === 0 ? 'Vence hoje!' : a.dias === 1 ? 'Vence amanhã!' : `Vence em ${a.dias} dias`;
+        const temTel      = !!(a.telefone || '').replace(/\D/g,'');
+        return `<div class="lembrete-item">
+          <div class="lembrete-info">
+            <div class="lembrete-nome" title="${esc(a.nome_aluno)}">${esc(a.nome_aluno)}</div>
+            <div class="lembrete-detalhe">${esc(a.plano)} · ${temTel ? esc(a.telefone) : '⚠️ Sem telefone'}</div>
+            <div class="lembrete-venc">📅 ${diasLabel} — ${dataVencStr}</div>
+          </div>
+          <button class="btn-wpp" onclick="enviarLembrete('${esc(a.id)}')">📲 Enviar</button>
+        </div>`;
+      }).join('');
+    }
+
+    window.enviarLembrete = function(id) {
+      const a = lembretes.find(x => x.id === id);
+      if (!a) return;
+      abrirWhatsApp(a.telefone, montarMensagem(a, a.vencimento));
+    };
+
+    document.getElementById('btnEnviarTodos').addEventListener('click', () => {
+      if (!lembretes.length) return;
+      if (!confirm(`Enviar lembretes para ${lembretes.length} aluno(s)?`)) return;
+      let i = 0;
+      function enviarProximo() {
+        if (i >= lembretes.length) return;
+        abrirWhatsApp(lembretes[i].telefone, montarMensagem(lembretes[i], lembretes[i].vencimento));
+        i++;
+        if (i < lembretes.length) setTimeout(enviarProximo, 1500);
+      }
+      enviarProximo();
+    });
+
+    /* ── Planos À Vista vencendo em 30 dias ── */
+    async function carregarAvistaVencendo() {
+      const info  = document.getElementById('avistaInfo');
+      const lista = document.getElementById('listaAvista');
+
+      try {
+        const snap = await getDocs(query(
+          collection(db, 'alunos'),
+          where('status', '==', 'ATIVO'),
+          where('plano', '==', 'Avista')
+        ));
+
+        const avistaVencendo = [];
+        const hoje = new Date(); hoje.setHours(0,0,0,0);
+
+        snap.forEach(d => {
+          const a = d.data();
+          if (!a.pago_ate) return; // "YYYY-MM"
+          // Último dia do mês pago
+          const [ano, mes] = a.pago_ate.split('-').map(Number);
+          const ultimoDia = new Date(ano, mes, 0); // dia 0 do mês seguinte = último dia do mês
+          ultimoDia.setHours(0,0,0,0);
+          const dias = diasAteData(new Date(ultimoDia));
+          if (dias >= 0 && dias <= DIAS_AVISO_AVISTA) {
+            avistaVencendo.push({
+              id:         d.id,
+              nome_aluno: a.nome_aluno || '',
+              telefone:   a.telefone   || '',
+              pago_ate:   a.pago_ate,
+              ultimoDia:  new Date(ultimoDia),
+              dias,
+            });
+          }
+        });
+
+        avistaVencendo.sort((a,b) => a.dias - b.dias);
+        info.textContent = '';
+
+        if (!avistaVencendo.length) {
+          lista.innerHTML = '<p class="presenca-vazia">Nenhum plano À Vista vencendo nos próximos 30 dias.</p>';
+          return;
+        }
+
+        lista.innerHTML = avistaVencendo.map(a => {
+          const mesAno    = formatarDataBR(a.pago_ate);
+          const diasLabel = a.dias === 0
+            ? '⚠️ Vence hoje!'
+            : a.dias <= 7
+            ? `⚠️ Vence em ${a.dias} dia${a.dias > 1 ? 's' : ''}`
+            : `Vence em ${a.dias} dias`;
+          const temTel = !!(a.telefone || '').replace(/\D/g,'');
+          return `<div class="lembrete-item avista">
+            <div class="lembrete-info">
+              <div class="lembrete-nome" title="${esc(a.nome_aluno)}">${esc(a.nome_aluno)}</div>
+              <div class="lembrete-detalhe">💳 À Vista · ${temTel ? esc(a.telefone) : '⚠️ Sem telefone'}</div>
+              <div class="lembrete-venc azul">📅 ${diasLabel} — Pago até ${mesAno}</div>
+            </div>
+            <button class="btn-wpp" style="background:#3498db;" onclick="enviarAvistaLembrete('${esc(a.id)}','${esc(a.pago_ate)}')">
+              📲 Avisar
+            </button>
+          </div>`;
+        }).join('');
+
+        // Guardar para uso no onclick
+        window._avistaVencendo = avistaVencendo;
+
+      } catch(e) {
+        info.textContent = '';
+        lista.innerHTML = `<p class="msg err">Erro ao carregar: ${esc(e.message)}</p>`;
+      }
+    }
+
+    window.enviarAvistaLembrete = function(id, pagoAte) {
+      const lista = window._avistaVencendo || [];
+      const a = lista.find(x => x.id === id);
+      if (!a) return;
+      const mesAno = formatarDataBR(pagoAte);
+      abrirWhatsApp(a.telefone, montarMensagemAvista(a, mesAno));
+    };
 
     document.getElementById('btnHdrSair').addEventListener('click', () => {
       signOut(auth).catch(() => {});
       sessionStorage.removeItem(TOKEN_KEY);
       location.href = './administrativo.html';
     });
-
-    function preencherSeletores() {
-      document.getElementById('selMes').value = mesSel;
-      const selAno   = document.getElementById('selAno');
-      const anoAtual = new Date().getFullYear();
-      for (let a = anoAtual; a >= anoAtual - 3; a--) {
-        const o = document.createElement('option');
-        o.value = a; o.textContent = a;
-        selAno.appendChild(o);
-      }
-      selAno.value = anoSel;
-      const hoje = new Date();
-      document.getElementById('despesaData').value =
-        hoje.getFullYear() + '-' +
-        String(hoje.getMonth() + 1).padStart(2, '0') + '-' +
-        String(hoje.getDate()).padStart(2, '0');
-    }
-
-    document.getElementById('btnCarregar').addEventListener('click', () => {
-      mesSel = parseInt(document.getElementById('selMes').value);
-      anoSel = parseInt(document.getElementById('selAno').value);
-      carregarTudo();
-    });
-
-    async function carregarTudo() {
-      document.getElementById('listaMov').innerHTML = '<div class="lista-vazia">Carregando…</div>';
-      try {
-        const [mensalidades, avista, vendas, despesas] = await Promise.all([
-          buscarMensalidades(),
-          buscarAVista(),
-          buscarVendas(),
-          buscarDespesas(),
-        ]);
-        todasMovs = [
-          ...mensalidades.map(m => ({ ...m, tipo: 'entrada', origem: 'mensalidade' })),
-          ...avista.map(v      => ({ ...v, tipo: 'entrada', origem: 'mensalidade' })),
-          ...vendas.map(v      => ({ ...v, tipo: 'entrada', origem: 'loja' })),
-          ...despesas.map(d    => ({ ...d, tipo: 'saida',   origem: 'despesa' })),
-        ].sort((a, b) => (b.dataTs || 0) - (a.dataTs || 0));
-        atualizarCards();
-        renderGrafico();
-        renderLista();
-      } catch (e) {
-        document.getElementById('listaMov').innerHTML =
-          `<div class="lista-vazia">Erro ao carregar: ${esc(e.message)}</div>`;
-      }
-    }
-
-    async function buscarMensalidades() {
-      const alunosSnap = await getDocs(query(collection(db, 'alunos'), where('status', '==', 'ATIVO')));
-      const idsAtivos  = new Set(alunosSnap.docs.map(d => d.id));
-      const snap = await getDocs(query(
-        collection(db, 'pagamentos'),
-        where('mes', '==', mesSel),
-        where('ano', '==', anoSel)
-      ));
-      return snap.docs
-        .filter(d => idsAtivos.has(d.data().alunoId))
-        .map(d => {
-          const p = d.data();
-          // ── USA LÍQUIDO SE TAXA FOI INFORMADA, SENÃO USA BRUTO ──
-          const valorBruto  = parseFloat(p.valor || 0);
-          const valorFinal  = (p.taxaPct != null && p.totalLiquido != null) ? parseFloat(p.totalLiquido) : valorBruto;
-          return {
-            id: d.id, descricao: p.nome || 'Aluno',
-            valor: valorFinal, valorBruto,
-            data: p.data || '',
-            dataTs: parseDateTS(p.data), categoria: 'Mensalidade',
-            forma: p.formaPagamento || '',
-            taxaPct: p.taxaPct ?? null,
-            totalLiquido: p.totalLiquido ?? null,
-            colecao: 'pagamentos',
-          };
-        });
-    }
-
-    async function buscarAVista() {
-      const snap = await getDocs(query(
-        collection(db, 'alunos'),
-        where('status', '==', 'ATIVO'),
-        where('plano', '==', 'Avista')
-      ));
-      const resultado = [];
-      snap.forEach(d => {
-        const a = d.data();
-        if (!a.pago_ate) return;
-        const [anoFim, mesFim] = a.pago_ate.split('-').map(Number);
-        const coberto = (anoSel < anoFim) || (anoSel === anoFim && mesSel <= mesFim);
-        if (!coberto) return;
-        resultado.push({
-          id: d.id, descricao: a.nome_aluno || 'Aluno',
-          valor: parseFloat(a.avista_valor || 0),
-          valorBruto: parseFloat(a.avista_valor || 0),
-          data: a.pago_ate.split('-').reverse().join('/'),
-          dataTs: new Date(anoFim, mesFim - 1, 1).getTime(),
-          categoria: 'À Vista', forma: a.avista_forma_pag || '',
-          taxaPct: null, totalLiquido: null,
-          _dataContrato: a.data_contrato || '',
-          colecao: null, // À Vista não é editável via modal
-        });
-      });
-      return resultado;
-    }
-
-    async function buscarVendas() {
-      const snap = await getDocs(collection(db, 'loja_vendas'));
-      return snap.docs
-        .map(d => ({ id: d.id, ...d.data() }))
-        .filter(v => {
-          const dt = parseDateBR(v.data);
-          return dt && dt.getMonth() + 1 === mesSel && dt.getFullYear() === anoSel;
-        })
-        .map(v => {
-          const valorBruto = parseFloat(v.total || 0);
-          const valorFinal = (v.taxaPct != null && v.totalLiquido != null) ? parseFloat(v.totalLiquido) : valorBruto;
-          return {
-            id:           v.id,
-            descricao:    v.produtoNome || 'Venda',
-            valor:        valorFinal,
-            valorBruto,
-            precoUnit:    parseFloat(v.precoUnit || 0),
-            quantidade:   v.quantidade || 1,
-            data:         v.data || '',
-            dataTs:       parseDateTS(v.data),
-            categoria:    'Lojinha',
-            forma:        v.formaPagamento || '',
-            taxaPct:      v.taxaPct ?? null,
-            totalLiquido: v.totalLiquido ?? null,
-            colecao:      'loja_vendas',
-          };
-        });
-    }
-
-    async function buscarDespesas() {
-      const snap = await getDocs(query(
-        collection(db, 'fluxo_despesas'),
-        where('mes', '==', mesSel),
-        where('ano', '==', anoSel)
-      ));
-      return snap.docs.map(d => {
-        const p = d.data();
-        return {
-          id: d.id, descricao: p.descricao || 'Despesa',
-          valor: parseFloat(p.valor || 0), valorBruto: parseFloat(p.valor || 0),
-          data: p.data || '',
-          dataTs: parseDateTS(p.data), categoria: p.categoria || 'Outro',
-          forma: '', podeDeletar: true, colecao: 'fluxo_despesas',
-          taxaPct: null, totalLiquido: null,
-        };
-      });
-    }
-
-    function atualizarCards() {
-      const entradas = todasMovs.filter(m => m.tipo === 'entrada');
-      const saidas   = todasMovs.filter(m => m.tipo === 'saida');
-      const totEnt   = entradas.reduce((s, m) => s + m.valor, 0);
-      const totSai   = saidas.reduce((s, m) => s + m.valor, 0);
-      const saldo    = totEnt - totSai;
-      const mens     = entradas.filter(m => m.origem === 'mensalidade').reduce((s, m) => s + m.valor, 0);
-      const loja     = entradas.filter(m => m.origem === 'loja').reduce((s, m) => s + m.valor, 0);
-      const fmt = n => 'R$ ' + n.toFixed(2).replace('.', ',');
-      document.getElementById('totalEntradas').textContent = fmt(totEnt);
-      document.getElementById('totalSaidas').textContent   = fmt(totSai);
-      document.getElementById('totalSaldo').textContent    = fmt(saldo);
-      document.getElementById('subEntradas').textContent   = `Mensalidades: ${fmt(mens)} · Loja: ${fmt(loja)}`;
-      document.getElementById('subSaidas').textContent     = `${saidas.length} lançamento${saidas.length !== 1 ? 's' : ''}`;
-      document.getElementById('subSaldo').textContent      = saldo >= 0 ? '✅ positivo' : '⚠️ negativo';
-      document.getElementById('totalSaldo').style.color    = saldo >= 0 ? '#3498db' : '#e74c3c';
-    }
-
-    async function renderGrafico() {
-      const container = document.getElementById('graficoBarras');
-      container.innerHTML = '<div class="skel" style="width:100%;height:100%;border-radius:6px;"></div>';
-      try {
-        const meses = [];
-        for (let i = 5; i >= 0; i--) {
-          const d = new Date(anoSel, mesSel - 1 - i, 1);
-          meses.push({ mes: d.getMonth()+1, ano: d.getFullYear(), label: d.toLocaleDateString('pt-BR',{month:'short'}).replace('.','') });
-        }
-        const alunosSnap = await getDocs(query(collection(db,'alunos'),where('status','==','ATIVO')));
-        const idsAtivos  = new Set(alunosSnap.docs.map(d=>d.id));
-        const avistaSnap = await getDocs(query(collection(db,'alunos'),where('status','==','ATIVO'),where('plano','==','Avista')));
-
-        const dadosMeses = await Promise.all(meses.map(async m => {
-          const [pagSnap, despSnap, vendasSnap] = await Promise.all([
-            getDocs(query(collection(db,'pagamentos'),where('mes','==',m.mes),where('ano','==',m.ano))),
-            getDocs(query(collection(db,'fluxo_despesas'),where('mes','==',m.mes),where('ano','==',m.ano))),
-            getDocs(collection(db,'loja_vendas')),
-          ]);
-
-          // ── Mensalidades: usa líquido quando disponível ──
-          const entMens = pagSnap.docs
-            .filter(d => idsAtivos.has(d.data().alunoId))
-            .reduce((s, d) => {
-              const p = d.data();
-              return s + parseFloat((p.taxaPct != null && p.totalLiquido != null) ? p.totalLiquido : (p.valor || 0));
-            }, 0);
-
-          // ── Loja: usa líquido quando disponível ──
-          const entLoja = vendasSnap.docs.map(d=>d.data())
-            .filter(v=>{ const dt=parseDateBR(v.data); return dt&&dt.getMonth()+1===m.mes&&dt.getFullYear()===m.ano; })
-            .reduce((s,v)=>s+parseFloat((v.taxaPct!=null&&v.totalLiquido!=null)?v.totalLiquido:(v.total||0)),0);
-
-          const entAvista = avistaSnap.docs.reduce((s,d)=>{
-            const a=d.data();
-            if(!a.pago_ate||!a.data_contrato) return s;
-            const anoRef=parseInt(a.data_contrato.slice(0,4));
-            const mesRef=parseInt(a.data_contrato.slice(5,7));
-            return (m.ano===anoRef&&m.mes===mesRef)?s+parseFloat(a.avista_valor||0):s;
-          },0);
-
-          const saidas = despSnap.docs.reduce((s,d)=>s+parseFloat(d.data().valor||0),0);
-          return { ...m, entradas: entMens+entLoja+entAvista, saidas };
-        }));
-
-        const maxVal = Math.max(...dadosMeses.flatMap(m=>[m.entradas,m.saidas]),1);
-        const trackH = 130;
-        container.innerHTML = dadosMeses.map(m => {
-          const hEnt = Math.max(2,Math.round((m.entradas/maxVal)*trackH));
-          const hSai = Math.max(2,Math.round((m.saidas/maxVal)*trackH));
-          return `<div class="grafico-col">
-            <div class="grafico-barras-pair">
-              <div class="barra entrada" style="height:${hEnt}px" title="Entradas: R$ ${m.entradas.toFixed(2).replace('.',',')}"></div>
-              <div class="barra saida"   style="height:${hSai}px" title="Saídas: R$ ${m.saidas.toFixed(2).replace('.',',')}"></div>
-            </div>
-            <div class="grafico-label">${m.label}/${String(m.ano).slice(2)}</div>
-          </div>`;
-        }).join('');
-      } catch(e) {
-        container.innerHTML = '<p style="color:#fff;font-size:12px;">Erro ao carregar gráfico.</p>';
-      }
-    }
-
-    function renderLista() {
-      let lista = todasMovs;
-      if (filtroAtivo === 'mensalidade') lista = lista.filter(m=>m.origem==='mensalidade');
-      if (filtroAtivo === 'loja')        lista = lista.filter(m=>m.origem==='loja');
-      if (filtroAtivo === 'despesa')     lista = lista.filter(m=>m.origem==='despesa');
-      const container = document.getElementById('listaMov');
-      if (!lista.length) { container.innerHTML='<div class="lista-vazia">Nenhuma movimentação neste período.</div>'; return; }
-
-      const catLabel   = {mensalidade:'💳 Mensalidade',loja:'🏪 Lojinha',despesa:'💸 Despesa'};
-      const formaLabel = {dinheiro:'💵',pix:'📲',debito:'💳',credito:'💳',maquina:'💳',cartao:'💳'};
-      const podeEditar = m => (m.origem === 'loja' || m.origem === 'mensalidade') && m.colecao;
-
-      container.innerHTML = lista.map(m => {
-        const temTaxa  = m.taxaPct != null && m.totalLiquido != null;
-        const taxaInfo = temTaxa ? ` · taxa ${m.taxaPct}%` : '';
-
-        // valores: se tem taxa mostra bruto riscado + líquido
-        const valoresHtml = temTaxa
-          ? `<div class="mov-valores">
-               <div class="mov-valor riscado">+ R$ ${m.valorBruto.toFixed(2).replace('.',',')}</div>
-               <div class="mov-valor-liquido entrada">+ R$ ${m.valor.toFixed(2).replace('.',',')}</div>
-               <div class="mov-taxa-badge">taxa ${m.taxaPct}%</div>
-             </div>`
-          : `<div class="mov-valores">
-               <div class="mov-valor ${m.tipo}">${m.tipo==='entrada'?'+':'−'} R$ ${m.valor.toFixed(2).replace('.',',')}</div>
-             </div>`;
-
-        const acoesHtml = (podeEditar(m) || m.podeDeletar)
-          ? `<div class="mov-acoes">
-               ${podeEditar(m) ? `<button class="btn-mov-acao editar" data-id="${esc(m.id)}">✏️ Editar</button>` : ''}
-               ${m.podeDeletar ? `<button class="btn-mov-acao deletar" data-id="${esc(m.id)}">🗑️ Excluir</button>` : ''}
-             </div>`
-          : '';
-
-        return `<div class="mov-card">
-          <div class="mov-card-top">
-            <div class="mov-tipo-dot ${m.tipo}"></div>
-            <div class="mov-info">
-              <div class="mov-nome">${esc(m.descricao)}</div>
-              <div class="mov-meta">
-                ${catLabel[m.origem]||''} · ${esc(m.categoria)}
-                ${m.forma?' · '+(formaLabel[m.forma]||'')+' '+esc(m.forma):''}
-                ${m.data?' · '+esc(m.data):''}
-                ${taxaInfo}
-              </div>
-            </div>
-            ${valoresHtml}
-          </div>
-          ${acoesHtml}
-        </div>`;
-      }).join('');
-
-      container.querySelectorAll('.btn-mov-acao.editar').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const mov = todasMovs.find(x => x.id === btn.dataset.id);
-          if (mov) abrirModalEditarMov(mov);
-        });
-      });
-      container.querySelectorAll('.btn-mov-acao.deletar').forEach(btn => {
-        btn.addEventListener('click', () => deletarDespesa(btn.dataset.id));
-      });
-    }
-
-    // ── MODAL EDITAR MOV ──────────────────────────────────────
-
-    function abrirModalEditarMov(mov) {
-      movEditando    = mov;
-      editFormaAtual = mov.forma || 'dinheiro';
-
-      document.getElementById('editMovNome').textContent    = esc(mov.descricao);
-      document.getElementById('editMovDetalhe').textContent =
-        `${mov.data || ''} · R$ ${mov.valorBruto.toFixed(2).replace('.', ',')} bruto`;
-      document.getElementById('editMovSubtitle').textContent = `ID: ${mov.id.slice(0,8)}…`;
-      document.getElementById('editMovMsg').textContent     = '';
-      document.getElementById('btnSalvarEditMov').disabled  = false;
-      document.getElementById('editMovTaxaPct').value       = (mov.taxaPct != null) ? mov.taxaPct : '';
-
-      // seleciona forma atual
-      document.querySelectorAll('#editMovFormaGrid .forma-pill').forEach(p =>
-        p.classList.toggle('selected', p.dataset.forma === editFormaAtual)
-      );
-
-      atualizarTaxaWrap();
-      atualizarTaxaBreakdownMov();
-
-      document.getElementById('modalEditMov').classList.add('open');
-    }
-
-    function atualizarTaxaWrap() {
-      const temTaxa = editFormaAtual === 'debito' || editFormaAtual === 'credito';
-      document.getElementById('editMovTaxaWrap').style.display = temTaxa ? '' : 'none';
-      if (!temTaxa) document.getElementById('editMovTaxaPct').value = '';
-      atualizarTaxaBreakdownMov();
-    }
-
-    function atualizarTaxaBreakdownMov() {
-      if (!movEditando) return;
-      const bruto   = movEditando.valorBruto;
-      const taxaPct = parseFloat(document.getElementById('editMovTaxaPct').value) || 0;
-      const desc    = bruto * (taxaPct / 100);
-      const liq     = bruto - desc;
-      const fmtR    = n => 'R$ ' + n.toFixed(2).replace('.', ',');
-      document.getElementById('editMovTaxaBruto').textContent    = fmtR(bruto);
-      document.getElementById('editMovTaxaDesconto').textContent = taxaPct > 0 ? `− ${fmtR(desc)}` : '—';
-      document.getElementById('editMovTaxaLiquido').textContent  = fmtR(taxaPct > 0 ? liq : bruto);
-      document.getElementById('editMovTotal').textContent        = fmtR(taxaPct > 0 ? liq : bruto);
-    }
-
-    document.getElementById('editMovTaxaPct').addEventListener('input', atualizarTaxaBreakdownMov);
-
-    document.querySelectorAll('#editMovFormaGrid .forma-pill').forEach(pill => {
-      pill.addEventListener('click', () => {
-        document.querySelectorAll('#editMovFormaGrid .forma-pill').forEach(p => p.classList.remove('selected'));
-        pill.classList.add('selected');
-        editFormaAtual = pill.dataset.forma;
-        atualizarTaxaWrap();
-      });
-    });
-
-    document.getElementById('btnCancelarEditMov').addEventListener('click', () =>
-      document.getElementById('modalEditMov').classList.remove('open')
-    );
-    document.getElementById('modalEditMov').addEventListener('click', function(e) {
-      if (e.target === this) this.classList.remove('open');
-    });
-
-    document.getElementById('btnSalvarEditMov').addEventListener('click', async () => {
-      if (!movEditando) return;
-      const btn = document.getElementById('btnSalvarEditMov');
-      const msg = document.getElementById('editMovMsg');
-      btn.disabled = true; msg.textContent = 'Salvando…'; msg.className = 'msg info';
-
-      try {
-        const taxaRaw = parseFloat(document.getElementById('editMovTaxaPct').value);
-        const temTaxa = (editFormaAtual === 'debito' || editFormaAtual === 'credito') && !isNaN(taxaRaw) && taxaRaw > 0;
-        const taxaPct     = temTaxa ? taxaRaw : null;
-        const totalLiquido = temTaxa ? movEditando.valorBruto - (movEditando.valorBruto * taxaRaw / 100) : null;
-
-        const dados = {
-          formaPagamento: editFormaAtual,
-          taxaPct,
-          totalLiquido,
-        };
-
-        await updateDoc(doc(db, movEditando.colecao, movEditando.id), dados);
-
-        // atualiza em memória
-        const idx = todasMovs.findIndex(x => x.id === movEditando.id);
-        if (idx >= 0) {
-          Object.assign(todasMovs[idx], {
-            forma: editFormaAtual,
-            taxaPct,
-            totalLiquido,
-            valor: totalLiquido !== null ? totalLiquido : todasMovs[idx].valorBruto,
-          });
-        }
-
-        msg.textContent = '✅ Salvo!'; msg.className = 'msg ok';
-        atualizarCards();
-        setTimeout(() => {
-          document.getElementById('modalEditMov').classList.remove('open');
-          renderLista();
-        }, 700);
-      } catch(e) {
-        msg.textContent = 'Erro: ' + e.message; msg.className = 'msg err';
-        btn.disabled = false;
-      }
-    });
-
-    // ── FILTROS ───────────────────────────────────────────────
-
-    document.querySelectorAll('.btn-filtro').forEach(btn=>{
-      btn.addEventListener('click',()=>{
-        document.querySelectorAll('.btn-filtro').forEach(b=>b.classList.remove('ativo'));
-        btn.classList.add('ativo'); filtroAtivo=btn.dataset.filtro; renderLista();
-      });
-    });
-
-    // ── MODAL NOVA DESPESA ────────────────────────────────────
-
-    document.getElementById('btnNovaDespesa').addEventListener('click',()=>{
-      document.getElementById('despesaDescricao').value='';
-      document.getElementById('despesaValor').value='';
-      document.getElementById('despesaMsg').textContent='';
-      document.getElementById('modalDespesa').classList.add('open');
-    });
-    document.getElementById('btnCancelarDespesa').addEventListener('click',()=>document.getElementById('modalDespesa').classList.remove('open'));
-    document.getElementById('modalDespesa').addEventListener('click',function(e){if(e.target===this)this.classList.remove('open');});
-
-    document.querySelectorAll('.cat-chip').forEach(chip=>{
-      chip.addEventListener('click',()=>{
-        document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('selected'));
-        chip.classList.add('selected'); catAtual=chip.dataset.cat;
-      });
-    });
-
-    document.getElementById('btnSalvarDespesa').addEventListener('click', async()=>{
-      const descricao=document.getElementById('despesaDescricao').value.trim();
-      const valor=parseFloat(document.getElementById('despesaValor').value);
-      const dataInput=document.getElementById('despesaData').value;
-      const msg=document.getElementById('despesaMsg');
-      const btn=document.getElementById('btnSalvarDespesa');
-      if(!descricao){msg.textContent='Informe a descrição.';msg.className='msg err';return;}
-      if(isNaN(valor)||valor<=0){msg.textContent='Informe um valor válido.';msg.className='msg err';return;}
-      msg.textContent='Salvando…';msg.className='msg info';btn.disabled=true;
-      try {
-        let dataBR='';
-        if(dataInput){const[y,m,d]=dataInput.split('-');dataBR=`${d}/${m}/${y}`;}
-        await addDoc(collection(db,'fluxo_despesas'),{
-          descricao,valor,categoria:catAtual,data:dataBR,mes:mesSel,ano:anoSel,criadoEm:serverTimestamp(),
-        });
-        msg.textContent='✅ Despesa lançada!';msg.className='msg ok';
-        setTimeout(()=>{document.getElementById('modalDespesa').classList.remove('open');carregarTudo();},700);
-      } catch(e){msg.textContent='Erro: '+e.message;msg.className='msg err';}
-      finally{btn.disabled=false;}
-    });
-
-    async function deletarDespesa(id){
-      if(!confirm('Remover este lançamento?')) return;
-      try{await deleteDoc(doc(db,'fluxo_despesas',id));carregarTudo();}
-      catch(e){alert('Erro: '+e.message);}
-    }
-
-    // ── UTILS ─────────────────────────────────────────────────
-
-    function parseDateBR(str){
-      if(!str) return null;
-      const[d,m,y]=str.split('/');
-      if(!d||!m||!y) return null;
-      return new Date(`${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}T00:00:00`);
-    }
-    function parseDateTS(str){const d=parseDateBR(str);return d?d.getTime():0;}
-    function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   </script>
 </body>
 </html>
