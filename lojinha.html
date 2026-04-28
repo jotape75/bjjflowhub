@@ -102,21 +102,6 @@
     .edit-resumo { background: #141414; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; }
     .edit-resumo-nome { font-size: 14px; font-weight: 700; color: #fff; }
     .edit-resumo-detalhe { font-size: 12px; color: #666; margin-top: 3px; }
-    /* ── TAXA MAQUININHA ── */
-    .taxa-wrap { background: #141414; border: 1px solid #332200; border-radius: 10px; padding: 12px 14px; margin-top: 14px; }
-    .taxa-wrap-title { font-size: 11px; font-weight: 700; color: #e67e22; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; }
-    .taxa-row { display: flex; align-items: center; gap: 10px; }
-    .taxa-input-inner { position: relative; width: 90px; flex-shrink: 0; }
-    .taxa-input-field { width: 100%; background: #1a1a1a; border: 1px solid #444; border-radius: 8px; padding: 9px 26px 9px 10px; font-size: 16px; font-weight: 700; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; }
-    .taxa-input-field:focus { border-color: #e67e22; }
-    .taxa-pct { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #666; pointer-events: none; }
-    .taxa-breakdown { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-    .taxa-line { display: flex; justify-content: space-between; font-size: 12px; }
-    .taxa-line .lbl { color: #666; }
-    .taxa-line .val { color: #aaa; font-weight: 600; }
-    .taxa-line.recebe .lbl { color: #aaa; font-weight: 700; }
-    .taxa-line.recebe .val { color: #2ecc71; font-size: 14px; font-weight: 900; }
-    .taxa-line.desc .val { color: #e67e22; }
     .forma-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 4px; }
     .forma-pill { padding: 10px; background: #1a1a1a; border: 2px solid #333; border-radius: 10px; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
     .forma-pill.selected { border-color: var(--red); background: rgba(192,57,43,0.1); }
@@ -280,32 +265,6 @@
         <div class="forma-pill" data-forma="pix"><span class="forma-pill-icon">📲</span><span class="forma-pill-label">Pix</span></div>
         <div class="forma-pill" data-forma="debito"><span class="forma-pill-icon">💳</span><span class="forma-pill-label">Débito</span></div>
         <div class="forma-pill" data-forma="credito"><span class="forma-pill-icon">💳</span><span class="forma-pill-label">Crédito</span></div>
-      </div>
-
-      <!-- ── TAXA DA MAQUININHA ── -->
-      <div class="taxa-wrap">
-        <div class="taxa-wrap-title">🏧 Taxa da Maquininha (opcional)</div>
-        <div class="taxa-row">
-          <div class="taxa-input-inner">
-            <input type="number" class="taxa-input-field" id="editTaxaPct"
-              min="0" max="100" step="0.01" placeholder="0" />
-            <span class="taxa-pct">%</span>
-          </div>
-          <div class="taxa-breakdown">
-            <div class="taxa-line">
-              <span class="lbl">Bruto cobrado</span>
-              <span class="val" id="taxaBruto">—</span>
-            </div>
-            <div class="taxa-line desc">
-              <span class="lbl">Taxa (R$)</span>
-              <span class="val" id="taxaDesconto">—</span>
-            </div>
-            <div class="taxa-line recebe">
-              <span class="lbl">Você recebe</span>
-              <span class="val" id="taxaLiquido">—</span>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div style="margin-top:14px;background:#1a1a1a;border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
@@ -491,7 +450,6 @@
       let tH=0,tS=0,tM=0;
       todasVendas.forEach(v => {
         const d = parseDateBR(v.data); if(!d) return;
-        // Usa líquido se taxa informada, senão bruto
         const val = (v.taxaPct!=null && v.totalLiquido!=null) ? v.totalLiquido : (v.total||0);
         if(d>=hoje)         tH += val;
         if(d>=inicioSemana) tS += val;
@@ -558,17 +516,15 @@
 
     /* ── Modal Editar Venda ── */
     function abrirModalEditarVenda(venda) {
-      vendaEditando = venda;
-      editQtyAtual  = venda.quantidade || 1;
+      vendaEditando  = venda;
+      editQtyAtual   = venda.quantidade || 1;
       editFormaAtual = venda.formaPagamento || 'dinheiro';
-      document.getElementById('editVendaNome').textContent    = esc(venda.produtoNome||'—');
-      document.getElementById('editVendaDetalhe').textContent = `${venda.data||''} ${venda.hora||''} · preço unit. R$ ${parseFloat(venda.precoUnit||0).toFixed(2).replace('.',',')}`;
+      document.getElementById('editVendaNome').textContent     = esc(venda.produtoNome||'—');
+      document.getElementById('editVendaDetalhe').textContent  = `${venda.data||''} ${venda.hora||''} · preço unit. R$ ${parseFloat(venda.precoUnit||0).toFixed(2).replace('.',',')}`;
       document.getElementById('editVendaSubtitle').textContent = `ID: ${venda.id.slice(0,8)}…`;
-      document.getElementById('editQtyValue').textContent     = editQtyAtual;
-      document.getElementById('editVendaMsg').textContent     = '';
-      document.getElementById('btnSalvarEditVenda').disabled  = false;
-      // Taxa: preenche se já existia
-      document.getElementById('editTaxaPct').value = (venda.taxaPct!=null) ? venda.taxaPct : '';
+      document.getElementById('editQtyValue').textContent      = editQtyAtual;
+      document.getElementById('editVendaMsg').textContent      = '';
+      document.getElementById('btnSalvarEditVenda').disabled   = false;
       document.querySelectorAll('#editFormaGrid .forma-pill').forEach(p=>p.classList.toggle('selected',p.dataset.forma===editFormaAtual));
       atualizarTotalEdit();
       document.getElementById('modalEditVenda').classList.add('open');
@@ -580,24 +536,8 @@
 
     function atualizarTotalEdit() {
       if (!vendaEditando) return;
-      const bruto = calcBrutoEdit();
-      document.getElementById('editVendaTotal').textContent = 'R$ '+bruto.toFixed(2).replace('.',',');
-      atualizarTaxaBreakdown();
+      document.getElementById('editVendaTotal').textContent = 'R$ ' + calcBrutoEdit().toFixed(2).replace('.',',');
     }
-
-    function atualizarTaxaBreakdown() {
-      if (!vendaEditando) return;
-      const bruto   = calcBrutoEdit();
-      const taxaPct = parseFloat(document.getElementById('editTaxaPct').value)||0;
-      const desc    = bruto * (taxaPct/100);
-      const liq     = bruto - desc;
-      const fmtR    = n => 'R$ '+n.toFixed(2).replace('.',',');
-      document.getElementById('taxaBruto').textContent    = fmtR(bruto);
-      document.getElementById('taxaDesconto').textContent = taxaPct>0 ? `− ${fmtR(desc)}` : '—';
-      document.getElementById('taxaLiquido').textContent  = fmtR(taxaPct>0 ? liq : bruto);
-    }
-
-    document.getElementById('editTaxaPct').addEventListener('input', atualizarTaxaBreakdown);
 
     document.getElementById('btnEditQtyMenos').addEventListener('click',()=>{if(editQtyAtual>1){editQtyAtual--;document.getElementById('editQtyValue').textContent=editQtyAtual;atualizarTotalEdit();}});
     document.getElementById('btnEditQtyMais').addEventListener('click', ()=>{editQtyAtual++;document.getElementById('editQtyValue').textContent=editQtyAtual;atualizarTotalEdit();});
@@ -618,17 +558,13 @@
       const msg = document.getElementById('editVendaMsg');
       btn.disabled=true; msg.textContent='Salvando…'; msg.className='msg info';
       try {
-        const novoTotal  = calcBrutoEdit();
-        const diffQty    = editQtyAtual - (vendaEditando.quantidade||1);
-        const taxaRaw    = parseFloat(document.getElementById('editTaxaPct').value);
-        const taxaPct    = (!isNaN(taxaRaw) && taxaRaw>0) ? taxaRaw : null;
-        const totalLiq   = taxaPct!=null ? novoTotal - (novoTotal*taxaPct/100) : null;
+        const novoTotal = calcBrutoEdit();
+        const diffQty   = editQtyAtual - (vendaEditando.quantidade||1);
 
         await updateDoc(doc(db,'loja_vendas',vendaEditando.id),{
-          quantidade: editQtyAtual, total: novoTotal,
+          quantidade:     editQtyAtual,
+          total:          novoTotal,
           formaPagamento: editFormaAtual,
-          taxaPct:      taxaPct,
-          totalLiquido: totalLiq,
         });
 
         if(diffQty!==0 && vendaEditando.produtoId){
@@ -642,7 +578,7 @@
         }
 
         const idx=todasVendas.findIndex(v=>v.id===vendaEditando.id);
-        if(idx>=0) Object.assign(todasVendas[idx],{quantidade:editQtyAtual,total:novoTotal,formaPagamento:editFormaAtual,taxaPct,totalLiquido:totalLiq});
+        if(idx>=0) Object.assign(todasVendas[idx],{quantidade:editQtyAtual,total:novoTotal,formaPagamento:editFormaAtual});
 
         msg.textContent='✅ Venda atualizada!'; msg.className='msg ok';
         atualizarResumo();
