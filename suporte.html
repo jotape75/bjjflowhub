@@ -20,7 +20,7 @@
       --border: rgba(255,255,255,0.1);
       --text: #f5f5f5;
       --text2: #c0c0c0;
-      --muted: #888;
+      --muted: #fff;
       --green: #2ecc71;
       --red: #e74c3c;
       --yellow: #f39c12;
@@ -106,7 +106,7 @@
     .reply-area.disabled { opacity: 0.5; pointer-events: none; }
     .reply-input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 13px 16px; font-size: 15px; color: var(--text); font-family: inherit; outline: none; resize: vertical; min-height: 90px; line-height: 1.6; transition: border-color 0.2s; }
     .reply-input:focus { border-color: rgba(74,122,181,0.6); }
-    .reply-input::placeholder { color: #555; }
+    .reply-input::placeholder { color: #fff; }
     .reply-actions { display: flex; justify-content: flex-end; margin-top: 12px; }
     .btn-enviar { background: var(--blue); border: none; color: #fff; border-radius: 9px; padding: 11px 26px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
     .btn-enviar:hover { opacity: 0.9; }
@@ -123,20 +123,20 @@
     @media (min-width: 769px) { .form-overlay { align-items: center; } .form-box { border-radius: 20px; max-width: 520px; } }
     .form-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 22px; }
     .form-field { margin-bottom: 18px; }
-    .form-label { display: block; font-size: 12px; font-weight: 700; color: #aaa; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 8px; }
+    .form-label { display: block; font-size: 12px; font-weight: 700; color: #fff; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 8px; }
     .form-input, .form-select, .form-textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 13px 16px; font-size: 15px; color: var(--text); font-family: inherit; outline: none; transition: border-color 0.2s; }
     .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: rgba(74,122,181,0.6); }
-    .form-input::placeholder, .form-textarea::placeholder { color: #555; }
+    .form-input::placeholder, .form-textarea::placeholder { color: #fff; }
     .form-select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23888' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; padding-right: 40px; cursor: pointer; }
     .form-select option { background: #1a1a1a; }
     .form-textarea { resize: vertical; min-height: 110px; line-height: 1.65; }
     .prioridade-row { display: flex; gap: 10px; }
-    .prio-btn { flex: 1; padding: 11px; border-radius: 9px; border: 1px solid var(--border); background: transparent; color: #aaa; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; text-align: center; }
+    .prio-btn { flex: 1; padding: 11px; border-radius: 9px; border: 1px solid var(--border); background: transparent; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; text-align: center; }
     .prio-btn.sel-baixa { background: rgba(46,204,113,0.15);  border-color: var(--green); color: var(--green); }
     .prio-btn.sel-media { background: rgba(243,156,18,0.15);  border-color: var(--yellow); color: var(--yellow); }
     .prio-btn.sel-alta  { background: rgba(231,76,60,0.15);   border-color: var(--red); color: #ff6b5b; }
     .form-btns { display: flex; gap: 12px; margin-top: 22px; }
-    .btn-cancelar { flex: 1; padding: 13px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: #aaa; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
+    .btn-cancelar { flex: 1; padding: 13px; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; }
     .btn-submit { flex: 2; padding: 13px; background: var(--blue); border: none; border-radius: 10px; color: #fff; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
     .btn-submit:hover { opacity: 0.9; }
     .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; }
