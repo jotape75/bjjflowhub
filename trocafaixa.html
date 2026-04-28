@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#c0392b" />
-  <title>Troca de Faixa – Riva BJJ</title>
+  <meta name="theme-color" content="#3D5A80" />
+  <title>Troca de Faixa – BJJFlowHub</title>
   <link rel="stylesheet" href="./styles.css" />
   <style>
     .admin-hdr-left { display: flex; align-items: center; gap: 14px; }
@@ -86,7 +86,7 @@
   <header class="hdr admin-hdr">
     <div class="hdr-inner admin-hdr-inner">
       <div class="admin-hdr-left">
-        <img class="logo admin-logo" src="./logo.png" alt="Riva BJJ" />
+        <img class="logo admin-logo" src="./logo.png" alt="BJJFlowHub" />
         <span class="admin-hdr-titulo">Portal Administrativo</span>
       </div>
       <button class="btn-logout admin-hdr-sair" id="btnHdrSair">Sair</button>
@@ -105,12 +105,15 @@
   </main>
 
   <script type="module">
-    import { db, auth } from './firebase-config.js';
-    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
+    import { db, auth, academiaId } from './firebase-config.js';
+    import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 
     const TOKEN_KEY = 'rv_prof_token';
     const MAX_GRAU  = 4;
+
+    // Helpers multi-tenant
+    const col = (nome) => collection(db, 'academias', academiaId, nome);
 
     function esc(str) {
       return String(str ?? '')
@@ -129,11 +132,10 @@
 
     async function carregarTrocaFaixa() {
       const subtitle = document.getElementById('pageSubtitle');
-      const info     = document.getElementById('pageInfo');
       const lista    = document.getElementById('listaTrocaFaixa');
 
       try {
-        const q    = query(collection(db, 'alunos'), where('status', '==', 'ATIVO'));
+        const q    = query(col('alunos'), where('status', '==', 'ATIVO'));
         const snap = await getDocs(q);
         const data = [];
 
