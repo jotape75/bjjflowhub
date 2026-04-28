@@ -21,7 +21,7 @@
     }
     @media (max-width: 768px) { .admin-hdr-inner { justify-content: center; } }
     .tabs { display: flex; gap: 4px; background: #141414; border: 1px solid var(--border); border-radius: 12px; padding: 4px; margin-bottom: 24px; }
-    .tab-btn { flex: 1; padding: 10px 8px; background: transparent; border: none; border-radius: 9px; color: #888; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.15s, color 0.15s; white-space: nowrap; }
+    .tab-btn { flex: 1; padding: 10px 8px; background: transparent; border: none; border-radius: 9px; color: #fff; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; transition: background 0.15s, color 0.15s; white-space: nowrap; }
     .tab-btn.active { background: var(--card); color: #fff; }
     .tab-btn:active { opacity: .8; }
     .tab-panel { display: none; }
@@ -32,15 +32,15 @@
     .resumo-loja-valor.verde   { color: #2ecc71; }
     .resumo-loja-valor.azul    { color: #3498db; }
     .resumo-loja-valor.amarelo { color: #f39c12; }
-    .resumo-loja-label { font-size: 10px; color: #aaa; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
+    .resumo-loja-label { font-size: 10px; color: #fff; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 4px; }
     .filtro-periodo { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
-    .btn-periodo { background: #222; border: 1px solid #444; color: #aaa; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: inherit; }
+    .btn-periodo { background: #222; border: 1px solid #444; color: #fff; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; font-family: inherit; }
     .btn-periodo.ativo { background: var(--red); color: #fff; border-color: var(--red); }
     .busca-wrap { position: sticky; top: 68px; z-index: 9; background: var(--bg); padding: 0 0 10px; }
     @media (max-width: 768px) { .busca-wrap { top: 64px; } }
     .busca-input { width: 100%; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 11px 14px 11px 38px; font-size: 14px; color: #fff; font-family: inherit; outline: none; }
     .busca-input:focus { border-color: var(--red); }
-    .busca-input::placeholder { color: #555; }
+    .busca-input::placeholder { color: #fff; }
     .busca-wrap-inner { position: relative; }
     .busca-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 15px; pointer-events: none; }
     .produto-lista-item { display: flex; align-items: center; gap: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; margin-bottom: 6px; cursor: pointer; transition: border-color 0.15s; }
@@ -49,10 +49,10 @@
     .produto-lista-item.sem-estoque { opacity: 0.45; cursor: not-allowed; }
     .produto-lista-item.sem-estoque:hover { border-color: var(--border); }
     .produto-lista-nome { flex: 1; font-size: 14px; font-weight: 700; color: #fff; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .produto-lista-cat  { font-size: 11px; color: #555; margin-top: 2px; }
+    .produto-lista-cat  { font-size: 11px; color: #fff; margin-top: 2px; }
     .produto-lista-right { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; flex-shrink: 0; }
     .produto-lista-preco { font-size: 15px; font-weight: 900; color: #2ecc71; white-space: nowrap; }
-    .produto-lista-estoque { font-size: 11px; color: #aaa; white-space: nowrap; }
+    .produto-lista-estoque { font-size: 11px; color: #fff; white-space: nowrap; }
     .produto-lista-estoque.baixo { color: #f39c12; }
     .produto-lista-estoque.zero  { color: #e74c3c; }
     .produto-lista-btn { background: var(--red); border: none; color: #fff; border-radius: 8px; padding: 6px 14px; font-size: 12px; font-weight: 800; cursor: pointer; font-family: inherit; flex-shrink: 0; white-space: nowrap; }
@@ -61,15 +61,15 @@
     .venda-card-top { display: flex; align-items: flex-start; gap: 12px; }
     .venda-info { flex: 1; min-width: 0; }
     .venda-nome { font-size: 14px; font-weight: 700; color: #fff; }
-    .venda-meta { font-size: 12px; color: #aaa; margin-top: 2px; }
+    .venda-meta { font-size: 12px; color: #fff; margin-top: 2px; }
     .venda-valores { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
     .venda-valor { font-size: 16px; font-weight: 900; color: #2ecc71; white-space: nowrap; }
-    .venda-valor.riscado { color: #555; font-size: 12px; text-decoration: line-through; font-weight: 400; }
+    .venda-valor.riscado { color: #fff; font-size: 12px; text-decoration: line-through; font-weight: 400; }
     .venda-liquido { font-size: 16px; font-weight: 900; color: #2ecc71; white-space: nowrap; }
     .venda-taxa-badge { font-size: 11px; color: #e67e22; white-space: nowrap; }
-    .lista-vazia { text-align: center; padding: 32px 0; color: #555; font-size: 14px; }
+    .lista-vazia { text-align: center; padding: 32px 0; color: #fff; font-size: 14px; }
     .venda-acoes { display: flex; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #222; }
-    .btn-venda-acao { background: transparent; border: 1px solid #333; color: #888; border-radius: 7px; padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .btn-venda-acao { background: transparent; border: 1px solid #333; color: #fff; border-radius: 7px; padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; }
     .btn-venda-acao.editar:hover  { border-color: #3498db; color: #3498db; background: rgba(52,152,219,0.08); }
     .btn-venda-acao.deletar:hover { border-color: #e74c3c; color: #e74c3c; background: rgba(231,76,60,0.08); }
     .btn-venda-acao:active { opacity: .7; }
@@ -78,7 +78,7 @@
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .form-group { margin-bottom: 12px; }
     .form-group:last-child { margin-bottom: 0; }
-    .form-label { font-size: 11px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; display: block; }
+    .form-label { font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; display: block; }
     .form-input { width: 100%; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 11px 12px; font-size: 14px; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; }
     .form-input:focus { border-color: var(--red); }
     .form-input::placeholder { color: #444; }
@@ -89,7 +89,7 @@
     .modal-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px)); width: 100%; max-width: 480px; }
     @media (min-width: 769px) { .modal-overlay { align-items: center; } .modal-box { border-radius: 20px; max-width: 420px; } }
     .modal-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 4px; }
-    .modal-subtitle { font-size: 13px; color: #aaa; margin-bottom: 18px; }
+    .modal-subtitle { font-size: 13px; color: #fff; margin-bottom: 18px; }
     .modal-btns { display: flex; gap: 10px; margin-top: 16px; }
     .modal-btns .btn { margin-top: 0; flex: 1; }
     .modal-edit-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 60; align-items: flex-end; justify-content: center; }
@@ -97,16 +97,16 @@
     .modal-edit-box { background: var(--card); border: 1px solid var(--border); border-radius: 20px 20px 0 0; padding: 24px 16px calc(20px + env(safe-area-inset-bottom, 0px)); width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
     @media (min-width: 769px) { .modal-edit-overlay { align-items: center; } .modal-edit-box { border-radius: 20px; max-width: 440px; } }
     .modal-edit-title { font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 4px; }
-    .modal-edit-subtitle { font-size: 12px; color: #666; margin-bottom: 20px; }
-    .edit-field-label { font-size: 11px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; display: block; }
+    .modal-edit-subtitle { font-size: 12px; color: #fff; margin-bottom: 20px; }
+    .edit-field-label { font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; display: block; }
     .edit-resumo { background: #141414; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; }
     .edit-resumo-nome { font-size: 14px; font-weight: 700; color: #fff; }
-    .edit-resumo-detalhe { font-size: 12px; color: #666; margin-top: 3px; }
+    .edit-resumo-detalhe { font-size: 12px; color: #fff; margin-top: 3px; }
     .forma-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 4px; }
     .forma-pill { padding: 10px; background: #1a1a1a; border: 2px solid #333; border-radius: 10px; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
     .forma-pill.selected { border-color: var(--red); background: rgba(192,57,43,0.1); }
     .forma-pill-icon { font-size: 18px; display: block; margin-bottom: 2px; }
-    .forma-pill-label { font-size: 11px; font-weight: 700; color: #ccc; }
+    .forma-pill-label { font-size: 11px; font-weight: 700; color: #fff; }
     .forma-pill.selected .forma-pill-label { color: #fff; }
     .qty-control { display: flex; align-items: center; gap: 12px; justify-content: center; margin: 14px 0; }
     .qty-btn { width: 36px; height: 36px; background: #222; border: 1px solid #444; border-radius: 8px; color: #fff; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: inherit; }
@@ -114,9 +114,9 @@
     .qty-value { font-size: 24px; font-weight: 900; color: #fff; min-width: 40px; text-align: center; }
     .msg { font-size: 13px; margin-top: 8px; min-height: 18px; }
     .msg.err  { color: #ff6b6b; }
-    .msg.info { color: #aaa; }
+    .msg.info { color: #fff; }
     .msg.ok   { color: #2ecc71; }
-    .contador-produtos { font-size: 12px; color: #555; margin-bottom: 10px; }
+    .contador-produtos { font-size: 12px; color: #fff; margin-bottom: 10px; }
   </style>
 </head>
 <body>
@@ -148,7 +148,7 @@
           </div>
         </div>
         <div class="contador-produtos" id="contadorProdutos"></div>
-        <div id="produtosLista"><div style="color:#555;font-size:13px;padding:16px;">Carregando produtos…</div></div>
+        <div id="produtosLista"><div style="color:#fff;font-size:13px;padding:16px;">Carregando produtos…</div></div>
         <p class="msg" id="vendaMsg"></p>
       </div>
 
@@ -205,7 +205,7 @@
             <button class="btn secondary" id="btnCancelarEdicao" style="display:none;margin-top:0;">Cancelar</button>
           </div>
         </div>
-        <div style="font-size:12px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Produtos cadastrados</div>
+        <div style="font-size:12px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px;">Produtos cadastrados</div>
         <div id="listaProdutosCad"></div>
       </div>
 
@@ -222,7 +222,7 @@
         <div class="qty-value" id="qtyValue">1</div>
         <button class="qty-btn" id="btnQtyMais">+</button>
       </div>
-      <div style="font-size:12px;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Forma de Pagamento</div>
+      <div style="font-size:12px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px;">Forma de Pagamento</div>
       <div class="forma-grid">
         <div class="forma-pill selected" data-forma="dinheiro"><span class="forma-pill-icon">💵</span><span class="forma-pill-label">Dinheiro</span></div>
         <div class="forma-pill" data-forma="pix"><span class="forma-pill-icon">📲</span><span class="forma-pill-label">Pix</span></div>
@@ -230,7 +230,7 @@
         <div class="forma-pill" data-forma="credito"><span class="forma-pill-icon">💳</span><span class="forma-pill-label">Crédito</span></div>
       </div>
       <div style="margin-top:14px;background:#1a1a1a;border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;">Total</span>
+        <span style="font-size:12px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;">Total</span>
         <span style="font-size:20px;font-weight:900;color:#2ecc71;" id="modalVendaTotal">R$ 0,00</span>
       </div>
       <p class="msg" id="modalVendaMsg"></p>
@@ -268,7 +268,7 @@
       </div>
 
       <div style="margin-top:14px;background:#1a1a1a;border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;">Total</span>
+        <span style="font-size:12px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;">Total</span>
         <span style="font-size:20px;font-weight:900;color:#2ecc71;" id="editVendaTotal">R$ 0,00</span>
       </div>
 
@@ -335,7 +335,7 @@
       const container = document.getElementById('produtosLista');
       const contador  = document.getElementById('contadorProdutos');
       if (!produtos.length) {
-        container.innerHTML = '<div style="color:#555;font-size:13px;padding:16px;">Nenhum produto cadastrado.</div>';
+        container.innerHTML = '<div style="color:#fff;font-size:13px;padding:16px;">Nenhum produto cadastrado.</div>';
         contador.textContent = ''; return;
       }
       let lista = termoBusca
@@ -488,7 +488,7 @@
         return `<div class="venda-card">
           <div class="venda-card-top">
             <div class="venda-info">
-              <div class="venda-nome">${esc(v.produtoNome||'—')}${v.quantidade>1?` <span style="color:#aaa;font-weight:400;">x${v.quantidade}</span>`:''}</div>
+              <div class="venda-nome">${esc(v.produtoNome||'—')}${v.quantidade>1?` <span style="color:#fff;font-weight:400;">x${v.quantidade}</span>`:''}</div>
               <div class="venda-meta">${fp[v.formaPagamento]||v.formaPagamento||'—'} · ${v.data||''} ${v.hora||''}</div>
             </div>
             ${valoresHtml}
@@ -608,7 +608,7 @@
     async function carregarListaProdutos() {
       await carregarProdutos();
       const container=document.getElementById('listaProdutosCad');
-      if(!produtos.length){container.innerHTML='<div style="color:#555;font-size:13px;padding:16px 0;">Nenhum produto ainda.</div>';return;}
+      if(!produtos.length){container.innerHTML='<div style="color:#fff;font-size:13px;padding:16px 0;">Nenhum produto ainda.</div>';return;}
       container.innerHTML=produtos.map(p=>`
         <div class="venda-card" style="margin-bottom:8px;">
           <div class="venda-card-top">
