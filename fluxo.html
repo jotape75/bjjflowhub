@@ -37,18 +37,18 @@
     .resumo-card.verde::before   { background: #2ecc71; }
     .resumo-card.vermelho::before{ background: #e74c3c; }
     .resumo-card.azul::before    { background: #3498db; }
-    .resumo-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 600; }
+    .resumo-label { font-size: 11px; color: #fff; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 8px; font-weight: 600; }
     .resumo-valor { font-size: 26px; font-weight: 900; color: #fff; line-height: 1; }
     .resumo-valor.verde   { color: #2ecc71; }
     .resumo-valor.vermelho{ color: #e74c3c; }
     .resumo-valor.azul    { color: #3498db; }
-    .resumo-sub { font-size: 11px; color: #555; margin-top: 6px; }
+    .resumo-sub { font-size: 11px; color: #fff; margin-top: 6px; }
     @media (max-width: 480px) { .resumo-grid { grid-template-columns: 1fr; } }
     .grafico-card { background: #111; border: 1px solid rgba(255,255,255,0.07); border-radius: 14px; padding: 20px; margin-bottom: 20px; }
     .grafico-titulo { font-size: 12px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-    .grafico-sub { font-size: 11px; color: #555; margin-bottom: 20px; }
+    .grafico-sub { font-size: 11px; color: #fff; margin-bottom: 20px; }
     .grafico-legenda { display: flex; gap: 16px; margin-bottom: 14px; }
-    .leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #aaa; }
+    .leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #fff; }
     .leg-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
     .leg-dot.verde   { background: #2ecc71; }
     .leg-dot.vermelho{ background: #e74c3c; }
@@ -59,10 +59,10 @@
     .barra.entrada { background: #2ecc71; opacity: 0.85; }
     .barra.saida   { background: #e74c3c; opacity: 0.85; }
     .barra:hover   { opacity: 1; }
-    .grafico-label { font-size: 10px; color: #555; text-align: center; white-space: nowrap; }
+    .grafico-label { font-size: 10px; color: #fff; text-align: center; white-space: nowrap; }
     .filtros-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; align-items: center; justify-content: space-between; }
     .filtros-esquerda { display: flex; gap: 6px; flex-wrap: wrap; }
-    .btn-filtro { background: #1a1a1a; border: 1px solid #333; color: #888; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; transition: all 0.15s; }
+    .btn-filtro { background: #1a1a1a; border: 1px solid #333; color: #fff; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; transition: all 0.15s; }
     .btn-filtro.ativo { background: var(--red); border-color: var(--red); color: #fff; }
     .btn-filtro:active { opacity: .75; }
     .btn-nova-despesa { background: #e74c3c; border: none; color: #fff; border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: inherit; white-space: nowrap; display: flex; align-items: center; gap: 6px; }
@@ -75,17 +75,17 @@
     .mov-tipo-dot.saida   { background: #e74c3c; }
     .mov-info { flex: 1; min-width: 0; }
     .mov-nome { font-size: 14px; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .mov-meta { font-size: 11px; color: #555; margin-top: 2px; }
+    .mov-meta { font-size: 11px; color: #fff; margin-top: 2px; }
     .mov-valor { font-size: 15px; font-weight: 900; white-space: nowrap; }
     .mov-valor.entrada { color: #2ecc71; }
     .mov-valor.saida   { color: #e74c3c; }
-    .mov-valor.riscado { color: #555; font-size: 12px; text-decoration: line-through; font-weight: 400; }
+    .mov-valor.riscado { color: #fff; font-size: 12px; text-decoration: line-through; font-weight: 400; }
     .mov-valor-liquido { font-size: 15px; font-weight: 900; white-space: nowrap; }
     .mov-valor-liquido.entrada { color: #2ecc71; }
     .mov-taxa-badge { font-size: 11px; color: #e67e22; white-space: nowrap; }
     .mov-valores { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
     .mov-acoes { display: flex; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #1e1e1e; }
-    .btn-mov-acao { background: transparent; border: 1px solid #333; color: #888; border-radius: 7px; padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .btn-mov-acao { background: transparent; border: 1px solid #333; color: #fff; border-radius: 7px; padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; }
     .btn-mov-acao.editar:hover  { border-color: #3498db; color: #3498db; background: rgba(52,152,219,0.08); }
     .btn-mov-acao.deletar:hover { border-color: #e74c3c; color: #e74c3c; background: rgba(231,76,60,0.08); }
     .btn-mov-acao:active { opacity: .7; }
@@ -100,12 +100,12 @@
     .modal-title { font-size: 18px; font-weight: 900; color: #fff; margin-bottom: 18px; }
     .modal-btns { display: flex; gap: 10px; margin-top: 16px; }
     .modal-btns .btn { margin-top: 0; flex: 1; }
-    .form-label { font-size: 11px; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; display: block; }
+    .form-label { font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; display: block; }
     .form-input { width: 100%; background: #1a1a1a; border: 1px solid #333; border-radius: 10px; padding: 11px 12px; font-size: 14px; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; margin-bottom: 12px; }
     .form-input:focus { border-color: var(--red); }
     .form-input::placeholder { color: #444; }
     .cat-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
-    .cat-chip { padding: 5px 12px; border-radius: 20px; border: 1px solid #333; background: transparent; color: #888; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .cat-chip { padding: 5px 12px; border-radius: 20px; border: 1px solid #333; background: transparent; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit; transition: all 0.15s; }
     .cat-chip.selected { background: #e74c3c; border-color: #e74c3c; color: #fff; }
     /* ── MODAL EDITAR MOV ── */
     .modal-edit-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 60; align-items: flex-end; justify-content: center; }
@@ -113,17 +113,17 @@
     .modal-edit-box { background: #141414; border: 1px solid rgba(255,255,255,0.08); border-radius: 20px 20px 0 0; padding: 24px 16px calc(20px + env(safe-area-inset-bottom,0px)); width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
     @media (min-width: 769px) { .modal-edit-overlay { align-items: center; } .modal-edit-box { border-radius: 20px; max-width: 440px; } }
     .modal-edit-title    { font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 4px; }
-    .modal-edit-subtitle { font-size: 12px; color: #666; margin-bottom: 20px; }
-    .edit-field-label { font-size: 11px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; display: block; }
+    .modal-edit-subtitle { font-size: 12px; color: #fff; margin-bottom: 20px; }
+    .edit-field-label { font-size: 11px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; display: block; }
     .edit-resumo { background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 12px 14px; margin-bottom: 16px; }
     .edit-resumo-nome    { font-size: 14px; font-weight: 700; color: #fff; }
-    .edit-resumo-detalhe { font-size: 12px; color: #666; margin-top: 3px; }
+    .edit-resumo-detalhe { font-size: 12px; color: #fff; margin-top: 3px; }
     /* ── FORMA PILLS ── */
     .forma-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 4px; }
     .forma-pill { padding: 10px; background: #1a1a1a; border: 2px solid #333; border-radius: 10px; text-align: center; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
     .forma-pill.selected { border-color: var(--red); background: rgba(192,57,43,0.1); }
     .forma-pill-icon  { font-size: 18px; display: block; margin-bottom: 2px; }
-    .forma-pill-label { font-size: 11px; font-weight: 700; color: #ccc; }
+    .forma-pill-label { font-size: 11px; font-weight: 700; color: #fff; }
     .forma-pill.selected .forma-pill-label { color: #fff; }
     /* ── TAXA MAQUININHA ── */
     .taxa-wrap { background: #1a1a1a; border: 1px solid #332200; border-radius: 10px; padding: 12px 14px; margin-top: 14px; }
@@ -132,18 +132,18 @@
     .taxa-input-inner { position: relative; width: 90px; flex-shrink: 0; }
     .taxa-input-field { width: 100%; background: #111; border: 1px solid #444; border-radius: 8px; padding: 9px 26px 9px 10px; font-size: 16px; font-weight: 700; color: #fff; font-family: inherit; outline: none; transition: border-color 0.2s; }
     .taxa-input-field:focus { border-color: #e67e22; }
-    .taxa-pct { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #666; pointer-events: none; }
+    .taxa-pct { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 13px; color: #fff; pointer-events: none; }
     .taxa-breakdown { flex: 1; display: flex; flex-direction: column; gap: 4px; }
     .taxa-line { display: flex; justify-content: space-between; font-size: 12px; }
-    .taxa-line .lbl { color: #666; }
-    .taxa-line .val { color: #aaa; font-weight: 600; }
-    .taxa-line.recebe .lbl { color: #aaa; font-weight: 700; }
+    .taxa-line .lbl { color: #fff; }
+    .taxa-line .val { color: #fff; font-weight: 600; }
+    .taxa-line.recebe .lbl { color: #fff; font-weight: 700; }
     .taxa-line.recebe .val { color: #2ecc71; font-size: 14px; font-weight: 900; }
     .taxa-line.desc .val { color: #e67e22; }
     /* ── MISC ── */
     .msg { font-size: 13px; margin-top: 4px; min-height: 18px; }
     .msg.err  { color: #ff6b6b; }
-    .msg.info { color: #aaa; }
+    .msg.info { color: #fff; }
     .msg.ok   { color: #2ecc71; }
     .skel { background: #1a1a1a; border-radius: 6px; animation: shimmer 1.2s infinite; }
     @keyframes shimmer { 0%,100%{opacity:.3} 50%{opacity:.7} }
@@ -306,7 +306,7 @@
       </div>
 
       <div style="margin-top:14px;background:#1a1a1a;border-radius:10px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;">
-        <span style="font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;">Total</span>
+        <span style="font-size:12px;color:#fff;text-transform:uppercase;letter-spacing:0.5px;">Total</span>
         <span style="font-size:20px;font-weight:900;color:#2ecc71;" id="editMovTotal">R$ 0,00</span>
       </div>
 
@@ -579,7 +579,7 @@
           </div>`;
         }).join('');
       } catch(e) {
-        container.innerHTML = '<p style="color:#555;font-size:12px;">Erro ao carregar gráfico.</p>';
+        container.innerHTML = '<p style="color:#fff;font-size:12px;">Erro ao carregar gráfico.</p>';
       }
     }
 
